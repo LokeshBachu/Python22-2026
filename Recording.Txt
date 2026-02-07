@@ -1,4 +1,6 @@
 22-Jan-2026 : AI Plan : https://meeting.zoho.in/meeting/public/videoprv?recordingId=186f998a2b0c47b40cb233f5ed7e456d5264b39624d2398eea3894c620140637&x-meeting-org=60040596127
 23_jan-2026:Setup and Initilization:https://meeting.zoho.in/meeting/public/videoprv?recordingId=1c9d11675307eecce7544b59d3517b409b691fa3645c45578cc42672fc0ad647&x-meeting-org=60040596127
 27-jan-2026:Basics and print statement:https://meeting.zoho.in/meeting/public/videoprv?recordingId=b4986d58da068b158cb70e3361dfd42c6d69c8c50f3cb5c50b639b342a496994&x-meeting-org=60040596127
-28-Jan-2025:Operators:https://meeting.zoho.in/meeting/public/videoprv?recordingId=2e27752edf73d4abbf104efccd7a6efb9f59cb6af4151f1d7efdb4cb09087929&x-meeting-org=60040596127
+28-Jan-2026:Operators:https://meeting.zoho.in/meeting/public/videoprv?recordingId=2e27752edf73d4abbf104efccd7a6efb9f59cb6af4151f1d7efdb4cb09087929&x-meeting-org=60040596127
+29-jan-2026:Operator Precedence:https://meeting.zoho.in/meeting/public/videoprv?recordingId=6f2f916289d2f1015d4f28b68f31a588eddbbaedb8caf4095055ce1c441a5a2b&x-meeting-org=60040596127
+30-jan-2026:Operator Precedence:https://meeting.zoho.in/meeting/public/videoprv?recordingId=e9a9a828dc5bf862c71413b650946dabf55a700d1bff2faa1a2beda986172274&x-meeting-org=60040596127
