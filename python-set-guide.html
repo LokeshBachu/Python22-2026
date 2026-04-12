@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Python Set — Complete Guide</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --surface: #ffffff;
+      --surface2: #edf0f7;
+      --border: #c9d3e8;
+      --accent: #059669;
+      --accent2: #0891b2;
+      --accent3: #7c3aed;
+      --accent4: #ea580c;
+      --accent5: #db2777;
+      --text: #1e293b;
+      --text-dim: #4b6080;
+      --code-bg: #f0f3fa;
+      --code-text: #1e293b;
+      --tag-bg: #d1fae5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #d1fae5 0%, #cffafe 60%, #f0f3fa 100%);
+      padding: 3rem 2rem 2.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    header .badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.85rem;
+      border-radius: 999px;
+      margin-bottom: 1rem;
+    }
+    header h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.75rem;
+    }
+    header p { color: var(--text-dim); font-size: 1.05rem; max-width: 640px; margin: 0 auto; }
+    .pills { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 1.25rem; }
+    .pill {
+      background: var(--tag-bg);
+      border: 1px solid #6ee7b7;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.2rem 0.75rem;
+      border-radius: 999px;
+    }
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(244,246,251,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 2rem;
+      display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;
+    }
+    nav a {
+      color: var(--text-dim); text-decoration: none;
+      font-size: 0.82rem; font-weight: 500;
+      padding: 0.3rem 0.75rem; border-radius: 6px; transition: all 0.2s;
+    }
+    nav a:hover { background: var(--surface2); color: var(--accent); }
+    /* ── MAIN ── */
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    /* ── SECTIONS ── */
+    section {
+      margin-bottom: 2.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .section-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 1rem 1.5rem;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    .section-icon { font-size: 1.3rem; }
+    .section-header h2 { font-size: 1.15rem; font-weight: 700; color: var(--text); }
+    .section-body { padding: 1.5rem; }
+    /* ── CODE ── */
+    .code-wrap { position: relative; margin: 0.75rem 0; }
+    .code-label {
+      position: absolute; top: 0.5rem; right: 0.75rem;
+      font-size: 0.7rem; color: var(--text-dim);
+      font-family: monospace; text-transform: uppercase; letter-spacing: 0.07em;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.25rem 1rem;
+      overflow-x: auto; font-size: 0.85rem; line-height: 1.65;
+    }
+    code { font-family: 'Cascadia Code','Fira Code','Consolas',monospace; color: var(--code-text); }
+    .kw  { color: #7c3aed; font-weight: 600; }
+    .fn  { color: #2563eb; }
+    .st  { color: #059669; }
+    .cm  { color: #6b7280; font-style: italic; }
+    .nm  { color: #ea580c; }
+    .op  { color: #0891b2; }
+    .cl  { color: #b45309; }
+    /* ── GRID / CARD ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+    @media(max-width:768px) { .grid-2,.grid-3 { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem 1.2rem;
+    }
+    .card h4 {
+      font-size: 0.85rem; font-weight: 700; color: var(--accent);
+      margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th {
+      background: var(--surface2); color: var(--accent);
+      padding: 0.65rem 1rem; text-align: left;
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em;
+    }
+    td { padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); color: var(--text); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface2); }
+    /* ── CALLOUT ── */
+    .callout {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      padding: 1rem 1.2rem; border-radius: 10px;
+      margin: 0.75rem 0; font-size: 0.88rem;
+    }
+    .callout-warn   { background: #fff7ed; border: 1px solid #f97316; color: #7c2d12; }
+    .callout-ok     { background: #f0fdf4; border: 1px solid #4ade80; color: #14532d; }
+    .callout-info   { background: #eff6ff; border: 1px solid #60a5fa; color: #1e3a8a; }
+    .callout-teal   { background: #f0fdfa; border: 1px solid #2dd4bf; color: #134e4a; }
+    .callout-icon   { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.05rem; }
+    /* ── VENN DIAGRAM ── */
+    .venn-wrap {
+      display: flex; gap: 2rem; flex-wrap: wrap;
+      justify-content: center; margin: 1rem 0;
+    }
+    .venn-card {
+      text-align: center; width: 220px;
+    }
+    .venn-card svg { width: 160px; height: 110px; }
+    .venn-label { font-size: 0.78rem; font-weight: 700; color: var(--text-dim); margin-top: 0.4rem; }
+    .venn-op    { font-size: 0.85rem; font-weight: 700; color: var(--accent); font-family: monospace; }
+    /* ── TAG ── */
+    .tag { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; margin-left: 0.4rem; }
+    .tag-yes { background: #dcfce7; color: #15803d; }
+    .tag-no  { background: #fee2e2; color: #b91c1c; }
+    /* ── CHEAT ── */
+    .cheat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 0.75rem; }
+    .cheat-item { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 0.75rem 0.9rem; }
+    .cheat-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent); margin-bottom: 0.35rem; }
+    /* ── FOOTER ── */
+    footer { text-align: center; padding: 2rem; color: var(--text-dim); font-size: 0.82rem; border-top: 1px solid var(--border); }
+    p { margin-bottom: 0.75rem; }
+    h3 { font-size: 1rem; font-weight: 700; margin: 1rem 0 0.5rem; color: var(--text); }
+    ul { padding-left: 1.4rem; margin-bottom: 0.75rem; }
+    li { margin-bottom: 0.3rem; }
+    inline-code { font-family: 'Cascadia Code','Fira Code','Consolas',monospace; background: var(--code-bg); border: 1px solid var(--border); border-radius: 4px; padding: 0.1rem 0.4rem; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════ HEADER ══════════════════════ -->
+<header>
+  <div class="badge">Python Data Structures</div>
+  <h1>🔵 Python Sets</h1>
+  <p>Complete end-to-end guide — creation, set math, operations, frozen sets, performance &amp; patterns</p>
+  <div class="pills">
+    <span class="pill">Unordered</span>
+    <span class="pill">No Duplicates</span>
+    <span class="pill">Mutable</span>
+    <span class="pill">Hashable Elements Only</span>
+    <span class="pill">Set Math</span>
+    <span class="pill">frozenset</span>
+    <span class="pill">O(1) Lookup</span>
+  </div>
+</header>
+
+<!-- ══════════════════════ NAV ══════════════════════ -->
+<nav>
+  <a href="#what">What is a Set</a>
+  <a href="#create">Creating</a>
+  <a href="#add">Adding</a>
+  <a href="#remove">Removing</a>
+  <a href="#search">Searching</a>
+  <a href="#iterate">Iterating</a>
+  <a href="#ops">Set Operations</a>
+  <a href="#methods">All Methods</a>
+  <a href="#comprehension">Comprehension</a>
+  <a href="#frozen">frozenset</a>
+  <a href="#vs">Set vs List vs Dict</a>
+  <a href="#perf">Performance</a>
+  <a href="#patterns">Patterns</a>
+  <a href="#pitfalls">Pitfalls</a>
+  <a href="#ref">Quick Reference</a>
+  <a href="#cheat">Cheatsheet</a>
+</nav>
+
+<main>
+
+<!-- ════════════════ 1. WHAT IS A SET ════════════════ -->
+<section id="what">
+  <div class="section-header">
+    <span class="section-icon">🔵</span>
+    <h2>1. What is a Set?</h2>
+  </div>
+  <div class="section-body">
+    <p>A <strong>set</strong> is an <strong>unordered collection of unique, hashable elements</strong>. It models mathematical sets and supports union, intersection, difference, and symmetric difference.</p>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Property</th><th>Description</th></tr>
+        <tr><td><strong>Unordered</strong></td><td>Elements have no guaranteed position; cannot be accessed by index</td></tr>
+        <tr><td><strong>Unique</strong></td><td>Duplicate values are automatically discarded</td></tr>
+        <tr><td><strong>Mutable</strong></td><td>Elements can be added or removed after creation</td></tr>
+        <tr><td><strong>Hashable elements only</strong></td><td>Elements must be immutable (int, str, tuple…) — no lists or dicts</td></tr>
+        <tr><td><strong>Not hashable itself</strong></td><td>A <code>set</code> cannot be used as a dict key (use <code>frozenset</code>)</td></tr>
+        <tr><td><strong>O(1) average lookup</strong></td><td>Membership tests are extremely fast regardless of size</td></tr>
+      </table>
+    </div>
+
+    <div class="code-wrap" style="margin-top:1rem">
+      <pre><code>my_set = {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">2</span>, <span class="nm">1</span>}
+<span class="fn">print</span>(my_set)   <span class="cm"># {1, 2, 3}  — duplicates removed automatically</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 2. CREATING ════════════════ -->
+<section id="create">
+  <div class="section-header">
+    <span class="section-icon">🏗️</span>
+    <h2>2. Creating Sets</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <div class="code-label">python</div>
+      <pre><code><span class="cm"># Curly-brace literal</span>
+fruits = {<span class="st">"apple"</span>, <span class="st">"banana"</span>, <span class="st">"cherry"</span>}
+nums   = {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>}
+mixed  = {<span class="nm">1</span>, <span class="st">"hello"</span>, (<span class="nm">1</span>, <span class="nm">2</span>)}      <span class="cm"># heterogeneous (all hashable)</span>
+
+<span class="cm"># set() constructor</span>
+empty      = <span class="fn">set</span>()               <span class="cm"># ⚠️ {} creates a dict, NOT a set!</span>
+from_list  = <span class="fn">set</span>([<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">2</span>, <span class="nm">3</span>])   <span class="cm"># {1, 2, 3}  — deduplicates</span>
+from_str   = <span class="fn">set</span>(<span class="st">"hello"</span>)        <span class="cm"># {'h','e','l','o'}  — unique chars</span>
+from_tuple = <span class="fn">set</span>((<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">2</span>, <span class="nm">3</span>))  <span class="cm"># {1, 2, 3}</span>
+from_range = <span class="fn">set</span>(<span class="fn">range</span>(<span class="nm">5</span>))       <span class="cm"># {0, 1, 2, 3, 4}</span>
+
+<span class="cm"># Comprehension</span>
+squares    = {x**<span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">6</span>)}   <span class="cm"># {0, 1, 4, 9, 16, 25}</span></code></pre>
+    </div>
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div><strong><code>{}</code> creates an empty <code>dict</code>, not a set!</strong><br>
+      Always use <code>set()</code> to create an empty set.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 3. ADDING ════════════════ -->
+<section id="add">
+  <div class="section-header">
+    <span class="section-icon">➕</span>
+    <h2>3. Adding Elements</h2>
+  </div>
+  <div class="section-body">
+    <div class="grid-2">
+      <div class="card">
+        <h4>add(x) — single element</h4>
+        <pre><code>s = {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>}
+s.<span class="fn">add</span>(<span class="nm">4</span>)       <span class="cm"># {1, 2, 3, 4}</span>
+s.<span class="fn">add</span>(<span class="nm">2</span>)       <span class="cm"># no change — already exists</span></code></pre>
+      </div>
+      <div class="card">
+        <h4>update(*iterables) — multiple</h4>
+        <pre><code>s = {<span class="nm">1</span>, <span class="nm">2</span>}
+s.<span class="fn">update</span>([<span class="nm">3</span>, <span class="nm">4</span>])         <span class="cm"># {1,2,3,4}</span>
+s.<span class="fn">update</span>({<span class="nm">5</span>}, (<span class="nm">6</span>, <span class="nm">7</span>))    <span class="cm"># {1,2,3,4,5,6,7}</span>
+s |= {<span class="nm">8</span>, <span class="nm">9</span>}               <span class="cm"># same as update</span></code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 4. REMOVING ════════════════ -->
+<section id="remove">
+  <div class="section-header">
+    <span class="section-icon">🗑️</span>
+    <h2>4. Removing Elements</h2>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <tr><th>Method</th><th>Behaviour</th><th>If element missing</th></tr>
+        <tr><td><code>s.remove(x)</code></td><td>Removes <code>x</code></td><td>Raises <code>KeyError</code></td></tr>
+        <tr><td><code>s.discard(x)</code></td><td>Removes <code>x</code></td><td>Does nothing (safe)</td></tr>
+        <tr><td><code>s.pop()</code></td><td>Removes &amp; returns an <em>arbitrary</em> element</td><td>Raises <code>KeyError</code> if empty</td></tr>
+        <tr><td><code>s.clear()</code></td><td>Removes all elements</td><td>—</td></tr>
+      </table>
+    </div>
+    <div class="code-wrap" style="margin-top:1rem">
+      <pre><code>s = {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>}
+
+s.<span class="fn">remove</span>(<span class="nm">2</span>)      <span class="cm"># {1, 3, 4}</span>
+s.<span class="fn">remove</span>(<span class="nm">99</span>)     <span class="cm"># ❌ KeyError</span>
+
+s.<span class="fn">discard</span>(<span class="nm">3</span>)     <span class="cm"># {1, 4}</span>
+s.<span class="fn">discard</span>(<span class="nm">99</span>)    <span class="cm"># ✅ no error — safe removal</span>
+
+item = s.<span class="fn">pop</span>()   <span class="cm"># removes/returns arbitrary element</span>
+s.<span class="fn">clear</span>()        <span class="cm"># set() — empty</span></code></pre>
+    </div>
+    <div class="callout callout-info">
+      <span class="callout-icon">💡</span>
+      <div>Prefer <code>discard()</code> over <code>remove()</code> when you're not sure if the element exists — it avoids the need for a try/except or prior membership check.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 5. SEARCHING ════════════════ -->
+<section id="search">
+  <div class="section-header">
+    <span class="section-icon">🔍</span>
+    <h2>5. Searching &amp; Checking</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <pre><code>s = {<span class="nm">10</span>, <span class="nm">20</span>, <span class="nm">30</span>, <span class="nm">40</span>}
+
+<span class="nm">20</span> <span class="kw">in</span> s           <span class="cm"># True   — O(1) average</span>
+<span class="nm">99</span> <span class="kw">not in</span> s      <span class="cm"># True</span>
+
+<span class="fn">len</span>(s)            <span class="cm"># 4</span>
+<span class="fn">min</span>(s)            <span class="cm"># 10</span>
+<span class="fn">max</span>(s)            <span class="cm"># 40</span>
+<span class="fn">sum</span>(s)            <span class="cm"># 100</span>
+
+<span class="fn">any</span>(x &gt; <span class="nm">35</span> <span class="kw">for</span> x <span class="kw">in</span> s)    <span class="cm"># True</span>
+<span class="fn">all</span>(x &gt; <span class="nm">0</span> <span class="kw">for</span> x <span class="kw">in</span> s)     <span class="cm"># True</span>
+
+<span class="cm"># Subset / superset checks</span>
+{<span class="nm">1</span>, <span class="nm">2</span>}.<span class="fn">issubset</span>({<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>})      <span class="cm"># True</span>
+{<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>}.<span class="fn">issuperset</span>({<span class="nm">1</span>, <span class="nm">2</span>})   <span class="cm"># True</span>
+{<span class="nm">1</span>, <span class="nm">2</span>}.<span class="fn">isdisjoint</span>({<span class="nm">3</span>, <span class="nm">4</span>})      <span class="cm"># True — no elements in common</span>
+
+<span class="cm"># Operator equivalents</span>
+{<span class="nm">1</span>, <span class="nm">2</span>} &lt;= {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>}    <span class="cm"># True  (subset)</span>
+{<span class="nm">1</span>, <span class="nm">2</span>} &lt;  {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>}    <span class="cm"># True  (proper subset)</span>
+{<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>} >= {<span class="nm">1</span>, <span class="nm">2</span>}   <span class="cm"># True  (superset)</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 6. ITERATING ════════════════ -->
+<section id="iterate">
+  <div class="section-header">
+    <span class="section-icon">🔁</span>
+    <h2>6. Iterating Over Sets</h2>
+  </div>
+  <div class="section-body">
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Sets are unordered</strong> — iteration order is not guaranteed and may differ between runs or Python versions.</div>
+    </div>
+    <div class="code-wrap">
+      <pre><code>s = {<span class="st">"apple"</span>, <span class="st">"banana"</span>, <span class="st">"cherry"</span>}
+
+<span class="cm"># Basic iteration</span>
+<span class="kw">for</span> item <span class="kw">in</span> s:
+    <span class="fn">print</span>(item)          <span class="cm"># order not guaranteed</span>
+
+<span class="cm"># Sorted iteration (returns a list)</span>
+<span class="kw">for</span> item <span class="kw">in</span> <span class="fn">sorted</span>(s):
+    <span class="fn">print</span>(item)          <span class="cm"># alphabetical order</span>
+
+<span class="cm"># With enumerate — note: index not meaningful for unordered data</span>
+<span class="kw">for</span> i, item <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="fn">sorted</span>(s)):
+    <span class="fn">print</span>(i, item)
+
+<span class="cm"># Convert to list for indexed access</span>
+lst = <span class="fn">list</span>(s)
+lst[<span class="nm">0</span>]    <span class="cm"># arbitrary element</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 7. SET OPERATIONS ════════════════ -->
+<section id="ops">
+  <div class="section-header">
+    <span class="section-icon">🔢</span>
+    <h2>7. Set Operations (Mathematical)</h2>
+  </div>
+  <div class="section-body">
+
+    <!-- Venn diagrams using pure SVG -->
+    <div class="venn-wrap">
+      <!-- Union -->
+      <div class="venn-card">
+        <svg viewBox="0 0 160 110">
+          <ellipse cx="55" cy="55" rx="45" ry="35" fill="#bbf7d0" stroke="#059669" stroke-width="2"/>
+          <ellipse cx="105" cy="55" rx="45" ry="35" fill="#bbf7d0" stroke="#059669" stroke-width="2"/>
+          <text x="38" y="58" font-size="11" fill="#065f46" font-weight="bold">A</text>
+          <text x="112" y="58" font-size="11" fill="#065f46" font-weight="bold">B</text>
+        </svg>
+        <div class="venn-op">A | B</div>
+        <div class="venn-label">Union — all elements</div>
+      </div>
+      <!-- Intersection -->
+      <div class="venn-card">
+        <svg viewBox="0 0 160 110">
+          <ellipse cx="55" cy="55" rx="45" ry="35" fill="#e5e7eb" stroke="#9ca3af" stroke-width="2"/>
+          <ellipse cx="105" cy="55" rx="45" ry="35" fill="#e5e7eb" stroke="#9ca3af" stroke-width="2"/>
+          <clipPath id="clipA"><ellipse cx="55" cy="55" rx="45" ry="35"/></clipPath>
+          <ellipse cx="105" cy="55" rx="45" ry="35" fill="#bbf7d0" stroke="none" clip-path="url(#clipA)"/>
+          <ellipse cx="55" cy="55" rx="45" ry="35" fill="none" stroke="#9ca3af" stroke-width="2"/>
+          <ellipse cx="105" cy="55" rx="45" ry="35" fill="none" stroke="#9ca3af" stroke-width="2"/>
+          <text x="38" y="58" font-size="11" fill="#374151" font-weight="bold">A</text>
+          <text x="112" y="58" font-size="11" fill="#374151" font-weight="bold">B</text>
+        </svg>
+        <div class="venn-op">A &amp; B</div>
+        <div class="venn-label">Intersection — common elements</div>
+      </div>
+      <!-- Difference A-B -->
+      <div class="venn-card">
+        <svg viewBox="0 0 160 110">
+          <ellipse cx="55" cy="55" rx="45" ry="35" fill="#bbf7d0" stroke="#059669" stroke-width="2"/>
+          <ellipse cx="105" cy="55" rx="45" ry="35" fill="#f3f4f6" stroke="#9ca3af" stroke-width="2"/>
+          <text x="30" y="58" font-size="11" fill="#065f46" font-weight="bold">A</text>
+          <text x="112" y="58" font-size="11" fill="#374151" font-weight="bold">B</text>
+        </svg>
+        <div class="venn-op">A - B</div>
+        <div class="venn-label">Difference — in A, not B</div>
+      </div>
+      <!-- Symmetric Difference -->
+      <div class="venn-card">
+        <svg viewBox="0 0 160 110">
+          <ellipse cx="55" cy="55" rx="45" ry="35" fill="#bbf7d0" stroke="#059669" stroke-width="2"/>
+          <ellipse cx="105" cy="55" rx="45" ry="35" fill="#bbf7d0" stroke="#059669" stroke-width="2"/>
+          <clipPath id="clipA2"><ellipse cx="55" cy="55" rx="45" ry="35"/></clipPath>
+          <ellipse cx="105" cy="55" rx="45" ry="35" fill="#ffffff" stroke="none" clip-path="url(#clipA2)"/>
+          <ellipse cx="55" cy="55" rx="45" ry="35" fill="none" stroke="#059669" stroke-width="2"/>
+          <ellipse cx="105" cy="55" rx="45" ry="35" fill="none" stroke="#059669" stroke-width="2"/>
+          <text x="30" y="58" font-size="11" fill="#065f46" font-weight="bold">A</text>
+          <text x="112" y="58" font-size="11" fill="#065f46" font-weight="bold">B</text>
+        </svg>
+        <div class="venn-op">A ^ B</div>
+        <div class="venn-label">Symmetric Diff — not in both</div>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-label">python</div>
+      <pre><code>a = {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>}
+b = {<span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>, <span class="nm">6</span>}
+
+<span class="cm"># ── Union — all elements from both sets ─────────────────────</span>
+a | b                    <span class="cm"># {1, 2, 3, 4, 5, 6}</span>
+a.<span class="fn">union</span>(b)              <span class="cm"># {1, 2, 3, 4, 5, 6}</span>
+a.<span class="fn">union</span>(b, {<span class="nm">7</span>, <span class="nm">8</span>})      <span class="cm"># multiple iterables supported by method</span>
+
+<span class="cm"># ── Intersection — only elements in BOTH sets ───────────────</span>
+a &amp; b                    <span class="cm"># {3, 4}</span>
+a.<span class="fn">intersection</span>(b)       <span class="cm"># {3, 4}</span>
+
+<span class="cm"># ── Difference — in A but NOT in B ──────────────────────────</span>
+a - b                    <span class="cm"># {1, 2}</span>
+a.<span class="fn">difference</span>(b)         <span class="cm"># {1, 2}</span>
+
+<span class="cm"># ── Symmetric Difference — in one but NOT both ──────────────</span>
+a ^ b                    <span class="cm"># {1, 2, 5, 6}</span>
+a.<span class="fn">symmetric_difference</span>(b) <span class="cm"># {1, 2, 5, 6}</span>
+
+<span class="cm"># ── Complement — elements NOT in set (relative to universe) ─</span>
+universe = {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>, <span class="nm">6</span>, <span class="nm">7</span>, <span class="nm">8</span>}
+complement_a = universe - a   <span class="cm"># {5, 6, 7, 8}</span></code></pre>
+    </div>
+
+    <h3>In-place (mutating) variants</h3>
+    <div class="code-wrap">
+      <pre><code>a = {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>}
+b = {<span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>, <span class="nm">6</span>}
+
+a |= b                        <span class="cm"># a = a.union(b) — add all of b into a</span>
+a.<span class="fn">update</span>(b)
+
+a &amp;= b                        <span class="cm"># a = a.intersection(b)</span>
+a.<span class="fn">intersection_update</span>(b)
+
+a -= b                        <span class="cm"># a = a.difference(b)</span>
+a.<span class="fn">difference_update</span>(b)
+
+a ^= b                        <span class="cm"># a = a.symmetric_difference(b)</span>
+a.<span class="fn">symmetric_difference_update</span>(b)</code></pre>
+    </div>
+
+    <div class="callout callout-teal">
+      <span class="callout-icon">💡</span>
+      <div><strong>Operator vs Method:</strong> Operators (<code>|</code>, <code>&amp;</code>, <code>-</code>, <code>^</code>) only accept <em>sets</em>.
+      Methods (<code>.union()</code>, <code>.intersection()</code>, etc.) accept <em>any iterable</em> (list, tuple, string…).</div>
+    </div>
+
+    <div class="code-wrap">
+      <pre><code>{<span class="nm">1</span>, <span class="nm">2</span>} | [<span class="nm">3</span>, <span class="nm">4</span>]            <span class="cm"># ❌ TypeError — operator needs a set</span>
+{<span class="nm">1</span>, <span class="nm">2</span>}.<span class="fn">union</span>([<span class="nm">3</span>, <span class="nm">4</span>])        <span class="cm"># ✅ {1, 2, 3, 4}</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 8. ALL METHODS ════════════════ -->
+<section id="methods">
+  <div class="section-header">
+    <span class="section-icon">🔧</span>
+    <h2>8. All Built-in Set Methods</h2>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <tr><th>Method</th><th>Operator</th><th>Description</th><th>Mutates?</th></tr>
+        <tr><td><code>s.add(x)</code></td><td>—</td><td>Add element x</td><td>Yes</td></tr>
+        <tr><td><code>s.remove(x)</code></td><td>—</td><td>Remove x; KeyError if missing</td><td>Yes</td></tr>
+        <tr><td><code>s.discard(x)</code></td><td>—</td><td>Remove x; no error if missing</td><td>Yes</td></tr>
+        <tr><td><code>s.pop()</code></td><td>—</td><td>Remove &amp; return arbitrary element</td><td>Yes</td></tr>
+        <tr><td><code>s.clear()</code></td><td>—</td><td>Remove all elements</td><td>Yes</td></tr>
+        <tr><td><code>s.update(*iters)</code></td><td><code>|=</code></td><td>Add all elements from iterables</td><td>Yes</td></tr>
+        <tr><td><code>s.intersection_update(*iters)</code></td><td><code>&amp;=</code></td><td>Keep only elements in all sets</td><td>Yes</td></tr>
+        <tr><td><code>s.difference_update(*iters)</code></td><td><code>-=</code></td><td>Remove elements found in others</td><td>Yes</td></tr>
+        <tr><td><code>s.symmetric_difference_update(t)</code></td><td><code>^=</code></td><td>Keep elements in exactly one set</td><td>Yes</td></tr>
+        <tr><td><code>s.union(*iters)</code></td><td><code>|</code></td><td>Return new set — all elements</td><td>No</td></tr>
+        <tr><td><code>s.intersection(*iters)</code></td><td><code>&amp;</code></td><td>Return new set — common elements</td><td>No</td></tr>
+        <tr><td><code>s.difference(*iters)</code></td><td><code>-</code></td><td>Return new set — in s, not others</td><td>No</td></tr>
+        <tr><td><code>s.symmetric_difference(t)</code></td><td><code>^</code></td><td>Return new set — not in both</td><td>No</td></tr>
+        <tr><td><code>s.copy()</code></td><td>—</td><td>Shallow copy</td><td>No</td></tr>
+        <tr><td><code>s.issubset(t)</code></td><td><code>&lt;=</code></td><td>True if every element of s is in t</td><td>No</td></tr>
+        <tr><td><code>s.issuperset(t)</code></td><td><code>&gt;=</code></td><td>True if every element of t is in s</td><td>No</td></tr>
+        <tr><td><code>s.isdisjoint(t)</code></td><td>—</td><td>True if s and t share no elements</td><td>No</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 9. COMPREHENSION ════════════════ -->
+<section id="comprehension">
+  <div class="section-header">
+    <span class="section-icon">✨</span>
+    <h2>9. Set Comprehensions</h2>
+  </div>
+  <div class="section-body">
+    <p>Syntax: <code>{ expression for item in iterable [if condition] }</code></p>
+    <div class="code-wrap">
+      <pre><code><span class="cm"># Basic</span>
+squares = {x**<span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">6</span>)}               <span class="cm"># {0, 1, 4, 9, 16, 25}</span>
+
+<span class="cm"># With condition</span>
+even_sq = {x**<span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">10</span>) <span class="kw">if</span> x % <span class="nm">2</span> == <span class="nm">0</span>}  <span class="cm"># {0, 4, 16, 36, 64}</span>
+
+<span class="cm"># Deduplication from a list</span>
+words = [<span class="st">"hello"</span>, <span class="st">"world"</span>, <span class="st">"hello"</span>, <span class="st">"python"</span>]
+unique_words = {w.<span class="fn">lower</span>() <span class="kw">for</span> w <span class="kw">in</span> words}       <span class="cm"># {'hello', 'world', 'python'}</span>
+
+<span class="cm"># Extract unique first characters</span>
+firsts = {w[<span class="nm">0</span>] <span class="kw">for</span> w <span class="kw">in</span> words}                  <span class="cm"># {'h', 'w', 'p'}</span>
+
+<span class="cm"># Nested — unique pairs</span>
+pairs = {(x, y) <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">3</span>) <span class="kw">for</span> y <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">3</span>) <span class="kw">if</span> x != y}
+<span class="cm"># {(0,1),(0,2),(1,0),(1,2),(2,0),(2,1)}</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 10. FROZENSET ════════════════ -->
+<section id="frozen">
+  <div class="section-header">
+    <span class="section-icon">🧊</span>
+    <h2>10. frozenset — Immutable Sets</h2>
+  </div>
+  <div class="section-body">
+    <p>A <code>frozenset</code> is an <strong>immutable, hashable</strong> version of a set. It supports all non-mutating set operations and can be used as a dict key or added to another set.</p>
+    <div class="code-wrap">
+      <pre><code><span class="cm"># Create</span>
+fs = <span class="fn">frozenset</span>([<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">2</span>])    <span class="cm"># frozenset({1, 2, 3})</span>
+fs = <span class="fn">frozenset</span>({<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>}) <span class="cm"># frozenset({'a','b','c'})</span>
+empty_fs = <span class="fn">frozenset</span>()
+
+<span class="cm"># All read-only set operations work</span>
+fs1 = <span class="fn">frozenset</span>({<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>})
+fs2 = <span class="fn">frozenset</span>({<span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>})
+fs1 | fs2    <span class="cm"># frozenset({1, 2, 3, 4})</span>
+fs1 &amp; fs2    <span class="cm"># frozenset({2, 3})</span>
+fs1 - fs2    <span class="cm"># frozenset({1})</span>
+
+<span class="cm"># Use as a dict key (set cannot!)</span>
+d = {<span class="fn">frozenset</span>({<span class="st">"read"</span>, <span class="st">"write"</span>}): <span class="st">"admin"</span>}
+
+<span class="cm"># Use as a set element</span>
+s = {<span class="fn">frozenset</span>({<span class="nm">1</span>, <span class="nm">2</span>}), <span class="fn">frozenset</span>({<span class="nm">3</span>, <span class="nm">4</span>})}
+
+<span class="cm"># Mutation raises AttributeError</span>
+fs1.<span class="fn">add</span>(<span class="nm">5</span>)     <span class="cm"># ❌ AttributeError</span>
+fs1.<span class="fn">remove</span>(<span class="nm">1</span>)  <span class="cm"># ❌ AttributeError</span></code></pre>
+    </div>
+
+    <div class="table-wrap" style="margin-top:1rem">
+      <table>
+        <tr><th>Feature</th><th>set</th><th>frozenset</th></tr>
+        <tr><td>Mutable</td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-no">❌ No</span></td></tr>
+        <tr><td>Hashable</td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-yes">✅ Yes</span></td></tr>
+        <tr><td>Dict key / set element</td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-yes">✅ Yes</span></td></tr>
+        <tr><td>Set math operators</td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-yes">✅ Yes</span></td></tr>
+        <tr><td>add / remove / update</td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-no">❌ No</span></td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 11. VS COMPARISON ════════════════ -->
+<section id="vs">
+  <div class="section-header">
+    <span class="section-icon">⚖️</span>
+    <h2>11. Set vs List vs Dict Keys</h2>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <tr><th>Feature</th><th>set</th><th>list</th><th>dict (keys)</th></tr>
+        <tr><td>Ordered</td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-yes">✅ Yes (insertion, 3.7+)</span></td></tr>
+        <tr><td>Duplicates allowed</td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-no">❌ No (keys)</span></td></tr>
+        <tr><td>Index access</td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-no">❌ No</span></td></tr>
+        <tr><td>Membership test</td><td>O(1) avg</td><td>O(n)</td><td>O(1) avg</td></tr>
+        <tr><td>Values stored</td><td>Element only</td><td>Element only</td><td>Key + Value</td></tr>
+        <tr><td>Set math</td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-no">❌ No</span></td></tr>
+        <tr><td>Hashable elements only</td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-yes">✅ Yes (keys)</span></td></tr>
+        <tr><td>Mutable</td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-yes">✅ Yes</span></td></tr>
+        <tr><td>Use case</td><td>Unique items, fast lookup, set math</td><td>Ordered sequence, duplicates OK</td><td>Key→Value mapping</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 12. PERFORMANCE ════════════════ -->
+<section id="perf">
+  <div class="section-header">
+    <span class="section-icon">🚀</span>
+    <h2>12. Memory &amp; Performance</h2>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <tr><th>Operation</th><th>set avg</th><th>list equiv</th><th>Note</th></tr>
+        <tr><td><code>x in s</code></td><td><strong>O(1)</strong></td><td>O(n)</td><td>Hash-based lookup</td></tr>
+        <tr><td><code>s.add(x)</code></td><td><strong>O(1)</strong></td><td>O(1) append</td><td>Amortized</td></tr>
+        <tr><td><code>s.remove(x)</code></td><td><strong>O(1)</strong></td><td>O(n)</td><td>List must scan</td></tr>
+        <tr><td><code>s.discard(x)</code></td><td><strong>O(1)</strong></td><td>O(n)</td><td>—</td></tr>
+        <tr><td><code>len(s)</code></td><td>O(1)</td><td>O(1)</td><td>Stored attribute</td></tr>
+        <tr><td>Union / Intersection</td><td>O(min(a,b))</td><td>—</td><td>Iterates smaller set</td></tr>
+        <tr><td>Iteration</td><td>O(n)</td><td>O(n)</td><td>Slightly more overhead (hash table)</td></tr>
+        <tr><td>Memory</td><td>More than list</td><td>Less</td><td>Hash table overhead</td></tr>
+      </table>
+    </div>
+
+    <div class="code-wrap" style="margin-top:1rem">
+      <pre><code><span class="kw">import</span> timeit, sys
+
+lst = <span class="fn">list</span>(<span class="fn">range</span>(<span class="nm">100_000</span>))
+s   = <span class="fn">set</span>(<span class="fn">range</span>(<span class="nm">100_000</span>))
+
+<span class="cm"># Membership — set is orders of magnitude faster</span>
+timeit.<span class="fn">timeit</span>(<span class="st">"99999 in lst"</span>, globals=<span class="fn">globals</span>(), number=<span class="nm">10_000</span>)  <span class="cm"># ~2.3s</span>
+timeit.<span class="fn">timeit</span>(<span class="st">"99999 in s"</span>,   globals=<span class="fn">globals</span>(), number=<span class="nm">10_000</span>)  <span class="cm"># ~0.001s</span>
+
+<span class="cm"># Memory</span>
+sys.<span class="fn">getsizeof</span>(lst)   <span class="cm"># ~800 KB</span>
+sys.<span class="fn">getsizeof</span>(s)     <span class="cm"># ~4 MB  ← hash table overhead</span></code></pre>
+    </div>
+    <div class="callout callout-ok">
+      <span class="callout-icon">✅</span>
+      <div><strong>Rule of thumb:</strong> If you need <strong>fast membership testing</strong> or <strong>duplicate removal</strong>, always use a set over a list. The extra memory cost is almost always worth it.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 13. PATTERNS ════════════════ -->
+<section id="patterns">
+  <div class="section-header">
+    <span class="section-icon">🎯</span>
+    <h2>13. Common Patterns &amp; Use Cases</h2>
+  </div>
+  <div class="section-body">
+
+    <h3>Remove Duplicates from a List</h3>
+    <div class="code-wrap">
+      <pre><code>lst = [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">1</span>, <span class="nm">4</span>]
+
+<span class="cm"># Fast — does NOT preserve order</span>
+unique = <span class="fn">list</span>(<span class="fn">set</span>(lst))          <span class="cm"># [1, 2, 3, 4] (order may vary)</span>
+
+<span class="cm"># Preserve insertion order (Python 3.7+)</span>
+unique = <span class="fn">list</span>(<span class="fn">dict</span>.<span class="fn">fromkeys</span>(lst))  <span class="cm"># [1, 2, 3, 4] (order kept)</span></code></pre>
+    </div>
+
+    <h3>Find Common / Unique Elements</h3>
+    <div class="code-wrap">
+      <pre><code>a = [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>]
+b = [<span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>, <span class="nm">6</span>]
+
+common      = <span class="fn">set</span>(a) &amp; <span class="fn">set</span>(b)   <span class="cm"># {3, 4}</span>
+only_in_a   = <span class="fn">set</span>(a) - <span class="fn">set</span>(b)   <span class="cm"># {1, 2}</span>
+only_in_b   = <span class="fn">set</span>(b) - <span class="fn">set</span>(a)   <span class="cm"># {5, 6}</span>
+in_one_only = <span class="fn">set</span>(a) ^ <span class="fn">set</span>(b)   <span class="cm"># {1, 2, 5, 6}</span></code></pre>
+    </div>
+
+    <h3>Fast Membership Testing in Loops</h3>
+    <div class="code-wrap">
+      <pre><code>valid_domains = {<span class="st">"hp.com"</span>, <span class="st">"hpe.com"</span>, <span class="st">"partner.hp.com"</span>}
+
+emails = [<span class="st">"alice@hp.com"</span>, <span class="st">"bob@gmail.com"</span>, <span class="st">"carol@hpe.com"</span>]
+<span class="kw">for</span> email <span class="kw">in</span> emails:
+    domain = email.<span class="fn">split</span>(<span class="st">"@"</span>)[<span class="nm">1</span>]
+    <span class="kw">if</span> domain <span class="kw">in</span> valid_domains:     <span class="cm"># O(1) — much faster than list</span>
+        <span class="fn">print</span>(<span class="fn">f</span><span class="st">"{email} is valid"</span>)</code></pre>
+    </div>
+
+    <h3>Visited / Seen Tracking</h3>
+    <div class="code-wrap">
+      <pre><code><span class="cm"># Check for duplicates</span>
+<span class="kw">def</span> <span class="fn">has_duplicates</span>(lst):
+    <span class="kw">return</span> <span class="fn">len</span>(lst) != <span class="fn">len</span>(<span class="fn">set</span>(lst))
+
+<span class="cm"># Graph traversal — avoid revisiting nodes</span>
+visited = <span class="fn">set</span>()
+<span class="kw">def</span> <span class="fn">dfs</span>(node):
+    <span class="kw">if</span> node <span class="kw">in</span> visited:
+        <span class="kw">return</span>
+    visited.<span class="fn">add</span>(node)
+    <span class="cm"># ... process node</span></code></pre>
+    </div>
+
+    <h3>Permission / Role Checks</h3>
+    <div class="code-wrap">
+      <pre><code>required_permissions = {<span class="st">"read"</span>, <span class="st">"write"</span>, <span class="st">"execute"</span>}
+user_permissions     = {<span class="st">"read"</span>, <span class="st">"write"</span>}
+
+<span class="cm"># Does user have ALL required permissions?</span>
+user_permissions.<span class="fn">issuperset</span>(required_permissions)   <span class="cm"># False</span>
+
+<span class="cm"># What is the user missing?</span>
+missing = required_permissions - user_permissions   <span class="cm"># {'execute'}</span>
+
+<span class="cm"># Does user have ANY required permission?</span>
+<span class="kw">not</span> user_permissions.<span class="fn">isdisjoint</span>(required_permissions)  <span class="cm"># True</span></code></pre>
+    </div>
+
+    <h3>Counting Unique Values</h3>
+    <div class="code-wrap">
+      <pre><code>data = [<span class="st">"HP"</span>, <span class="st">"HPE"</span>, <span class="st">"HP"</span>, <span class="st">"IBM"</span>, <span class="st">"HPE"</span>, <span class="st">"HP"</span>]
+unique_count = <span class="fn">len</span>(<span class="fn">set</span>(data))    <span class="cm"># 3</span>
+unique_vals  = <span class="fn">set</span>(data)          <span class="cm"># {'HP', 'HPE', 'IBM'}</span></code></pre>
+    </div>
+
+    <h3>Multi-set Intersection (3+ sets)</h3>
+    <div class="code-wrap">
+      <pre><code>groups = [
+    {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>},
+    {<span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">5</span>, <span class="nm">6</span>},
+    {<span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">7</span>, <span class="nm">8</span>},
+]
+common = <span class="fn">set</span>.<span class="fn">intersection</span>(*groups)    <span class="cm"># {2, 3}</span>
+union  = <span class="fn">set</span>.<span class="fn">union</span>(*groups)           <span class="cm"># {1,2,3,4,5,6,7,8}</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 14. PITFALLS ════════════════ -->
+<section id="pitfalls">
+  <div class="section-header">
+    <span class="section-icon">🪤</span>
+    <h2>14. Common Pitfalls</h2>
+  </div>
+  <div class="section-body">
+
+    <div class="callout callout-warn" style="margin-bottom:1rem">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 1 — <code>{}</code> is a dict, not a set!</strong><br>
+      <code>empty = {}</code> creates an empty <code>dict</code>.<br>
+      <code>empty = set()</code> creates an empty set.</div>
+    </div>
+
+    <div class="callout callout-warn" style="margin-bottom:1rem">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 2 — Sets have no guaranteed order</strong><br>
+      Never rely on the order elements come out of a set. Use <code>sorted(s)</code> when order matters.</div>
+    </div>
+
+    <div class="callout callout-warn" style="margin-bottom:1rem">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 3 — Only hashable elements allowed</strong><br>
+      <code>{[1, 2]}</code> → <code>TypeError: unhashable type: 'list'</code><br>
+      Use tuples instead: <code>{(1, 2)}</code></div>
+    </div>
+
+    <div class="callout callout-warn" style="margin-bottom:1rem">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 4 — No index access</strong><br>
+      <code>s[0]</code> raises <code>TypeError</code>. Convert with <code>list(s)[0]</code> or use <code>next(iter(s))</code> for the first arbitrary element.</div>
+    </div>
+
+    <div class="callout callout-warn" style="margin-bottom:1rem">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 5 — Modifying a set while iterating</strong><br>
+      <code>for x in s: s.discard(x)</code> → <code>RuntimeError: Set changed size during iteration</code><br>
+      Iterate over a copy: <code>for x in list(s): ...</code></div>
+    </div>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 6 — <code>remove()</code> vs <code>discard()</code></strong><br>
+      <code>s.remove(x)</code> raises <code>KeyError</code> if x is not in s.<br>
+      Prefer <code>s.discard(x)</code> when absence is acceptable.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 15. QUICK REFERENCE ════════════════ -->
+<section id="ref">
+  <div class="section-header">
+    <span class="section-icon">📋</span>
+    <h2>15. Quick Reference Table</h2>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <tr><th>Operation</th><th>Syntax / Method</th><th>Returns</th><th>Mutates</th></tr>
+        <tr><td>Create</td><td><code>{1,2,3}</code> / <code>set(iter)</code></td><td>set</td><td>—</td></tr>
+        <tr><td>Empty set</td><td><code>set()</code></td><td>set</td><td>—</td></tr>
+        <tr><td>Add element</td><td><code>s.add(x)</code></td><td>None</td><td>Yes</td></tr>
+        <tr><td>Add many</td><td><code>s.update(iter)</code> / <code>s |= t</code></td><td>None</td><td>Yes</td></tr>
+        <tr><td>Remove (strict)</td><td><code>s.remove(x)</code></td><td>None</td><td>Yes</td></tr>
+        <tr><td>Remove (safe)</td><td><code>s.discard(x)</code></td><td>None</td><td>Yes</td></tr>
+        <tr><td>Pop arbitrary</td><td><code>s.pop()</code></td><td>element</td><td>Yes</td></tr>
+        <tr><td>Clear</td><td><code>s.clear()</code></td><td>None</td><td>Yes</td></tr>
+        <tr><td>Membership</td><td><code>x in s</code></td><td>bool</td><td>No</td></tr>
+        <tr><td>Length</td><td><code>len(s)</code></td><td>int</td><td>No</td></tr>
+        <tr><td>Union</td><td><code>s | t</code> / <code>s.union(t)</code></td><td>set</td><td>No</td></tr>
+        <tr><td>Intersection</td><td><code>s &amp; t</code> / <code>s.intersection(t)</code></td><td>set</td><td>No</td></tr>
+        <tr><td>Difference</td><td><code>s - t</code> / <code>s.difference(t)</code></td><td>set</td><td>No</td></tr>
+        <tr><td>Sym. Difference</td><td><code>s ^ t</code> / <code>s.symmetric_difference(t)</code></td><td>set</td><td>No</td></tr>
+        <tr><td>Subset</td><td><code>s &lt;= t</code> / <code>s.issubset(t)</code></td><td>bool</td><td>No</td></tr>
+        <tr><td>Superset</td><td><code>s &gt;= t</code> / <code>s.issuperset(t)</code></td><td>bool</td><td>No</td></tr>
+        <tr><td>Disjoint check</td><td><code>s.isdisjoint(t)</code></td><td>bool</td><td>No</td></tr>
+        <tr><td>Copy</td><td><code>s.copy()</code></td><td>set</td><td>No</td></tr>
+        <tr><td>Convert to list</td><td><code>list(s)</code></td><td>list</td><td>No</td></tr>
+        <tr><td>Convert to sorted list</td><td><code>sorted(s)</code></td><td>list</td><td>No</td></tr>
+        <tr><td>Frozenset</td><td><code>frozenset(s)</code></td><td>frozenset</td><td>No</td></tr>
+        <tr><td>Min / Max / Sum</td><td><code>min/max/sum(s)</code></td><td>value</td><td>No</td></tr>
+        <tr><td>Comprehension</td><td><code>{expr for x in iter}</code></td><td>set</td><td>—</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 16. CHEATSHEET ════════════════ -->
+<section id="cheat">
+  <div class="section-header">
+    <span class="section-icon">⚡</span>
+    <h2>16. Cheatsheet</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <div class="code-label">quick reference</div>
+      <pre><code><span class="cm"># ── Create ─────────────────────────────────────────────────</span>
+s = {<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>}              <span class="cm"># literal</span>
+s = <span class="fn">set</span>()                  <span class="cm"># empty (NEVER use {})</span>
+s = <span class="fn">set</span>([<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">2</span>, <span class="nm">3</span>])      <span class="cm"># from list → deduplicated</span>
+s = {x**<span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>)}  <span class="cm"># comprehension</span>
+
+<span class="cm"># ── Add ────────────────────────────────────────────────────</span>
+s.<span class="fn">add</span>(x)                   <span class="cm"># single element</span>
+s.<span class="fn">update</span>([<span class="nm">4</span>, <span class="nm">5</span>], {<span class="nm">6</span>})      <span class="cm"># multiple iterables</span>
+s |= {<span class="nm">7</span>, <span class="nm">8</span>}                <span class="cm"># same as update</span>
+
+<span class="cm"># ── Remove ─────────────────────────────────────────────────</span>
+s.<span class="fn">remove</span>(x)                <span class="cm"># KeyError if missing</span>
+s.<span class="fn">discard</span>(x)               <span class="cm"># safe — no error</span>
+s.<span class="fn">pop</span>()                    <span class="cm"># arbitrary element</span>
+s.<span class="fn">clear</span>()                  <span class="cm"># empty the set</span>
+
+<span class="cm"># ── Check ──────────────────────────────────────────────────</span>
+x <span class="kw">in</span> s                     <span class="cm"># O(1) membership</span>
+<span class="fn">len</span>(s)                     <span class="cm"># count</span>
+s.<span class="fn">issubset</span>(t)   <span class="cm"># or s <= t</span>
+s.<span class="fn">issuperset</span>(t) <span class="cm"># or s >= t</span>
+s.<span class="fn">isdisjoint</span>(t) <span class="cm"># no common elements?</span>
+
+<span class="cm"># ── Set Math ───────────────────────────────────────────────</span>
+s | t   <span class="cm"># union</span>
+s &amp; t   <span class="cm"># intersection</span>
+s - t   <span class="cm"># difference (in s, not t)</span>
+s ^ t   <span class="cm"># symmetric difference</span>
+
+<span class="cm"># In-place versions</span>
+s |= t  <span class="cm"># s.update(t)</span>
+s &amp;= t  <span class="cm"># s.intersection_update(t)</span>
+s -= t  <span class="cm"># s.difference_update(t)</span>
+s ^= t  <span class="cm"># s.symmetric_difference_update(t)</span>
+
+<span class="cm"># ── Common Recipes ─────────────────────────────────────────</span>
+<span class="fn">list</span>(<span class="fn">set</span>(lst))             <span class="cm"># deduplicate (order not preserved)</span>
+<span class="fn">list</span>(<span class="fn">dict</span>.<span class="fn">fromkeys</span>(lst))   <span class="cm"># deduplicate (order preserved)</span>
+<span class="fn">len</span>(<span class="fn">set</span>(lst)) != <span class="fn">len</span>(lst)  <span class="cm"># has duplicates?</span>
+<span class="fn">set</span>(a) &amp; <span class="fn">set</span>(b)            <span class="cm"># common elements</span>
+<span class="fn">set</span>(a) - <span class="fn">set</span>(b)            <span class="cm"># only in a</span>
+<span class="fn">set</span>.<span class="fn">intersection</span>(*sets)    <span class="cm"># intersection of many sets</span>
+
+<span class="cm"># ── frozenset ──────────────────────────────────────────────</span>
+fs = <span class="fn">frozenset</span>({<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>})  <span class="cm"># immutable, hashable</span>
+d  = {<span class="fn">frozenset</span>({<span class="st">"r"</span>,<span class="st">"w"</span>}): <span class="st">"admin"</span>}   <span class="cm"># use as dict key</span>
+
+<span class="cm"># ── Convert ────────────────────────────────────────────────</span>
+<span class="fn">list</span>(s)        <span class="cm"># → list (arbitrary order)</span>
+<span class="fn">sorted</span>(s)      <span class="cm"># → sorted list</span>
+<span class="fn">tuple</span>(s)       <span class="cm"># → tuple</span>
+<span class="fn">frozenset</span>(s)   <span class="cm"># → frozenset</span></code></pre>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Python Set — Complete Guide &nbsp;|&nbsp; Python 3.x &nbsp;|&nbsp; March 2026
+</footer>
+
+</body>
+</html>
