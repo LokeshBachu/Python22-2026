@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Python Tuple — Complete Guide</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --surface: #ffffff;
+      --surface2: #edf0f7;
+      --border: #c9d3e8;
+      --accent: #2563eb;
+      --accent2: #7c3aed;
+      --accent3: #059669;
+      --accent4: #ea580c;
+      --accent5: #db2777;
+      --text: #1e293b;
+      --text-dim: #4b6080;
+      --code-bg: #f0f3fa;
+      --code-text: #1e293b;
+      --tag-bg: #dde5f7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #ede9fe 0%, #dbeafe 60%, #f0f3fa 100%);
+      padding: 3rem 2rem 2.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    header .badge {
+      display: inline-block;
+      background: var(--accent2);
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.85rem;
+      border-radius: 999px;
+      margin-bottom: 1rem;
+    }
+    header h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.75rem;
+    }
+    header p {
+      color: var(--text-dim);
+      font-size: 1.05rem;
+      max-width: 620px;
+      margin: 0 auto;
+    }
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 1.25rem;
+    }
+    .pill {
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      color: var(--accent2);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.2rem 0.75rem;
+      border-radius: 999px;
+    }
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(244,246,251,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 2rem;
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    nav a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 0.3rem 0.75rem;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    nav a:hover { background: var(--surface2); color: var(--accent2); }
+    /* ── MAIN ── */
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    /* ── SECTIONS ── */
+    section {
+      margin-bottom: 2.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    .section-icon { font-size: 1.3rem; }
+    .section-header h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .section-body { padding: 1.5rem; }
+    /* ── CODE BLOCKS ── */
+    .code-wrap { position: relative; margin: 0.75rem 0; }
+    .code-label {
+      position: absolute;
+      top: 0.5rem; right: 0.75rem;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      font-family: monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.25rem 1rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      line-height: 1.65;
+    }
+    code {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      color: var(--code-text);
+    }
+    /* Syntax highlight */
+    .kw  { color: #7c3aed; font-weight: 600; }
+    .fn  { color: #2563eb; }
+    .st  { color: #059669; }
+    .cm  { color: #6b7280; font-style: italic; }
+    .nm  { color: #ea580c; }
+    .op  { color: #0891b2; }
+    .cl  { color: #b45309; }
+    /* ── GRID ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+    @media(max-width:768px) { .grid-2,.grid-3 { grid-template-columns: 1fr; } }
+    /* ── CARDS ── */
+    .card {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem 1.2rem;
+    }
+    .card h4 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent2);
+      margin-bottom: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th {
+      background: var(--surface2);
+      color: var(--accent2);
+      padding: 0.65rem 1rem;
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    td { padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); color: var(--text); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface2); }
+    /* ── CALLOUT ── */
+    .callout {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 1rem 1.2rem;
+      border-radius: 10px;
+      margin: 0.75rem 0;
+      font-size: 0.88rem;
+    }
+    .callout-warn  { background: #fff7ed; border: 1px solid #f97316; color: #7c2d12; }
+    .callout-ok    { background: #f0fdf4; border: 1px solid #4ade80; color: #14532d; }
+    .callout-info  { background: #eff6ff; border: 1px solid #60a5fa; color: #1e3a8a; }
+    .callout-purple { background: #faf5ff; border: 1px solid #c084fc; color: #581c87; }
+    .callout-icon  { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.05rem; }
+    /* ── INDEX DIAGRAM ── */
+    .index-diagram {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      font-family: 'Cascadia Code','Fira Code','Consolas',monospace;
+      font-size: 0.82rem;
+      margin: 0.75rem 0;
+      overflow-x: auto;
+    }
+    .idx-row {
+      display: flex;
+    }
+    .idx-cell {
+      min-width: 60px;
+      padding: 0.4rem 0.5rem;
+      border: 1px solid var(--border);
+      text-align: center;
+      background: var(--code-bg);
+      color: var(--text);
+    }
+    .idx-cell.label {
+      background: var(--surface2);
+      color: var(--accent2);
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+    .idx-cell.neg { color: var(--accent4); font-weight: 600; }
+    .idx-cell.pos { color: var(--accent); font-weight: 600; }
+    /* ── CHEATSHEET ── */
+    .cheat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem;
+    }
+    .cheat-item {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 0.9rem;
+    }
+    .cheat-item .cheat-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--accent2);
+      margin-bottom: 0.35rem;
+    }
+    .cheat-item code { font-size: 0.8rem; color: var(--code-text); }
+    /* ── BADGE TAGS ── */
+    .tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.55rem;
+      border-radius: 999px;
+      margin-left: 0.4rem;
+    }
+    .tag-yes  { background: #dcfce7; color: #15803d; }
+    .tag-no   { background: #fee2e2; color: #b91c1c; }
+    .tag-new  { background: #ede9fe; color: #6d28d9; }
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      border-top: 1px solid var(--border);
+    }
+    p { margin-bottom: 0.75rem; }
+    h3 { font-size: 1rem; font-weight: 700; margin: 1rem 0 0.5rem; color: var(--text); }
+    ul { padding-left: 1.4rem; margin-bottom: 0.75rem; }
+    li { margin-bottom: 0.3rem; }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════ HEADER ════════════════════════════ -->
+<header>
+  <div class="badge">Python Data Structures</div>
+  <h1>🔒 Python Tuples</h1>
+  <p>Complete end-to-end guide — immutability, unpacking, named tuples, patterns &amp; performance</p>
+  <div class="pills">
+    <span class="pill">Immutable</span>
+    <span class="pill">Ordered</span>
+    <span class="pill">Indexed</span>
+    <span class="pill">Hashable</span>
+    <span class="pill">Packing / Unpacking</span>
+    <span class="pill">namedtuple</span>
+    <span class="pill">NamedTuple</span>
+  </div>
+</header>
+
+<!-- ════════════════════════════ NAV ════════════════════════════ -->
+<nav>
+  <a href="#what">What is a Tuple</a>
+  <a href="#create">Creating</a>
+  <a href="#access">Accessing</a>
+  <a href="#slice">Slicing</a>
+  <a href="#immutable">Immutability</a>
+  <a href="#unpack">Packing &amp; Unpacking</a>
+  <a href="#methods">Methods</a>
+  <a href="#search">Searching</a>
+  <a href="#concat">Concat &amp; Repeat</a>
+  <a href="#sort">Sorting</a>
+  <a href="#iterate">Iterating</a>
+  <a href="#genexpr">Generator Expr</a>
+  <a href="#dictkey">Dict Keys</a>
+  <a href="#named">Named Tuples</a>
+  <a href="#typing">typing.NamedTuple</a>
+  <a href="#vslist">Tuple vs List</a>
+  <a href="#perf">Performance</a>
+  <a href="#patterns">Common Patterns</a>
+  <a href="#pitfalls">Pitfalls</a>
+  <a href="#ref">Quick Reference</a>
+  <a href="#cheat">Cheatsheet</a>
+</nav>
+
+<main>
+
+<!-- ════════════════ 1. WHAT IS A TUPLE ════════════════ -->
+<section id="what">
+  <div class="section-header">
+    <span class="section-icon">📦</span>
+    <h2>1. What is a Tuple?</h2>
+  </div>
+  <div class="section-body">
+    <p>A <strong>tuple</strong> is Python's ordered, immutable sequence. Once created, its contents cannot change.</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Property</th><th>Description</th></tr>
+        <tr><td><strong>Ordered</strong></td><td>Elements maintain insertion order</td></tr>
+        <tr><td><strong>Immutable</strong></td><td>Cannot add, remove, or change elements after creation</td></tr>
+        <tr><td><strong>Indexed</strong></td><td>Access via 0-based integer index</td></tr>
+        <tr><td><strong>Heterogeneous</strong></td><td>Can store any mix of data types</td></tr>
+        <tr><td><strong>Hashable</strong></td><td>Can be used as dict keys / set members (when all elements are hashable)</td></tr>
+        <tr><td><strong>Memory Efficient</strong></td><td>Uses less memory than an equivalent list</td></tr>
+      </table>
+    </div>
+    <div class="code-wrap">
+      <pre><code><span class="nm">my_tuple</span> = (<span class="nm">1</span>, <span class="st">"hello"</span>, <span class="nm">3.14</span>, <span class="kw">True</span>, <span class="kw">None</span>)</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 2. CREATING ════════════════ -->
+<section id="create">
+  <div class="section-header">
+    <span class="section-icon">🏗️</span>
+    <h2>2. Creating Tuples</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <div class="code-label">python</div>
+      <pre><code><span class="cm"># Literal syntax</span>
+empty      = ()
+single     = (<span class="nm">42</span>,)          <span class="cm"># ← trailing comma required!</span>
+pair       = (<span class="nm">1</span>, <span class="nm">2</span>)
+mixed      = (<span class="nm">1</span>, <span class="st">"a"</span>, <span class="nm">3.14</span>, <span class="kw">True</span>)
+nested     = ((<span class="nm">1</span>, <span class="nm">2</span>), (<span class="nm">3</span>, <span class="nm">4</span>))
+
+<span class="cm"># Without parentheses — tuple packing</span>
+packed     = <span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>          <span class="cm"># (1, 2, 3)</span>
+
+<span class="cm"># tuple() constructor</span>
+from_list  = <span class="fn">tuple</span>([<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>])   <span class="cm"># (1, 2, 3)</span>
+from_str   = <span class="fn">tuple</span>(<span class="st">"abc"</span>)       <span class="cm"># ('a', 'b', 'c')</span>
+from_range = <span class="fn">tuple</span>(<span class="fn">range</span>(<span class="nm">5</span>))    <span class="cm"># (0, 1, 2, 3, 4)</span>
+from_set   = <span class="fn">tuple</span>({<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>})   <span class="cm"># order may vary</span>
+
+<span class="cm"># Repetition</span>
+repeated   = (<span class="nm">0</span>,) * <span class="nm">4</span>           <span class="cm"># (0, 0, 0, 0)</span></code></pre>
+    </div>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div>
+        <strong>Single-element tuple — trailing comma is required!</strong><br>
+        <code>(42)</code> is an <strong>int</strong>, not a tuple.<br>
+        <code>(42,)</code> or <code>42,</code> are both valid single-element tuples.
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <pre><code>x = (<span class="nm">42</span>)    <span class="cm"># ❌ just an int</span>
+x = (<span class="nm">42</span>,)   <span class="cm"># ✅ tuple with one element</span>
+x = <span class="nm">42</span>,     <span class="cm"># ✅ also a tuple</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 3. ACCESSING ════════════════ -->
+<section id="access">
+  <div class="section-header">
+    <span class="section-icon">🔍</span>
+    <h2>3. Accessing Elements</h2>
+  </div>
+  <div class="section-body">
+    <h3>Positive Indexing (left → right, starts at 0)</h3>
+    <div class="index-diagram">
+      <div class="idx-row">
+        <div class="idx-cell label">Index</div>
+        <div class="idx-cell pos">0</div>
+        <div class="idx-cell pos">1</div>
+        <div class="idx-cell pos">2</div>
+        <div class="idx-cell pos">3</div>
+        <div class="idx-cell pos">4</div>
+      </div>
+      <div class="idx-row">
+        <div class="idx-cell label">Value</div>
+        <div class="idx-cell">'a'</div>
+        <div class="idx-cell">'b'</div>
+        <div class="idx-cell">'c'</div>
+        <div class="idx-cell">'d'</div>
+        <div class="idx-cell">'e'</div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:1rem">Negative Indexing (right → left, starts at -1)</h3>
+    <div class="index-diagram">
+      <div class="idx-row">
+        <div class="idx-cell label">Index</div>
+        <div class="idx-cell neg">-5</div>
+        <div class="idx-cell neg">-4</div>
+        <div class="idx-cell neg">-3</div>
+        <div class="idx-cell neg">-2</div>
+        <div class="idx-cell neg">-1</div>
+      </div>
+      <div class="idx-row">
+        <div class="idx-cell label">Value</div>
+        <div class="idx-cell">'a'</div>
+        <div class="idx-cell">'b'</div>
+        <div class="idx-cell">'c'</div>
+        <div class="idx-cell">'d'</div>
+        <div class="idx-cell">'e'</div>
+      </div>
+    </div>
+
+    <div class="code-wrap" style="margin-top:1rem">
+      <pre><code>t = (<span class="st">'a'</span>, <span class="st">'b'</span>, <span class="st">'c'</span>, <span class="st">'d'</span>, <span class="st">'e'</span>)
+t[<span class="nm">0</span>]    <span class="cm"># 'a'</span>
+t[<span class="nm">2</span>]    <span class="cm"># 'c'</span>
+t[<span class="nm">-1</span>]   <span class="cm"># 'e'</span>
+t[<span class="nm">-3</span>]   <span class="cm"># 'c'</span>
+
+<span class="cm"># Nested access</span>
+matrix = ((<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>), (<span class="nm">4</span>, <span class="nm">5</span>, <span class="nm">6</span>))
+matrix[<span class="nm">1</span>][<span class="nm">2</span>]   <span class="cm"># 6</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 4. SLICING ════════════════ -->
+<section id="slice">
+  <div class="section-header">
+    <span class="section-icon">✂️</span>
+    <h2>4. Slicing</h2>
+  </div>
+  <div class="section-body">
+    <p>Slicing returns a <strong>new tuple</strong>. Syntax: <code>tuple[start : stop : step]</code></p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Parameter</th><th>Default</th><th>Meaning</th></tr>
+        <tr><td><code>start</code></td><td>0</td><td>Inclusive start index</td></tr>
+        <tr><td><code>stop</code></td><td>len(t)</td><td>Exclusive end index</td></tr>
+        <tr><td><code>step</code></td><td>1</td><td>Step direction &amp; size</td></tr>
+      </table>
+    </div>
+    <div class="code-wrap">
+      <pre><code>t = (<span class="nm">0</span>, <span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>, <span class="nm">6</span>, <span class="nm">7</span>, <span class="nm">8</span>, <span class="nm">9</span>)
+
+t[<span class="nm">2</span>:<span class="nm">5</span>]     <span class="cm"># (2, 3, 4)</span>
+t[:<span class="nm">4</span>]      <span class="cm"># (0, 1, 2, 3)</span>
+t[<span class="nm">6</span>:]      <span class="cm"># (6, 7, 8, 9)</span>
+t[:]        <span class="cm"># full copy: (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)</span>
+t[::<span class="nm">2</span>]     <span class="cm"># every 2nd: (0, 2, 4, 6, 8)</span>
+t[::<span class="nm">-1</span>]    <span class="cm"># reversed:  (9, 8, 7, 6, 5, 4, 3, 2, 1, 0)</span>
+t[<span class="nm">1</span>:<span class="nm">8</span>:<span class="nm">2</span>]   <span class="cm"># (1, 3, 5, 7)</span></code></pre>
+    </div>
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <div>Unlike lists, <strong>slice assignment is not supported</strong> on tuples — they are immutable.
+      <code>t[1:3] = (10, 20)</code> raises a <code>TypeError</code>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 5. IMMUTABILITY ════════════════ -->
+<section id="immutable">
+  <div class="section-header">
+    <span class="section-icon">🔒</span>
+    <h2>5. Immutability — What It Really Means</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <pre><code>t = (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>)
+t[<span class="nm">0</span>] = <span class="nm">99</span>     <span class="cm"># ❌ TypeError: 'tuple' object does not support item assignment</span>
+t.<span class="fn">append</span>(<span class="nm">4</span>) <span class="cm"># ❌ AttributeError: 'tuple' has no attribute 'append'</span>
+<span class="kw">del</span> t[<span class="nm">0</span>]      <span class="cm"># ❌ TypeError</span>
+
+<span class="cm"># Workaround — convert ↔ list</span>
+t = (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>)
+lst = <span class="fn">list</span>(t)
+lst.<span class="fn">append</span>(<span class="nm">4</span>)
+t = <span class="fn">tuple</span>(lst)   <span class="cm"># (1, 2, 3, 4)</span></code></pre>
+    </div>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Mutable objects inside a tuple CAN still change!</strong><br>
+      The tuple holds a <em>reference</em> to the object — not a copy of it.
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <pre><code>t = (<span class="nm">1</span>, [<span class="nm">2</span>, <span class="nm">3</span>], <span class="nm">4</span>)
+t[<span class="nm">1</span>].<span class="fn">append</span>(<span class="nm">99</span>)   <span class="cm"># ✅ the list inside is mutable</span>
+<span class="fn">print</span>(t)           <span class="cm"># (1, [2, 3, 99], 4)  — the tuple's reference didn't change</span>
+<span class="fn">hash</span>(t)            <span class="cm"># ❌ TypeError — now unhashable because of the list inside</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 6. PACKING & UNPACKING ════════════════ -->
+<section id="unpack">
+  <div class="section-header">
+    <span class="section-icon">📤</span>
+    <h2>6. Tuple Packing &amp; Unpacking</h2>
+  </div>
+  <div class="section-body">
+    <div class="grid-2">
+      <div class="card">
+        <h4>Packing</h4>
+        <pre><code>point = <span class="nm">10</span>, <span class="nm">20</span>, <span class="nm">30</span>   <span class="cm"># → (10, 20, 30)</span></code></pre>
+      </div>
+      <div class="card">
+        <h4>Basic Unpacking</h4>
+        <pre><code>x, y, z = (<span class="nm">10</span>, <span class="nm">20</span>, <span class="nm">30</span>)
+<span class="cm"># x=10  y=20  z=30</span></code></pre>
+      </div>
+    </div>
+
+    <h3 style="margin-top:1rem">Variable Swap</h3>
+    <div class="code-wrap">
+      <pre><code>a, b = <span class="nm">1</span>, <span class="nm">2</span>
+a, b = b, a   <span class="cm"># a=2, b=1  — classic Python swap (no temp variable needed)</span></code></pre>
+    </div>
+
+    <h3>Ignore Values with <code>_</code></h3>
+    <div class="code-wrap">
+      <pre><code>first, _, last = (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>)   <span class="cm"># discard middle value</span></code></pre>
+    </div>
+
+    <h3>Extended Unpacking with <code>*</code> (Star Operator)</h3>
+    <div class="code-wrap">
+      <pre><code>first, *rest  = (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>)   <span class="cm"># first=1, rest=[2,3,4,5]</span>
+*init, last   = (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>)   <span class="cm"># init=[1,2,3,4], last=5</span>
+first, *mid, last = (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>)  <span class="cm"># first=1, mid=[2,3,4], last=5</span></code></pre>
+    </div>
+
+    <h3>Nested Unpacking</h3>
+    <div class="code-wrap">
+      <pre><code>(a, b), c = (<span class="nm">1</span>, <span class="nm">2</span>), <span class="nm">3</span>
+<span class="fn">print</span>(a, b, c)   <span class="cm"># 1 2 3</span>
+
+<span class="kw">for</span> (x, y) <span class="kw">in</span> [(<span class="nm">1</span>, <span class="nm">2</span>), (<span class="nm">3</span>, <span class="nm">4</span>), (<span class="nm">5</span>, <span class="nm">6</span>)]:
+    <span class="fn">print</span>(x, y)</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 7. METHODS ════════════════ -->
+<section id="methods">
+  <div class="section-header">
+    <span class="section-icon">🔧</span>
+    <h2>7. Built-in Methods (only 2)</h2>
+  </div>
+  <div class="section-body">
+    <div class="callout callout-purple">
+      <span class="callout-icon">🔒</span>
+      <div>Tuples intentionally have only <strong>two methods</strong> — because they are immutable, there is no need for add/remove/sort mutations.</div>
+    </div>
+    <div class="grid-2" style="margin-top:0.75rem">
+      <div class="card">
+        <h4>count(x)</h4>
+        <p style="font-size:0.85rem;margin-bottom:0.5rem">Returns the number of times <code>x</code> appears.</p>
+        <pre><code>t = (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">2</span>, <span class="nm">4</span>, <span class="nm">2</span>)
+t.<span class="fn">count</span>(<span class="nm">2</span>)   <span class="cm"># 3</span>
+t.<span class="fn">count</span>(<span class="nm">9</span>)   <span class="cm"># 0</span></code></pre>
+      </div>
+      <div class="card">
+        <h4>index(x [, start [, stop]])</h4>
+        <p style="font-size:0.85rem;margin-bottom:0.5rem">Returns the first index of <code>x</code>. Raises <code>ValueError</code> if not found.</p>
+        <pre><code>t = (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">2</span>, <span class="nm">4</span>)
+t.<span class="fn">index</span>(<span class="nm">2</span>)     <span class="cm"># 1</span>
+t.<span class="fn">index</span>(<span class="nm">2</span>, <span class="nm">2</span>)  <span class="cm"># 3  (search from index 2)</span></code></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 8. SEARCHING ════════════════ -->
+<section id="search">
+  <div class="section-header">
+    <span class="section-icon">🔎</span>
+    <h2>8. Searching &amp; Checking</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <pre><code>t = (<span class="nm">10</span>, <span class="nm">20</span>, <span class="nm">30</span>, <span class="nm">20</span>, <span class="nm">50</span>)
+
+<span class="nm">10</span> <span class="kw">in</span> t              <span class="cm"># True</span>
+<span class="nm">99</span> <span class="kw">not in</span> t          <span class="cm"># True</span>
+
+t.<span class="fn">index</span>(<span class="nm">20</span>)          <span class="cm"># 1  (first occurrence)</span>
+t.<span class="fn">count</span>(<span class="nm">20</span>)          <span class="cm"># 2</span>
+
+<span class="fn">min</span>(t)               <span class="cm"># 10</span>
+<span class="fn">max</span>(t)               <span class="cm"># 50</span>
+<span class="fn">sum</span>(t)               <span class="cm"># 130</span>
+<span class="fn">len</span>(t)               <span class="cm"># 5</span>
+
+<span class="fn">any</span>(x &gt; <span class="nm">40</span> <span class="kw">for</span> x <span class="kw">in</span> t)   <span class="cm"># True</span>
+<span class="fn">all</span>(x &gt; <span class="nm">0</span> <span class="kw">for</span> x <span class="kw">in</span> t)    <span class="cm"># True</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 9. CONCAT & REPEAT ════════════════ -->
+<section id="concat">
+  <div class="section-header">
+    <span class="section-icon">➕</span>
+    <h2>9. Concatenation &amp; Repetition</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <pre><code>a = (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>)
+b = (<span class="nm">4</span>, <span class="nm">5</span>, <span class="nm">6</span>)
+
+<span class="cm"># + creates a new tuple</span>
+c = a + b              <span class="cm"># (1, 2, 3, 4, 5, 6)</span>
+
+<span class="cm"># += rebinds variable to a NEW tuple</span>
+a += (<span class="nm">4</span>, <span class="nm">5</span>)            <span class="cm"># a is now (1, 2, 3, 4, 5)</span>
+
+<span class="cm"># Repetition</span>
+t = (<span class="nm">0</span>, <span class="nm">1</span>) * <span class="nm">3</span>         <span class="cm"># (0, 1, 0, 1, 0, 1)</span>
+
+<span class="cm"># Must concatenate with a tuple, not a bare value</span>
+a + (<span class="nm">4</span>,)              <span class="cm"># ✅ (1, 2, 3, 4)</span>
+a + <span class="nm">4</span>                <span class="cm"># ❌ TypeError</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 10. SORTING ════════════════ -->
+<section id="sort">
+  <div class="section-header">
+    <span class="section-icon">🔀</span>
+    <h2>10. Sorting</h2>
+  </div>
+  <div class="section-body">
+    <div class="callout callout-info">
+      <span class="callout-icon">ℹ️</span>
+      <div>Tuples have no <code>.sort()</code> method. Use the built-in <code>sorted()</code>, which always returns a <strong>list</strong>.</div>
+    </div>
+    <div class="code-wrap">
+      <pre><code>t = (<span class="nm">3</span>, <span class="nm">1</span>, <span class="nm">4</span>, <span class="nm">1</span>, <span class="nm">5</span>, <span class="nm">9</span>)
+
+<span class="fn">sorted</span>(t)                          <span class="cm"># [1, 1, 3, 4, 5, 9]  ← returns a LIST</span>
+<span class="fn">tuple</span>(<span class="fn">sorted</span>(t))                   <span class="cm"># (1, 1, 3, 4, 5, 9)  ← back to tuple</span>
+<span class="fn">tuple</span>(<span class="fn">sorted</span>(t, reverse=<span class="kw">True</span>))     <span class="cm"># (9, 5, 4, 3, 1, 1)</span>
+
+<span class="cm"># Sort by key</span>
+words = (<span class="st">"banana"</span>, <span class="st">"kiwi"</span>, <span class="st">"apple"</span>)
+<span class="fn">sorted</span>(words, key=<span class="fn">len</span>)             <span class="cm"># ['kiwi', 'apple', 'banana']</span>
+
+<span class="cm"># Sort tuples by element position</span>
+pairs = [(<span class="nm">3</span>, <span class="st">'b'</span>), (<span class="nm">1</span>, <span class="st">'a'</span>), (<span class="nm">2</span>, <span class="st">'c'</span>)]
+<span class="fn">sorted</span>(pairs)                      <span class="cm"># [(1,'a'),(2,'c'),(3,'b')] — by first element</span>
+<span class="fn">sorted</span>(pairs, key=<span class="kw">lambda</span> x: x[<span class="nm">1</span>]) <span class="cm"># sort by second element</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 11. ITERATING ════════════════ -->
+<section id="iterate">
+  <div class="section-header">
+    <span class="section-icon">🔁</span>
+    <h2>11. Iterating Over Tuples</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <pre><code>t = (<span class="st">'a'</span>, <span class="st">'b'</span>, <span class="st">'c'</span>)
+
+<span class="cm"># Basic for loop</span>
+<span class="kw">for</span> item <span class="kw">in</span> t:
+    <span class="fn">print</span>(item)
+
+<span class="cm"># With index via enumerate</span>
+<span class="kw">for</span> i, item <span class="kw">in</span> <span class="fn">enumerate</span>(t):
+    <span class="fn">print</span>(i, item)      <span class="cm"># 0 a,  1 b,  2 c</span>
+
+<span class="kw">for</span> i, item <span class="kw">in</span> <span class="fn">enumerate</span>(t, start=<span class="nm">1</span>):
+    <span class="fn">print</span>(i, item)      <span class="cm"># 1 a,  2 b,  3 c</span>
+
+<span class="cm"># Reversed iteration</span>
+<span class="kw">for</span> item <span class="kw">in</span> <span class="fn">reversed</span>(t):
+    <span class="fn">print</span>(item)
+
+<span class="cm"># Zip two tuples</span>
+names  = (<span class="st">"Alice"</span>, <span class="st">"Bob"</span>, <span class="st">"Carol"</span>)
+scores = (<span class="nm">90</span>, <span class="nm">85</span>, <span class="nm">92</span>)
+<span class="kw">for</span> name, score <span class="kw">in</span> <span class="fn">zip</span>(names, scores):
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"{name}: {score}"</span>)</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 12. GENERATOR EXPRESSIONS ════════════════ -->
+<section id="genexpr">
+  <div class="section-header">
+    <span class="section-icon">⚡</span>
+    <h2>12. No Tuple Comprehension — Use Generator Expressions</h2>
+  </div>
+  <div class="section-body">
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>There is no tuple comprehension in Python.</strong><br>
+      <code>(x**2 for x in range(5))</code> creates a <strong>generator object</strong>, not a tuple.</div>
+    </div>
+    <div class="code-wrap">
+      <pre><code>gen = (x**<span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>))    <span class="cm"># generator object — lazy evaluation</span>
+t   = <span class="fn">tuple</span>(x**<span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>)) <span class="cm"># ✅ (0, 1, 4, 9, 16)</span>
+
+<span class="cm"># Generator expressions are memory-efficient for pipelines</span>
+total = <span class="fn">sum</span>(x**<span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1000</span>))   <span class="cm"># no intermediate list created</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 13. DICT KEYS ════════════════ -->
+<section id="dictkey">
+  <div class="section-header">
+    <span class="section-icon">🗝️</span>
+    <h2>13. Tuples as Dictionary Keys &amp; Set Members</h2>
+  </div>
+  <div class="section-body">
+    <p>Because tuples are <strong>hashable</strong> (when all elements are also hashable), they can be used anywhere a hash is required — lists cannot.</p>
+    <div class="code-wrap">
+      <pre><code><span class="cm"># 2D coordinates as dict keys</span>
+grid = {}
+grid[(<span class="nm">0</span>, <span class="nm">0</span>)] = <span class="st">"origin"</span>
+grid[(<span class="nm">1</span>, <span class="nm">2</span>)] = <span class="st">"point A"</span>
+grid[(<span class="nm">-1</span>, <span class="nm">3</span>)] = <span class="st">"point B"</span>
+<span class="fn">print</span>(grid[(<span class="nm">1</span>, <span class="nm">2</span>)])      <span class="cm"># "point A"</span>
+
+<span class="cm"># Multi-key composite lookup</span>
+cache = {}
+cache[(<span class="st">"user_123"</span>, <span class="st">"hpsc"</span>, <span class="st">"en"</span>)] = profile_data
+
+<span class="cm"># In a set</span>
+locations = {(<span class="nm">0</span>, <span class="nm">0</span>), (<span class="nm">1</span>, <span class="nm">2</span>), (<span class="nm">3</span>, <span class="nm">4</span>)}
+(<span class="nm">1</span>, <span class="nm">2</span>) <span class="kw">in</span> locations          <span class="cm"># True</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 14. NAMEDTUPLE ════════════════ -->
+<section id="named">
+  <div class="section-header">
+    <span class="section-icon">🏷️</span>
+    <h2>14. Named Tuples — <code>collections.namedtuple</code></h2>
+  </div>
+  <div class="section-body">
+    <p>Named tuples add <strong>field-name access</strong> while keeping all tuple properties (immutable, indexable, hashable, memory-efficient).</p>
+    <div class="code-wrap">
+      <pre><code><span class="kw">from</span> collections <span class="kw">import</span> namedtuple
+
+<span class="cm"># Define a named tuple class</span>
+<span class="cl">Point</span>  = <span class="fn">namedtuple</span>(<span class="st">'Point'</span>,  [<span class="st">'x'</span>, <span class="st">'y'</span>])
+<span class="cl">Person</span> = <span class="fn">namedtuple</span>(<span class="st">'Person'</span>, [<span class="st">'name'</span>, <span class="st">'age'</span>, <span class="st">'city'</span>])
+
+<span class="cm"># Create instances</span>
+p     = <span class="cl">Point</span>(<span class="nm">10</span>, <span class="nm">20</span>)
+alice = <span class="cl">Person</span>(<span class="st">'Alice'</span>, <span class="nm">30</span>, <span class="st">'NYC'</span>)
+
+<span class="cm"># Access by name or index</span>
+p.x               <span class="cm"># 10</span>
+p[<span class="nm">0</span>]               <span class="cm"># 10</span>
+alice.name        <span class="cm"># 'Alice'</span>
+
+<span class="cm"># Still a real tuple</span>
+<span class="fn">isinstance</span>(p, <span class="fn">tuple</span>)   <span class="cm"># True</span>
+x, y = p               <span class="cm"># unpacking still works</span>
+
+<span class="cm"># Utility methods</span>
+p._asdict()            <span class="cm"># {'x': 10, 'y': 20}  (ordered dict)</span>
+p._replace(x=<span class="nm">99</span>)      <span class="cm"># Point(x=99, y=20)   (new object)</span>
+<span class="cl">Point</span>._fields         <span class="cm"># ('x', 'y')</span>
+<span class="cl">Point</span>._make([<span class="nm">5</span>, <span class="nm">6</span>])   <span class="cm"># Point(x=5, y=6)  — from iterable</span></code></pre>
+    </div>
+
+    <h3>Default Values</h3>
+    <div class="code-wrap">
+      <pre><code>Point3D = <span class="fn">namedtuple</span>(<span class="st">'Point3D'</span>, [<span class="st">'x'</span>, <span class="st">'y'</span>, <span class="st">'z'</span>])
+Point3D.__new__.__defaults__ = (<span class="nm">0</span>,)    <span class="cm"># z defaults to 0</span>
+p = Point3D(<span class="nm">1</span>, <span class="nm">2</span>)   <span class="cm"># Point3D(x=1, y=2, z=0)</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 15. TYPING.NAMEDTUPLE ════════════════ -->
+<section id="typing">
+  <div class="section-header">
+    <span class="section-icon">🆕</span>
+    <h2>15. <code>typing.NamedTuple</code> — Modern Syntax</h2>
+  </div>
+  <div class="section-body">
+    <div class="callout callout-ok">
+      <span class="callout-icon">✅</span>
+      <div>Prefer <code>typing.NamedTuple</code> for new code — cleaner syntax, type hints, and default values supported natively.</div>
+    </div>
+    <div class="code-wrap">
+      <pre><code><span class="kw">from</span> typing <span class="kw">import</span> NamedTuple
+
+<span class="kw">class</span> <span class="cl">Point</span>(NamedTuple):
+    x: <span class="fn">float</span>
+    y: <span class="fn">float</span>
+    z: <span class="fn">float</span> = <span class="nm">0.0</span>     <span class="cm"># default value</span>
+
+<span class="kw">class</span> <span class="cl">Employee</span>(NamedTuple):
+    name:   <span class="fn">str</span>
+    dept:   <span class="fn">str</span>
+    salary: <span class="fn">float</span>
+    active: <span class="fn">bool</span> = <span class="kw">True</span>
+
+<span class="cm"># Create instances</span>
+p  = <span class="cl">Point</span>(<span class="nm">1.0</span>, <span class="nm">2.0</span>)
+e  = <span class="cl">Employee</span>(<span class="st">"Alice"</span>, <span class="st">"Eng"</span>, <span class="nm">95000</span>)
+
+<span class="fn">print</span>(p)        <span class="cm"># Point(x=1.0, y=2.0, z=0.0)</span>
+<span class="fn">print</span>(p.x)      <span class="cm"># 1.0</span>
+<span class="fn">print</span>(p[<span class="nm">1</span>])     <span class="cm"># 2.0</span>
+
+<span class="cm"># Can also have methods</span>
+<span class="kw">class</span> <span class="cl">Vector</span>(NamedTuple):
+    x: <span class="fn">float</span>
+    y: <span class="fn">float</span>
+
+    <span class="kw">def</span> <span class="fn">magnitude</span>(self) -&gt; <span class="fn">float</span>:
+        <span class="kw">return</span> (self.x**<span class="nm">2</span> + self.y**<span class="nm">2</span>) ** <span class="nm">0.5</span>
+
+v = <span class="cl">Vector</span>(<span class="nm">3</span>, <span class="nm">4</span>)
+v.<span class="fn">magnitude</span>()   <span class="cm"># 5.0</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 16. TUPLE VS LIST ════════════════ -->
+<section id="vslist">
+  <div class="section-header">
+    <span class="section-icon">⚖️</span>
+    <h2>16. Tuple vs List — When to Use Which</h2>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Feature</th>
+          <th>Tuple</th>
+          <th>List</th>
+        </tr>
+        <tr><td>Mutable</td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-yes">✅ Yes</span></td></tr>
+        <tr><td>Ordered</td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-yes">✅ Yes</span></td></tr>
+        <tr><td>Indexed</td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-yes">✅ Yes</span></td></tr>
+        <tr><td>Hashable (dict key / set member)</td><td><span class="tag tag-yes">✅ Yes*</span></td><td><span class="tag tag-no">❌ No</span></td></tr>
+        <tr><td>Memory usage</td><td>Less (compact)</td><td>More (over-allocates)</td></tr>
+        <tr><td>Creation speed</td><td>Faster</td><td>Slower</td></tr>
+        <tr><td>Built-in methods</td><td>2</td><td>11</td></tr>
+        <tr><td>Best for</td><td>Fixed records, return values, dict keys, constants</td><td>Dynamic collections that grow/shrink</td></tr>
+      </table>
+    </div>
+    <p style="font-size:0.8rem;color:var(--text-dim);margin-top:0.5rem">* Only hashable when all elements are also hashable.</p>
+
+    <div class="code-wrap" style="margin-top:1rem">
+      <pre><code><span class="kw">import</span> sys
+lst = [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>]
+tup = (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>)
+
+sys.<span class="fn">getsizeof</span>(lst)   <span class="cm"># 104 bytes</span>
+sys.<span class="fn">getsizeof</span>(tup)   <span class="cm"># 80 bytes  ← ~23% smaller</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 17. PERFORMANCE ════════════════ -->
+<section id="perf">
+  <div class="section-header">
+    <span class="section-icon">🚀</span>
+    <h2>17. Memory &amp; Performance</h2>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <tr><th>Operation</th><th>Time Complexity</th><th>Note</th></tr>
+        <tr><td><code>t[i]</code></td><td>O(1)</td><td>Direct index access</td></tr>
+        <tr><td><code>x in t</code></td><td>O(n)</td><td>Linear scan — use set for frequent checks</td></tr>
+        <tr><td><code>t.count(x)</code></td><td>O(n)</td><td>Full scan</td></tr>
+        <tr><td><code>t.index(x)</code></td><td>O(n)</td><td>Stops at first match</td></tr>
+        <tr><td><code>len(t)</code></td><td>O(1)</td><td>Stored attribute</td></tr>
+        <tr><td><code>t1 + t2</code></td><td>O(n+k)</td><td>Creates new tuple</td></tr>
+        <tr><td><code>sorted(t)</code></td><td>O(n log n)</td><td>Timsort, returns list</td></tr>
+        <tr><td>Iteration</td><td>O(n)</td><td>Slightly faster than list iteration</td></tr>
+        <tr><td>Creation</td><td>O(n)</td><td>Faster than list (CPython constant-folds small tuples)</td></tr>
+        <tr><td><code>hash(t)</code></td><td>O(n)</td><td>Hashes all elements recursively</td></tr>
+      </table>
+    </div>
+
+    <div class="code-wrap" style="margin-top:1rem">
+      <pre><code><span class="kw">import</span> timeit
+
+<span class="cm"># Tuple creation is faster than list</span>
+timeit.<span class="fn">timeit</span>(<span class="st">"(1,2,3,4,5)"</span>, number=<span class="nm">10_000_000</span>)   <span class="cm"># ~0.04s</span>
+timeit.<span class="fn">timeit</span>(<span class="st">"[1,2,3,4,5]"</span>, number=<span class="nm">10_000_000</span>)   <span class="cm"># ~0.11s</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 18. COMMON PATTERNS ════════════════ -->
+<section id="patterns">
+  <div class="section-header">
+    <span class="section-icon">🎯</span>
+    <h2>18. Common Patterns</h2>
+  </div>
+  <div class="section-body">
+    <h3>Multiple Return Values</h3>
+    <div class="code-wrap">
+      <pre><code><span class="kw">def</span> <span class="fn">min_max</span>(lst):
+    <span class="kw">return</span> <span class="fn">min</span>(lst), <span class="fn">max</span>(lst)          <span class="cm"># returns a tuple</span>
+
+lo, hi = <span class="fn">min_max</span>([<span class="nm">3</span>, <span class="nm">1</span>, <span class="nm">4</span>, <span class="nm">1</span>, <span class="nm">5</span>, <span class="nm">9</span>])  <span class="cm"># lo=1, hi=9</span></code></pre>
+    </div>
+
+    <h3>Structured Records</h3>
+    <div class="code-wrap">
+      <pre><code>employees = [
+    (<span class="st">"Alice"</span>, <span class="st">"Engineering"</span>, <span class="nm">95000</span>),
+    (<span class="st">"Bob"</span>,   <span class="st">"Marketing"</span>,   <span class="nm">78000</span>),
+]
+<span class="kw">for</span> name, dept, salary <span class="kw">in</span> employees:
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"{name} in {dept} earns ${salary:,}"</span>)</code></pre>
+    </div>
+
+    <h3>enumerate / zip / dict.items() all yield tuples</h3>
+    <div class="code-wrap">
+      <pre><code><span class="kw">for</span> tup <span class="kw">in</span> <span class="fn">enumerate</span>([<span class="st">'a'</span>, <span class="st">'b'</span>, <span class="st">'c'</span>]):
+    <span class="fn">print</span>(tup)    <span class="cm"># (0,'a'), (1,'b'), (2,'c')</span>
+
+<span class="kw">for</span> tup <span class="kw">in</span> <span class="fn">zip</span>([<span class="nm">1</span>, <span class="nm">2</span>], [<span class="st">'x'</span>, <span class="st">'y'</span>]):
+    <span class="fn">print</span>(tup)    <span class="cm"># (1,'x'), (2,'y')</span>
+
+d = {<span class="st">'a'</span>: <span class="nm">1</span>, <span class="st">'b'</span>: <span class="nm">2</span>}
+<span class="kw">for</span> k, v <span class="kw">in</span> d.<span class="fn">items</span>():
+    <span class="fn">print</span>(k, v)</code></pre>
+    </div>
+
+    <h3>Tuple as Composite Cache Key</h3>
+    <div class="code-wrap">
+      <pre><code><span class="kw">from</span> functools <span class="kw">import</span> lru_cache
+
+<span class="op">@</span><span class="fn">lru_cache</span>(maxsize=<span class="nm">256</span>)
+<span class="kw">def</span> <span class="fn">get_profile</span>(user_id: <span class="fn">str</span>, domain: <span class="fn">str</span>, lang: <span class="fn">str</span>):
+    ...
+
+<span class="cm"># lru_cache internally uses a tuple of args as the cache key</span>
+<span class="fn">get_profile</span>(<span class="st">"user123"</span>, <span class="st">"hpsc"</span>, <span class="st">"en"</span>)</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 19. PITFALLS ════════════════ -->
+<section id="pitfalls">
+  <div class="section-header">
+    <span class="section-icon">🪤</span>
+    <h2>19. Common Pitfalls</h2>
+  </div>
+  <div class="section-body">
+
+    <div class="callout callout-warn" style="margin-bottom:1rem">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 1 — Missing trailing comma in single-element tuple</strong><br>
+      <code>x = (42)</code> is an <strong>int</strong>!<br>
+      <code>x = (42,)</code> or <code>x = 42,</code> — these are tuples.
+      </div>
+    </div>
+
+    <div class="callout callout-warn" style="margin-bottom:1rem">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 2 — Mutable objects inside a tuple can change</strong><br>
+      <code>t = (1, [2, 3]); t[1].append(99)</code> — this works! The tuple stores a reference, not a copy of the list.
+      </div>
+    </div>
+
+    <div class="callout callout-warn" style="margin-bottom:1rem">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 3 — Concatenating non-tuples</strong><br>
+      <code>t + 4</code> raises <code>TypeError</code>. Must be <code>t + (4,)</code>.
+      </div>
+    </div>
+
+    <div class="callout callout-warn" style="margin-bottom:1rem">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 4 — <code>+=</code> creates a new tuple object</strong><br>
+      <code>t += (3,)</code> rebinds <code>t</code> to a brand-new tuple. The original object is unchanged (other references to it are not affected).
+      </div>
+    </div>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 5 — Tuple with mutable element becomes unhashable</strong><br>
+      <code>hash((1, [2, 3]))</code> raises <code>TypeError</code>. Cannot use as dict key or set member.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 20. QUICK REFERENCE ════════════════ -->
+<section id="ref">
+  <div class="section-header">
+    <span class="section-icon">📋</span>
+    <h2>20. All Operations Quick Reference</h2>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <tr><th>Operation</th><th>Syntax</th><th>Returns</th><th>Mutates?</th></tr>
+        <tr><td>Create</td><td><code>(1, 2, 3)</code> or <code>tuple(iter)</code></td><td>tuple</td><td>—</td></tr>
+        <tr><td>Index</td><td><code>t[i]</code></td><td>element</td><td>No</td></tr>
+        <tr><td>Slice</td><td><code>t[i:j:step]</code></td><td>tuple</td><td>No</td></tr>
+        <tr><td>Length</td><td><code>len(t)</code></td><td>int</td><td>No</td></tr>
+        <tr><td>Count occurrences</td><td><code>t.count(x)</code></td><td>int</td><td>No</td></tr>
+        <tr><td>Find index</td><td><code>t.index(x)</code></td><td>int</td><td>No</td></tr>
+        <tr><td>Membership</td><td><code>x in t</code></td><td>bool</td><td>No</td></tr>
+        <tr><td>Concatenate</td><td><code>t1 + t2</code></td><td>tuple</td><td>No</td></tr>
+        <tr><td>Repeat</td><td><code>t * n</code></td><td>tuple</td><td>No</td></tr>
+        <tr><td>Unpack</td><td><code>a, b = t</code></td><td>values</td><td>No</td></tr>
+        <tr><td>Star unpack</td><td><code>a, *rest = t</code></td><td>values + list</td><td>No</td></tr>
+        <tr><td>Sort</td><td><code>sorted(t)</code></td><td>list</td><td>No</td></tr>
+        <tr><td>Min / Max / Sum</td><td><code>min/max/sum(t)</code></td><td>value</td><td>No</td></tr>
+        <tr><td>Convert to list</td><td><code>list(t)</code></td><td>list</td><td>No</td></tr>
+        <tr><td>Convert to set</td><td><code>set(t)</code></td><td>set</td><td>No</td></tr>
+        <tr><td>Hash</td><td><code>hash(t)</code></td><td>int</td><td>No</td></tr>
+        <tr><td>Iterate</td><td><code>for x in t</code></td><td>—</td><td>No</td></tr>
+        <tr><td>Reversed</td><td><code>reversed(t)</code></td><td>iterator</td><td>No</td></tr>
+        <tr><td>Named field access</td><td><code>t.field</code></td><td>element</td><td>No</td></tr>
+        <tr><td>To dict (namedtuple)</td><td><code>t._asdict()</code></td><td>dict</td><td>No</td></tr>
+        <tr><td>Replace (namedtuple)</td><td><code>t._replace(x=v)</code></td><td>new tuple</td><td>No</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 21. CHEATSHEET ════════════════ -->
+<section id="cheat">
+  <div class="section-header">
+    <span class="section-icon">⚡</span>
+    <h2>21. Cheatsheet</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <div class="code-label">quick reference</div>
+      <pre><code><span class="cm"># ── Create ─────────────────────────────────────────────</span>
+t = ()                        <span class="cm"># empty</span>
+t = (<span class="nm">42</span>,)                     <span class="cm"># single — comma required!</span>
+t = (<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>)                 <span class="cm"># literal</span>
+t = <span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>                   <span class="cm"># packing</span>
+t = <span class="fn">tuple</span>(<span class="fn">range</span>(<span class="nm">5</span>))            <span class="cm"># (0,1,2,3,4)</span>
+
+<span class="cm"># ── Access ─────────────────────────────────────────────</span>
+t[<span class="nm">0</span>]          <span class="cm"># first</span>
+t[<span class="nm">-1</span>]         <span class="cm"># last</span>
+t[<span class="nm">1</span>:<span class="nm">4</span>]        <span class="cm"># slice</span>
+t[::<span class="nm">-1</span>]       <span class="cm"># reversed tuple</span>
+
+<span class="cm"># ── Unpack ─────────────────────────────────────────────</span>
+a, b, c   = t              <span class="cm"># exact match</span>
+a, *rest  = t              <span class="cm"># first + rest as list</span>
+*init, z  = t              <span class="cm"># all-but-last + last</span>
+a, b = b, a               <span class="cm"># swap</span>
+
+<span class="cm"># ── Methods (only 2) ───────────────────────────────────</span>
+t.<span class="fn">count</span>(x)      <span class="cm"># occurrences of x</span>
+t.<span class="fn">index</span>(x)      <span class="cm"># first index of x</span>
+
+<span class="cm"># ── Search ─────────────────────────────────────────────</span>
+x <span class="kw">in</span> t                 <span class="cm"># membership check</span>
+<span class="fn">min</span> / <span class="fn">max</span> / <span class="fn">sum</span> / <span class="fn">len</span>(t)
+
+<span class="cm"># ── Combine ────────────────────────────────────────────</span>
+t1 + t2               <span class="cm"># concatenate → new tuple</span>
+t * <span class="nm">3</span>                 <span class="cm"># repeat → new tuple</span>
+<span class="fn">tuple</span>(<span class="fn">sorted</span>(t))      <span class="cm"># sorted → new tuple</span>
+
+<span class="cm"># ── Convert ────────────────────────────────────────────</span>
+<span class="fn">list</span>(t)               <span class="cm"># → list</span>
+<span class="fn">set</span>(t)                <span class="cm"># → set</span>
+<span class="fn">dict</span>(t)               <span class="cm"># only for ((k,v),...) pairs</span>
+
+<span class="cm"># ── Named Tuple (classic) ──────────────────────────────</span>
+<span class="kw">from</span> collections <span class="kw">import</span> namedtuple
+<span class="cl">Point</span> = <span class="fn">namedtuple</span>(<span class="st">'Point'</span>, [<span class="st">'x'</span>, <span class="st">'y'</span>])
+p = <span class="cl">Point</span>(<span class="nm">1</span>, <span class="nm">2</span>); p.x; p._asdict(); p._replace(x=<span class="nm">9</span>)
+
+<span class="cm"># ── Named Tuple (modern) ───────────────────────────────</span>
+<span class="kw">from</span> typing <span class="kw">import</span> NamedTuple
+<span class="kw">class</span> <span class="cl">Point</span>(NamedTuple):
+    x: <span class="fn">float</span>; y: <span class="fn">float</span>; z: <span class="fn">float</span> = <span class="nm">0.0</span>
+
+<span class="cm"># ── As Dict Key ────────────────────────────────────────</span>
+d = {(<span class="nm">0</span>, <span class="nm">0</span>): <span class="st">"origin"</span>, (<span class="nm">1</span>, <span class="nm">2</span>): <span class="st">"A"</span>}
+
+<span class="cm"># ── Generator (no tuple comprehension!)  ───────────────</span>
+t = <span class="fn">tuple</span>(x**<span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>))   <span class="cm"># (0, 1, 4, 9, 16)</span>
+
+<span class="cm"># ── Iteration ──────────────────────────────────────────</span>
+<span class="kw">for</span> x <span class="kw">in</span> t: ...
+<span class="kw">for</span> i, x <span class="kw">in</span> <span class="fn">enumerate</span>(t): ...
+<span class="kw">for</span> a, b <span class="kw">in</span> <span class="fn">zip</span>(t1, t2): ...</code></pre>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Python Tuple — Complete Guide &nbsp;|&nbsp; Python 3.x &nbsp;|&nbsp; March 2026
+</footer>
+
+</body>
+</html>
