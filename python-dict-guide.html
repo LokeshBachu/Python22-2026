@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Python Dictionary — Complete Guide</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --surface: #ffffff;
+      --surface2: #edf0f7;
+      --border: #c9d3e8;
+      --accent: #2563eb;
+      --accent2: #7c3aed;
+      --accent3: #059669;
+      --accent4: #ea580c;
+      --accent5: #db2777;
+      --text: #1e293b;
+      --text-dim: #4b6080;
+      --code-bg: #f0f3fa;
+      --tag-bg: #dbeafe;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #dbeafe 0%, #ede9fe 60%, #f0fdf4 100%);
+      padding: 3rem 2rem 2.5rem; text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    header .badge {
+      display: inline-block; background: var(--accent); color: #fff;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; padding: 0.25rem 0.85rem; border-radius: 999px; margin-bottom: 1rem;
+    }
+    header h1 {
+      font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 0.75rem;
+    }
+    header p { color: var(--text-dim); font-size: 1.05rem; max-width: 640px; margin: 0 auto; }
+    .pills { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 1.25rem; }
+    .pill {
+      background: var(--tag-bg); border: 1px solid #93c5fd; color: var(--accent);
+      font-size: 0.78rem; font-weight: 600; padding: 0.2rem 0.75rem; border-radius: 999px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(244,246,251,0.95); backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 2rem; display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;
+    }
+    nav a {
+      color: var(--text-dim); text-decoration: none; font-size: 0.82rem; font-weight: 500;
+      padding: 0.3rem 0.75rem; border-radius: 6px; transition: all 0.2s;
+    }
+    nav a:hover { background: var(--surface2); color: var(--accent); }
+
+    /* ── MAIN ── */
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* ── SECTIONS ── */
+    section {
+      margin-bottom: 2.5rem; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+    }
+    .section-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 1rem 1.5rem; background: var(--surface2); border-bottom: 1px solid var(--border);
+    }
+    .section-icon { font-size: 1.3rem; }
+    .section-header h2 { font-size: 1.15rem; font-weight: 700; color: var(--text); }
+    .section-body { padding: 1.5rem; }
+
+    /* ── CODE ── */
+    .code-wrap { position: relative; margin: 0.75rem 0; }
+    .code-label {
+      position: absolute; top: 0.5rem; right: 0.75rem;
+      font-size: 0.7rem; color: var(--text-dim); font-family: monospace;
+      text-transform: uppercase; letter-spacing: 0.07em;
+    }
+    pre {
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 1.25rem 1.25rem 1rem; overflow-x: auto; font-size: 0.85rem; line-height: 1.65;
+    }
+    code { font-family: 'Cascadia Code','Fira Code','Consolas',monospace; color: var(--text); }
+    .kw  { color: #7c3aed; font-weight: 600; }
+    .fn  { color: #2563eb; }
+    .st  { color: #059669; }
+    .cm  { color: #6b7280; font-style: italic; }
+    .nm  { color: #ea580c; }
+    .op  { color: #0891b2; }
+    .cl  { color: #b45309; }
+
+    /* ── GRID ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+    @media(max-width:768px) { .grid-2,.grid-3 { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--code-bg); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.1rem 1.2rem;
+    }
+    .card h4 {
+      font-size: 0.85rem; font-weight: 700; color: var(--accent);
+      margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th {
+      background: var(--surface2); color: var(--accent);
+      padding: 0.65rem 1rem; text-align: left;
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em;
+    }
+    td { padding: 0.6rem 1rem; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--surface2); }
+
+    /* ── CALLOUT ── */
+    .callout {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      padding: 1rem 1.2rem; border-radius: 10px; margin: 0.75rem 0; font-size: 0.88rem;
+    }
+    .callout-warn  { background: #fff7ed; border: 1px solid #f97316; color: #7c2d12; }
+    .callout-ok    { background: #f0fdf4; border: 1px solid #4ade80; color: #14532d; }
+    .callout-info  { background: #eff6ff; border: 1px solid #60a5fa; color: #1e3a8a; }
+    .callout-purple{ background: #faf5ff; border: 1px solid #c084fc; color: #581c87; }
+    .callout-icon  { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.05rem; }
+
+    /* ── VISUAL: Dict anatomy diagram ── */
+    .dict-diagram {
+      display: flex; flex-direction: column; gap: 0;
+      border: 2px solid var(--accent); border-radius: 10px;
+      overflow: hidden; font-family: 'Cascadia Code','Consolas',monospace;
+      font-size: 0.85rem; margin: 1rem 0;
+    }
+    .dict-row {
+      display: grid; grid-template-columns: 130px 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+    .dict-row:last-child { border-bottom: none; }
+    .dict-key {
+      background: #dbeafe; color: var(--accent); font-weight: 700;
+      padding: 0.55rem 1rem; display: flex; align-items: center; border-right: 2px solid var(--accent);
+    }
+    .dict-val {
+      background: var(--code-bg); padding: 0.55rem 1rem;
+      display: flex; align-items: center; color: #059669; font-weight: 500;
+    }
+    .dict-header {
+      background: var(--accent); color: #fff; font-weight: 700; font-size: 0.75rem;
+      letter-spacing: 0.08em; padding: 0.4rem 1rem; text-transform: uppercase;
+      display: grid; grid-template-columns: 130px 1fr;
+    }
+
+    /* ── TAG ── */
+    .tag { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.55rem; border-radius: 999px; margin-left: 0.4rem; }
+    .tag-yes { background: #dcfce7; color: #15803d; }
+    .tag-no  { background: #fee2e2; color: #b91c1c; }
+
+    /* ── MISC ── */
+    p  { margin-bottom: 0.75rem; }
+    h3 { font-size: 1rem; font-weight: 700; margin: 1rem 0 0.5rem; color: var(--text); }
+    ul { padding-left: 1.4rem; margin-bottom: 0.75rem; }
+    li { margin-bottom: 0.3rem; }
+    footer { text-align: center; padding: 2rem; color: var(--text-dim); font-size: 0.82rem; border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════ HEADER ══════════════════════ -->
+<header>
+  <div class="badge">Python Data Structures</div>
+  <h1>📘 Python Dictionaries</h1>
+  <p>Complete end-to-end guide — creation, access, iteration, comprehensions, merging, advanced patterns &amp; typing</p>
+  <div class="pills">
+    <span class="pill">Key → Value</span>
+    <span class="pill">Ordered (3.7+)</span>
+    <span class="pill">Mutable</span>
+    <span class="pill">O(1) Lookup</span>
+    <span class="pill">Keys Must Be Hashable</span>
+    <span class="pill">dict Comprehension</span>
+    <span class="pill">defaultdict · OrderedDict · Counter · ChainMap</span>
+  </div>
+</header>
+
+<!-- ══════════════════════ NAV ══════════════════════ -->
+<nav>
+  <a href="#what">What is a Dict</a>
+  <a href="#create">Creating</a>
+  <a href="#access">Accessing</a>
+  <a href="#modify">Adding/Updating</a>
+  <a href="#remove">Removing</a>
+  <a href="#check">Checking</a>
+  <a href="#iterate">Iterating</a>
+  <a href="#methods">All Methods</a>
+  <a href="#comprehension">Comprehension</a>
+  <a href="#merge">Merging</a>
+  <a href="#nested">Nested Dicts</a>
+  <a href="#special">Special Dicts</a>
+  <a href="#typing">Typing</a>
+  <a href="#vs">Dict vs Others</a>
+  <a href="#perf">Performance</a>
+  <a href="#patterns">Patterns</a>
+  <a href="#pitfalls">Pitfalls</a>
+  <a href="#ref">Quick Ref</a>
+  <a href="#cheat">Cheatsheet</a>
+</nav>
+
+<main>
+
+<!-- ════════════════ 1. WHAT IS A DICT ════════════════ -->
+<section id="what">
+  <div class="section-header">
+    <span class="section-icon">📘</span>
+    <h2>1. What is a Dictionary?</h2>
+  </div>
+  <div class="section-body">
+    <p>A <strong>dictionary</strong> is an ordered (Python 3.7+), mutable collection of <strong>key → value pairs</strong>. Keys must be unique and hashable; values can be any Python object.</p>
+
+    <!-- Visual anatomy -->
+    <div class="dict-diagram">
+      <div class="dict-header"><span>KEY</span><span>VALUE</span></div>
+      <div class="dict-row"><div class="dict-key">"name"</div><div class="dict-val">"Alice"</div></div>
+      <div class="dict-row"><div class="dict-key">"age"</div><div class="dict-val">30</div></div>
+      <div class="dict-row"><div class="dict-key">"skills"</div><div class="dict-val">["Python", "Java"]</div></div>
+      <div class="dict-row"><div class="dict-key">"active"</div><div class="dict-val">True</div></div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Property</th><th>Description</th></tr>
+        <tr><td><strong>Ordered</strong></td><td>Preserves insertion order (CPython 3.6+, guaranteed 3.7+)</td></tr>
+        <tr><td><strong>Mutable</strong></td><td>Keys/values can be added, updated, or removed</td></tr>
+        <tr><td><strong>Unique keys</strong></td><td>Duplicate keys are overwritten; values can repeat</td></tr>
+        <tr><td><strong>Hashable keys only</strong></td><td>Keys must be immutable: str, int, float, tuple (no list/dict/set)</td></tr>
+        <tr><td><strong>Any value type</strong></td><td>Values can be anything — lists, functions, other dicts…</td></tr>
+        <tr><td><strong>O(1) average</strong></td><td>Lookup, insert, delete are constant time on average</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 2. CREATING ════════════════ -->
+<section id="create">
+  <div class="section-header">
+    <span class="section-icon">🏗️</span>
+    <h2>2. Creating Dictionaries</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <div class="code-label">python</div>
+      <pre><code><span class="cm"># ── Curly-brace literal ───────────────────────────────────</span>
+person = {<span class="st">"name"</span>: <span class="st">"Alice"</span>, <span class="st">"age"</span>: <span class="nm">30</span>, <span class="st">"city"</span>: <span class="st">"Paris"</span>}
+
+<span class="cm"># ── dict() constructor ─────────────────────────────────────</span>
+d1 = <span class="fn">dict</span>(name=<span class="st">"Alice"</span>, age=<span class="nm">30</span>)         <span class="cm"># keyword args (keys become strings)</span>
+d2 = <span class="fn">dict</span>([(  <span class="st">"a"</span>, <span class="nm">1</span>), (<span class="st">"b"</span>, <span class="nm">2</span>)])          <span class="cm"># from list of (key, value) pairs</span>
+d3 = <span class="fn">dict</span>(<span class="fn">zip</span>([<span class="st">"a"</span>, <span class="st">"b"</span>], [<span class="nm">1</span>, <span class="nm">2</span>]))      <span class="cm"># from two parallel iterables</span>
+
+<span class="cm"># ── dict.fromkeys() ────────────────────────────────────────</span>
+keys = [<span class="st">"x"</span>, <span class="st">"y"</span>, <span class="st">"z"</span>]
+d4 = <span class="fn">dict</span>.<span class="fn">fromkeys</span>(keys)          <span class="cm"># {'x': None, 'y': None, 'z': None}</span>
+d5 = <span class="fn">dict</span>.<span class="fn">fromkeys</span>(keys, <span class="nm">0</span>)       <span class="cm"># {'x': 0, 'y': 0, 'z': 0}</span>
+
+<span class="cm"># ── Empty dict ─────────────────────────────────────────────</span>
+empty = {}
+empty = <span class="fn">dict</span>()
+
+<span class="cm"># ── Comprehension ──────────────────────────────────────────</span>
+squares = {x: x**<span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">5</span>)}    <span class="cm"># {0:0, 1:1, 2:4, 3:9, 4:16}</span>
+
+<span class="cm"># ── Mixed value types ──────────────────────────────────────</span>
+config = {
+    <span class="st">"host"</span>:    <span class="st">"localhost"</span>,
+    <span class="st">"port"</span>:    <span class="nm">8080</span>,
+    <span class="st">"debug"</span>:   <span class="kw">True</span>,
+    <span class="st">"tags"</span>:    [<span class="st">"web"</span>, <span class="st">"api"</span>],
+    <span class="st">"options"</span>: {<span class="st">"timeout"</span>: <span class="nm">30</span>},
+}</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <span class="callout-icon">💡</span>
+      <div><strong><code>dict.fromkeys(keys, value)</code> warning:</strong> The default value is shared across all keys. If the value is mutable (e.g., a list), all keys will reference the <em>same</em> list object. Use a comprehension instead: <code>{k: [] for k in keys}</code>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 3. ACCESSING ════════════════ -->
+<section id="access">
+  <div class="section-header">
+    <span class="section-icon">🔑</span>
+    <h2>3. Accessing Values</h2>
+  </div>
+  <div class="section-body">
+    <div class="grid-2">
+      <div class="card">
+        <h4>Bracket Notation []</h4>
+        <pre><code>d = {<span class="st">"a"</span>: <span class="nm">1</span>, <span class="st">"b"</span>: <span class="nm">2</span>}
+d[<span class="st">"a"</span>]      <span class="cm"># 1</span>
+d[<span class="st">"z"</span>]      <span class="cm"># ❌ KeyError</span></code></pre>
+      </div>
+      <div class="card">
+        <h4>get() — safe access</h4>
+        <pre><code>d.<span class="fn">get</span>(<span class="st">"a"</span>)          <span class="cm"># 1</span>
+d.<span class="fn">get</span>(<span class="st">"z"</span>)          <span class="cm"># None  (no error)</span>
+d.<span class="fn">get</span>(<span class="st">"z"</span>, <span class="st">"N/A"</span>)   <span class="cm"># "N/A" (custom default)</span></code></pre>
+      </div>
+    </div>
+
+    <div class="code-wrap" style="margin-top:1rem">
+      <pre><code><span class="cm"># All keys, values, items</span>
+d = {<span class="st">"x"</span>: <span class="nm">10</span>, <span class="st">"y"</span>: <span class="nm">20</span>, <span class="st">"z"</span>: <span class="nm">30</span>}
+d.<span class="fn">keys</span>()     <span class="cm"># dict_keys(['x', 'y', 'z'])</span>
+d.<span class="fn">values</span>()   <span class="cm"># dict_values([10, 20, 30])</span>
+d.<span class="fn">items</span>()    <span class="cm"># dict_items([('x',10),('y',20),('z',30)])</span>
+
+<span class="cm"># Convert to lists</span>
+<span class="fn">list</span>(d.<span class="fn">keys</span>())    <span class="cm"># ['x', 'y', 'z']</span>
+<span class="fn">list</span>(d.<span class="fn">values</span>())  <span class="cm"># [10, 20, 30]</span>
+
+<span class="cm"># Nested access</span>
+config = {<span class="st">"db"</span>: {<span class="st">"host"</span>: <span class="st">"localhost"</span>, <span class="st">"port"</span>: <span class="nm">5432</span>}}
+config[<span class="st">"db"</span>][<span class="st">"host"</span>]             <span class="cm"># "localhost"</span>
+config.<span class="fn">get</span>(<span class="st">"db"</span>, {}).<span class="fn">get</span>(<span class="st">"port"</span>)  <span class="cm"># 5432 — safe nested access</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 4. ADDING / UPDATING ════════════════ -->
+<section id="modify">
+  <div class="section-header">
+    <span class="section-icon">✏️</span>
+    <h2>4. Adding &amp; Updating</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <pre><code>d = {<span class="st">"a"</span>: <span class="nm">1</span>}
+
+<span class="cm"># Add a new key</span>
+d[<span class="st">"b"</span>] = <span class="nm">2</span>          <span class="cm"># {'a': 1, 'b': 2}</span>
+
+<span class="cm"># Update existing key</span>
+d[<span class="st">"a"</span>] = <span class="nm">99</span>         <span class="cm"># {'a': 99, 'b': 2}</span>
+
+<span class="cm"># update() — merge another dict or iterable of pairs</span>
+d.<span class="fn">update</span>({<span class="st">"c"</span>: <span class="nm">3</span>, <span class="st">"d"</span>: <span class="nm">4</span>})        <span class="cm"># adds/updates c and d</span>
+d.<span class="fn">update</span>(e=<span class="nm">5</span>, f=<span class="nm">6</span>)               <span class="cm"># keyword args</span>
+d.<span class="fn">update</span>([(<span class="st">"g"</span>, <span class="nm">7</span>), (<span class="st">"h"</span>, <span class="nm">8</span>)])   <span class="cm"># list of tuples</span>
+
+<span class="cm"># setdefault() — add key ONLY if it doesn't exist</span>
+d.<span class="fn">setdefault</span>(<span class="st">"a"</span>, <span class="nm">0</span>)   <span class="cm"># returns 99 — key exists, no change</span>
+d.<span class="fn">setdefault</span>(<span class="st">"z"</span>, <span class="nm">0</span>)   <span class="cm"># inserts z=0, returns 0</span>
+
+<span class="cm"># Python 3.9+ — merge operator |=</span>
+d |= {<span class="st">"x"</span>: <span class="nm">100</span>}       <span class="cm"># in-place update</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 5. REMOVING ════════════════ -->
+<section id="remove">
+  <div class="section-header">
+    <span class="section-icon">🗑️</span>
+    <h2>5. Removing Elements</h2>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <tr><th>Method</th><th>Behaviour</th><th>If key missing</th><th>Returns</th></tr>
+        <tr><td><code>del d[k]</code></td><td>Removes key k</td><td><code>KeyError</code></td><td>None</td></tr>
+        <tr><td><code>d.pop(k)</code></td><td>Removes &amp; returns value of k</td><td><code>KeyError</code></td><td>value</td></tr>
+        <tr><td><code>d.pop(k, default)</code></td><td>Removes &amp; returns value, or default</td><td>Returns default (safe)</td><td>value/default</td></tr>
+        <tr><td><code>d.popitem()</code></td><td>Removes &amp; returns last inserted (k, v) pair (LIFO)</td><td><code>KeyError</code> if empty</td><td>(key, value) tuple</td></tr>
+        <tr><td><code>d.clear()</code></td><td>Removes all key-value pairs</td><td>—</td><td>None</td></tr>
+      </table>
+    </div>
+    <div class="code-wrap" style="margin-top:1rem">
+      <pre><code>d = {<span class="st">"a"</span>: <span class="nm">1</span>, <span class="st">"b"</span>: <span class="nm">2</span>, <span class="st">"c"</span>: <span class="nm">3</span>}
+
+<span class="kw">del</span> d[<span class="st">"a"</span>]                 <span class="cm"># {'b':2, 'c':3}</span>
+v = d.<span class="fn">pop</span>(<span class="st">"b"</span>)             <span class="cm"># v=2, d={'c':3}</span>
+v = d.<span class="fn">pop</span>(<span class="st">"z"</span>, <span class="st">"N/A"</span>)     <span class="cm"># v="N/A", no error</span>
+k, v = d.<span class="fn">popitem</span>()        <span class="cm"># removes last item</span>
+d.<span class="fn">clear</span>()                  <span class="cm"># {}</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 6. CHECKING ════════════════ -->
+<section id="check">
+  <div class="section-header">
+    <span class="section-icon">🔍</span>
+    <h2>6. Checking &amp; Testing</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <pre><code>d = {<span class="st">"name"</span>: <span class="st">"Alice"</span>, <span class="st">"age"</span>: <span class="nm">30</span>}
+
+<span class="cm"># Key membership — O(1)</span>
+<span class="st">"name"</span> <span class="kw">in</span> d             <span class="cm"># True</span>
+<span class="st">"email"</span> <span class="kw">not in</span> d        <span class="cm"># True</span>
+
+<span class="cm"># Value membership — O(n)</span>
+<span class="st">"Alice"</span> <span class="kw">in</span> d.<span class="fn">values</span>()   <span class="cm"># True</span>
+
+<span class="cm"># Item / pair membership</span>
+(<span class="st">"age"</span>, <span class="nm">30</span>) <span class="kw">in</span> d.<span class="fn">items</span>()   <span class="cm"># True</span>
+
+<span class="cm"># Size</span>
+<span class="fn">len</span>(d)                   <span class="cm"># 2</span>
+<span class="kw">not</span> d                    <span class="cm"># False (non-empty dict is truthy)</span>
+<span class="kw">not</span> {}                   <span class="cm"># True  (empty dict is falsy)</span>
+
+<span class="cm"># Type check</span>
+<span class="fn">isinstance</span>(d, <span class="fn">dict</span>)      <span class="cm"># True</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 7. ITERATING ════════════════ -->
+<section id="iterate">
+  <div class="section-header">
+    <span class="section-icon">🔁</span>
+    <h2>7. Iterating Over Dictionaries</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <pre><code>d = {<span class="st">"a"</span>: <span class="nm">1</span>, <span class="st">"b"</span>: <span class="nm">2</span>, <span class="st">"c"</span>: <span class="nm">3</span>}
+
+<span class="cm"># ── Iterate keys (default) ────────────────────────────</span>
+<span class="kw">for</span> k <span class="kw">in</span> d:
+    <span class="fn">print</span>(k, d[k])
+
+<span class="cm"># ── Iterate keys explicitly ───────────────────────────</span>
+<span class="kw">for</span> k <span class="kw">in</span> d.<span class="fn">keys</span>():
+    <span class="fn">print</span>(k)
+
+<span class="cm"># ── Iterate values ────────────────────────────────────</span>
+<span class="kw">for</span> v <span class="kw">in</span> d.<span class="fn">values</span>():
+    <span class="fn">print</span>(v)
+
+<span class="cm"># ── Iterate key-value pairs (most common) ─────────────</span>
+<span class="kw">for</span> k, v <span class="kw">in</span> d.<span class="fn">items</span>():
+    <span class="fn">print</span>(<span class="fn">f</span><span class="st">"{k} → {v}"</span>)
+
+<span class="cm"># ── Sorted iteration ──────────────────────────────────</span>
+<span class="kw">for</span> k <span class="kw">in</span> <span class="fn">sorted</span>(d):
+    <span class="fn">print</span>(k, d[k])
+
+<span class="kw">for</span> k, v <span class="kw">in</span> <span class="fn">sorted</span>(d.<span class="fn">items</span>(), key=<span class="kw">lambda</span> x: x[<span class="nm">1</span>]):   <span class="cm"># sort by value</span>
+    <span class="fn">print</span>(k, v)
+
+<span class="cm"># ── Reversed iteration (Python 3.8+) ──────────────────</span>
+<span class="kw">for</span> k <span class="kw">in</span> <span class="fn">reversed</span>(d):
+    <span class="fn">print</span>(k)
+
+<span class="cm"># ── Enumerate with index ──────────────────────────────</span>
+<span class="kw">for</span> i, (k, v) <span class="kw">in</span> <span class="fn">enumerate</span>(d.<span class="fn">items</span>()):
+    <span class="fn">print</span>(i, k, v)</code></pre>
+    </div>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div>Do <strong>not</strong> add or remove keys while iterating over a dict — this raises <code>RuntimeError: dictionary changed size during iteration</code>. Iterate over <code>list(d.items())</code> or collect keys to delete first.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 8. ALL METHODS ════════════════ -->
+<section id="methods">
+  <div class="section-header">
+    <span class="section-icon">🔧</span>
+    <h2>8. All Built-in Dictionary Methods</h2>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <tr><th>Method</th><th>Description</th><th>Returns</th><th>Mutates</th></tr>
+        <tr><td><code>d.get(k, default)</code></td><td>Value for key k, or default (None)</td><td>value / default</td><td>No</td></tr>
+        <tr><td><code>d.keys()</code></td><td>View of all keys</td><td>dict_keys</td><td>No</td></tr>
+        <tr><td><code>d.values()</code></td><td>View of all values</td><td>dict_values</td><td>No</td></tr>
+        <tr><td><code>d.items()</code></td><td>View of all (key, value) pairs</td><td>dict_items</td><td>No</td></tr>
+        <tr><td><code>d.update(other)</code></td><td>Add/overwrite from another dict/iterable</td><td>None</td><td>Yes</td></tr>
+        <tr><td><code>d.setdefault(k, v)</code></td><td>Get value for k; if missing, insert k=v and return v</td><td>value</td><td>Yes (if absent)</td></tr>
+        <tr><td><code>d.pop(k, default)</code></td><td>Remove and return value for k</td><td>value</td><td>Yes</td></tr>
+        <tr><td><code>d.popitem()</code></td><td>Remove and return last (k, v) pair</td><td>(key, val)</td><td>Yes</td></tr>
+        <tr><td><code>d.clear()</code></td><td>Remove all items</td><td>None</td><td>Yes</td></tr>
+        <tr><td><code>d.copy()</code></td><td>Shallow copy</td><td>dict</td><td>No</td></tr>
+        <tr><td><code>dict.fromkeys(iter, v)</code></td><td>New dict with keys from iter, all set to v</td><td>dict</td><td>No</td></tr>
+      </table>
+    </div>
+
+    <h3>View Objects — Dynamic Windows</h3>
+    <div class="code-wrap">
+      <pre><code>d = {<span class="st">"a"</span>: <span class="nm">1</span>, <span class="st">"b"</span>: <span class="nm">2</span>}
+keys = d.<span class="fn">keys</span>()      <span class="cm"># dict_keys(['a', 'b'])</span>
+d[<span class="st">"c"</span>] = <span class="nm">3</span>
+<span class="fn">print</span>(keys)          <span class="cm"># dict_keys(['a', 'b', 'c']) — auto-updated!</span>
+
+<span class="cm"># Views support set-like operations</span>
+d1 = {<span class="st">"a"</span>: <span class="nm">1</span>, <span class="st">"b"</span>: <span class="nm">2</span>}
+d2 = {<span class="st">"b"</span>: <span class="nm">3</span>, <span class="st">"c"</span>: <span class="nm">4</span>}
+d1.<span class="fn">keys</span>() &amp; d2.<span class="fn">keys</span>()   <span class="cm"># {'b'} — common keys</span>
+d1.<span class="fn">keys</span>() - d2.<span class="fn">keys</span>()   <span class="cm"># {'a'} — keys only in d1</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 9. COMPREHENSION ════════════════ -->
+<section id="comprehension">
+  <div class="section-header">
+    <span class="section-icon">✨</span>
+    <h2>9. Dictionary Comprehensions</h2>
+  </div>
+  <div class="section-body">
+    <p>Syntax: <code>{ key_expr: val_expr for item in iterable [if condition] }</code></p>
+    <div class="code-wrap">
+      <pre><code><span class="cm"># Basic</span>
+squares = {x: x**<span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">6</span>)}
+<span class="cm"># {0: 0, 1: 1, 2: 4, 3: 9, 4: 16, 5: 25}</span>
+
+<span class="cm"># With condition</span>
+even_sq = {x: x**<span class="nm">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">10</span>) <span class="kw">if</span> x % <span class="nm">2</span> == <span class="nm">0</span>}
+<span class="cm"># {0: 0, 2: 4, 4: 16, 6: 36, 8: 64}</span>
+
+<span class="cm"># Invert a dict (swap keys and values)</span>
+d      = {<span class="st">"a"</span>: <span class="nm">1</span>, <span class="st">"b"</span>: <span class="nm">2</span>, <span class="st">"c"</span>: <span class="nm">3</span>}
+inv    = {v: k <span class="kw">for</span> k, v <span class="kw">in</span> d.<span class="fn">items</span>()}   <span class="cm"># {1:'a', 2:'b', 3:'c'}</span>
+
+<span class="cm"># Filter keys</span>
+scores = {<span class="st">"Alice"</span>: <span class="nm">88</span>, <span class="st">"Bob"</span>: <span class="nm">55</span>, <span class="st">"Carol"</span>: <span class="nm">91</span>}
+passed = {k: v <span class="kw">for</span> k, v <span class="kw">in</span> scores.<span class="fn">items</span>() <span class="kw">if</span> v >= <span class="nm">60</span>}
+<span class="cm"># {'Alice': 88, 'Carol': 91}</span>
+
+<span class="cm"># Transform values</span>
+upper = {k: v.<span class="fn">upper</span>() <span class="kw">for</span> k, v <span class="kw">in</span> {<span class="st">"a"</span>: <span class="st">"hello"</span>, <span class="st">"b"</span>: <span class="st">"world"</span>}.<span class="fn">items</span>()}
+
+<span class="cm"># From two lists</span>
+keys   = [<span class="st">"name"</span>, <span class="st">"age"</span>, <span class="st">"city"</span>]
+values = [<span class="st">"Alice"</span>, <span class="nm">30</span>, <span class="st">"Paris"</span>]
+d = {k: v <span class="kw">for</span> k, v <span class="kw">in</span> <span class="fn">zip</span>(keys, values)}
+
+<span class="cm"># Nested comprehension — flatten nested dict</span>
+nested = {<span class="st">"a"</span>: {<span class="st">"x"</span>: <span class="nm">1</span>}, <span class="st">"b"</span>: {<span class="st">"y"</span>: <span class="nm">2</span>}}
+flat   = {f<span class="st">"{ok}.{ik}"</span>: iv <span class="kw">for</span> ok, ov <span class="kw">in</span> nested.<span class="fn">items</span>() <span class="kw">for</span> ik, iv <span class="kw">in</span> ov.<span class="fn">items</span>()}
+<span class="cm"># {'a.x': 1, 'b.y': 2}</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 10. MERGING ════════════════ -->
+<section id="merge">
+  <div class="section-header">
+    <span class="section-icon">🔀</span>
+    <h2>10. Merging Dictionaries</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <pre><code>a = {<span class="st">"x"</span>: <span class="nm">1</span>, <span class="st">"y"</span>: <span class="nm">2</span>}
+b = {<span class="st">"y"</span>: <span class="nm">99</span>, <span class="st">"z"</span>: <span class="nm">3</span>}   <span class="cm"># b's value for 'y' wins on conflict</span>
+
+<span class="cm"># ── Python 3.9+ — merge operator | ──────────────────────</span>
+merged = a | b           <span class="cm"># {'x':1, 'y':99, 'z':3} — new dict</span>
+a |= b                   <span class="cm"># in-place update a</span>
+
+<span class="cm"># ── Unpacking (Python 3.5+) ──────────────────────────────</span>
+merged = {**a, **b}      <span class="cm"># {'x':1, 'y':99, 'z':3}</span>
+merged = {**a, **b, <span class="st">"extra"</span>: <span class="nm">42</span>}   <span class="cm"># add extra keys inline</span>
+
+<span class="cm"># ── update() — mutates a ─────────────────────────────────</span>
+a.<span class="fn">update</span>(b)              <span class="cm"># a modified in place</span>
+
+<span class="cm"># ── ChainMap — non-destructive layering ──────────────────</span>
+<span class="kw">from</span> collections <span class="kw">import</span> <span class="cl">ChainMap</span>
+cm = <span class="cl">ChainMap</span>(b, a)      <span class="cm"># looks up b first, then a</span>
+cm[<span class="st">"y"</span>]                  <span class="cm"># 99   (from b)</span>
+cm[<span class="st">"x"</span>]                  <span class="cm"># 1    (from a)</span>
+
+<span class="cm"># ── Merge preserving all values (list per key) ───────────</span>
+<span class="kw">from</span> collections <span class="kw">import</span> <span class="cl">defaultdict</span>
+merged = <span class="fn">defaultdict</span>(<span class="fn">list</span>)
+<span class="kw">for</span> d <span class="kw">in</span> [a, b]:
+    <span class="kw">for</span> k, v <span class="kw">in</span> d.<span class="fn">items</span>():
+        merged[k].<span class="fn">append</span>(v)
+<span class="cm"># {'x': [1], 'y': [2, 99], 'z': [3]}</span></code></pre>
+    </div>
+    <div class="callout callout-info">
+      <span class="callout-icon">💡</span>
+      <div>When two dicts share a key and you merge, <strong>the right-hand dict wins</strong> for both <code>|</code> and <code>{**a, **b}</code>. Earlier keys in <code>ChainMap</code> win (first-write-wins lookup).</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 11. NESTED DICTS ════════════════ -->
+<section id="nested">
+  <div class="section-header">
+    <span class="section-icon">📦</span>
+    <h2>11. Nested Dictionaries</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <pre><code>org = {
+    <span class="st">"CEO"</span>: {
+        <span class="st">"name"</span>: <span class="st">"Alice"</span>,
+        <span class="st">"reports"</span>: {
+            <span class="st">"CTO"</span>: {<span class="st">"name"</span>: <span class="st">"Bob"</span>, <span class="st">"reports"</span>: {}},
+            <span class="st">"CFO"</span>: {<span class="st">"name"</span>: <span class="st">"Carol"</span>, <span class="st">"reports"</span>: {}},
+        }
+    }
+}
+
+<span class="cm"># Access nested value</span>
+org[<span class="st">"CEO"</span>][<span class="st">"reports"</span>][<span class="st">"CTO"</span>][<span class="st">"name"</span>]   <span class="cm"># "Bob"</span>
+
+<span class="cm"># Safe deep access with .get() chaining</span>
+org.<span class="fn">get</span>(<span class="st">"CEO"</span>, {}).<span class="fn">get</span>(<span class="st">"reports"</span>, {}).\
+    <span class="fn">get</span>(<span class="st">"CTO"</span>, {}).<span class="fn">get</span>(<span class="st">"name"</span>)          <span class="cm"># "Bob"</span>
+
+<span class="cm"># Generic deep_get helper</span>
+<span class="kw">def</span> <span class="fn">deep_get</span>(d, *keys, default=<span class="kw">None</span>):
+    <span class="kw">for</span> k <span class="kw">in</span> keys:
+        <span class="kw">if not</span> <span class="fn">isinstance</span>(d, <span class="fn">dict</span>):
+            <span class="kw">return</span> default
+        d = d.<span class="fn">get</span>(k, default)
+    <span class="kw">return</span> d
+
+<span class="fn">deep_get</span>(org, <span class="st">"CEO"</span>, <span class="st">"reports"</span>, <span class="st">"CTO"</span>, <span class="st">"name"</span>)  <span class="cm"># "Bob"</span>
+<span class="fn">deep_get</span>(org, <span class="st">"CEO"</span>, <span class="st">"reports"</span>, <span class="st">"COO"</span>, <span class="st">"name"</span>)  <span class="cm"># None</span>
+
+<span class="cm"># Update nested value</span>
+org[<span class="st">"CEO"</span>][<span class="st">"reports"</span>][<span class="st">"CTO"</span>][<span class="st">"name"</span>] = <span class="st">"Robert"</span>
+
+<span class="cm"># Copy (shallow vs deep)</span>
+<span class="kw">import</span> copy
+shallow = org.<span class="fn">copy</span>()            <span class="cm"># inner dicts still shared</span>
+deep    = copy.<span class="fn">deepcopy</span>(org)    <span class="cm"># fully independent copy</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 12. SPECIAL DICTS ════════════════ -->
+<section id="special">
+  <div class="section-header">
+    <span class="section-icon">🧰</span>
+    <h2>12. Specialized Dictionary Types</h2>
+  </div>
+  <div class="section-body">
+
+    <h3>defaultdict — automatic default values</h3>
+    <div class="code-wrap">
+      <pre><code><span class="kw">from</span> collections <span class="kw">import</span> <span class="cl">defaultdict</span>
+
+<span class="cm"># Grouping</span>
+items = [(<span class="st">"a"</span>, <span class="nm">1</span>), (<span class="st">"b"</span>, <span class="nm">2</span>), (<span class="st">"a"</span>, <span class="nm">3</span>), (<span class="st">"b"</span>, <span class="nm">4</span>)]
+grouped = <span class="fn">defaultdict</span>(<span class="fn">list</span>)
+<span class="kw">for</span> k, v <span class="kw">in</span> items:
+    grouped[k].<span class="fn">append</span>(v)
+<span class="cm"># defaultdict(list, {'a': [1, 3], 'b': [2, 4]})</span>
+
+<span class="cm"># Word frequency count</span>
+freq = <span class="fn">defaultdict</span>(<span class="fn">int</span>)
+<span class="kw">for</span> word <span class="kw">in</span> <span class="st">"the cat sat on the mat"</span>.<span class="fn">split</span>():
+    freq[word] += <span class="nm">1</span>
+<span class="cm"># {'the': 2, 'cat': 1, 'sat': 1, 'on': 1, 'mat': 1}</span>
+
+<span class="cm"># Nested defaultdict</span>
+nested = <span class="fn">defaultdict</span>(<span class="kw">lambda</span>: <span class="fn">defaultdict</span>(<span class="fn">int</span>))
+nested[<span class="st">"A"</span>][<span class="st">"x"</span>] += <span class="nm">1</span>    <span class="cm"># no KeyError</span></code></pre>
+    </div>
+
+    <h3>Counter — frequency counting</h3>
+    <div class="code-wrap">
+      <pre><code><span class="kw">from</span> collections <span class="kw">import</span> <span class="cl">Counter</span>
+
+c = <span class="cl">Counter</span>(<span class="st">"abracadabra"</span>)
+<span class="cm"># Counter({'a': 5, 'b': 2, 'r': 2, 'c': 1, 'd': 1})</span>
+
+c = <span class="cl">Counter</span>([<span class="st">"apple"</span>, <span class="st">"banana"</span>, <span class="st">"apple"</span>, <span class="st">"cherry"</span>])
+c.<span class="fn">most_common</span>(<span class="nm">2</span>)        <span class="cm"># [('apple', 2), ('banana', 1)]</span>
+
+c[<span class="st">"apple"</span>]               <span class="cm"># 2</span>
+c[<span class="st">"missing"</span>]             <span class="cm"># 0 — no KeyError!</span>
+
+<span class="cm"># Counter arithmetic</span>
+c1 = <span class="cl">Counter</span>(a=<span class="nm">3</span>, b=<span class="nm">1</span>)
+c2 = <span class="cl">Counter</span>(a=<span class="nm">1</span>, b=<span class="nm">2</span>)
+c1 + c2   <span class="cm"># Counter({'a': 4, 'b': 3})</span>
+c1 - c2   <span class="cm"># Counter({'a': 2})        — negatives dropped</span>
+c1 & c2   <span class="cm"># Counter({'a': 1, 'b': 1}) — min of each</span>
+c1 | c2   <span class="cm"># Counter({'a': 3, 'b': 2}) — max of each</span></code></pre>
+    </div>
+
+    <h3>OrderedDict — explicit ordering (legacy)</h3>
+    <div class="code-wrap">
+      <pre><code><span class="kw">from</span> collections <span class="kw">import</span> <span class="cl">OrderedDict</span>
+
+od = <span class="cl">OrderedDict</span>()
+od[<span class="st">"first"</span>]  = <span class="nm">1</span>
+od[<span class="st">"second"</span>] = <span class="nm">2</span>
+od[<span class="st">"third"</span>]  = <span class="nm">3</span>
+
+od.<span class="fn">move_to_end</span>(<span class="st">"first"</span>)       <span class="cm"># move to end</span>
+od.<span class="fn">move_to_end</span>(<span class="st">"third"</span>, last=<span class="kw">False</span>)  <span class="cm"># move to front</span>
+
+<span class="cm"># Equality — OrderedDict considers order, dict doesn't</span>
+<span class="cl">OrderedDict</span>([(<span class="st">"a"</span>,<span class="nm">1</span>),(<span class="st">"b"</span>,<span class="nm">2</span>)]) == <span class="cl">OrderedDict</span>([(<span class="st">"b"</span>,<span class="nm">2</span>),(<span class="st">"a"</span>,<span class="nm">1</span>)])
+<span class="cm"># False</span></code></pre>
+    </div>
+
+    <h3>ChainMap — layered lookups</h3>
+    <div class="code-wrap">
+      <pre><code><span class="kw">from</span> collections <span class="kw">import</span> <span class="cl">ChainMap</span>
+
+defaults = {<span class="st">"color"</span>: <span class="st">"red"</span>, <span class="st">"user"</span>: <span class="st">"guest"</span>}
+env      = {<span class="st">"user"</span>: <span class="st">"admin"</span>}          <span class="cm"># overrides default</span>
+cli      = {<span class="st">"color"</span>: <span class="st">"blue"</span>}          <span class="cm"># highest priority</span>
+
+config = <span class="cl">ChainMap</span>(cli, env, defaults)  <span class="cm"># left-to-right priority</span>
+config[<span class="st">"color"</span>]   <span class="cm"># "blue"  (from cli)</span>
+config[<span class="st">"user"</span>]    <span class="cm"># "admin" (from env)</span>
+
+<span class="cm"># Writes go to the FIRST map</span>
+config[<span class="st">"new_key"</span>] = <span class="st">"hi"</span>    <span class="cm"># added to cli</span></code></pre>
+    </div>
+
+    <h3>Types.MappingProxyType — read-only dict</h3>
+    <div class="code-wrap">
+      <pre><code><span class="kw">from</span> types <span class="kw">import</span> <span class="cl">MappingProxyType</span>
+
+d     = {<span class="st">"a"</span>: <span class="nm">1</span>, <span class="st">"b"</span>: <span class="nm">2</span>}
+proxy = <span class="cl">MappingProxyType</span>(d)
+
+proxy[<span class="st">"a"</span>]        <span class="cm"># 1 — read OK</span>
+proxy[<span class="st">"c"</span>] = <span class="nm">3</span>   <span class="cm"># ❌ TypeError: 'mappingproxy' does not support item assignment</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 13. TYPING ════════════════ -->
+<section id="typing">
+  <div class="section-header">
+    <span class="section-icon">🔷</span>
+    <h2>13. Type Annotations</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <pre><code><span class="cm"># ── Python 3.9+ — built-in generics ──────────────────────</span>
+<span class="kw">def</span> <span class="fn">get_score</span>(scores: <span class="fn">dict</span>[<span class="fn">str</span>, <span class="fn">int</span>], name: <span class="fn">str</span>) -> <span class="fn">int</span>:
+    <span class="kw">return</span> scores.<span class="fn">get</span>(name, <span class="nm">0</span>)
+
+mapping: <span class="fn">dict</span>[<span class="fn">str</span>, <span class="fn">list</span>[<span class="fn">int</span>]] = {<span class="st">"a"</span>: [<span class="nm">1</span>, <span class="nm">2</span>], <span class="st">"b"</span>: [<span class="nm">3</span>, <span class="nm">4</span>]}
+
+<span class="cm"># ── Python 3.8 and earlier — typing module ───────────────</span>
+<span class="kw">from</span> typing <span class="kw">import</span> <span class="cl">Dict</span>, <span class="cl">List</span>, <span class="cl">Optional</span>, <span class="cl">Any</span>
+
+scores: <span class="cl">Dict</span>[<span class="fn">str</span>, <span class="fn">int</span>]              = {<span class="st">"Alice"</span>: <span class="nm">95</span>}
+config: <span class="cl">Dict</span>[<span class="fn">str</span>, <span class="cl">Any</span>]             = {<span class="st">"port"</span>: <span class="nm">8080</span>, <span class="st">"debug"</span>: <span class="kw">True</span>}
+nested: <span class="cl">Dict</span>[<span class="fn">str</span>, <span class="cl">Dict</span>[<span class="fn">str</span>, <span class="fn">int</span>]]  = {<span class="st">"a"</span>: {<span class="st">"x"</span>: <span class="nm">1</span>}}
+
+<span class="cm"># ── TypedDict — typed dict with fixed keys ────────────────</span>
+<span class="kw">from</span> typing <span class="kw">import</span> <span class="cl">TypedDict</span>
+
+<span class="kw">class</span> <span class="cl">Person</span>(<span class="cl">TypedDict</span>):
+    name: <span class="fn">str</span>
+    age:  <span class="fn">int</span>
+    city: <span class="fn">str</span>
+
+<span class="kw">class</span> <span class="cl">PersonOpt</span>(<span class="cl">TypedDict</span>, total=<span class="kw">False</span>):  <span class="cm"># all keys optional</span>
+    name: <span class="fn">str</span>
+    age:  <span class="fn">int</span>
+
+alice: <span class="cl">Person</span> = {<span class="st">"name"</span>: <span class="st">"Alice"</span>, <span class="st">"age"</span>: <span class="nm">30</span>, <span class="st">"city"</span>: <span class="st">"Paris"</span>}
+
+<span class="cm"># ── Mapping — read-only protocol ──────────────────────────</span>
+<span class="kw">from</span> collections.abc <span class="kw">import</span> <span class="cl">Mapping</span>
+
+<span class="kw">def</span> <span class="fn">process</span>(data: <span class="cl">Mapping</span>[<span class="fn">str</span>, <span class="fn">int</span>]) -> <span class="fn">int</span>:
+    <span class="kw">return</span> <span class="fn">sum</span>(data.<span class="fn">values</span>())</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 14. VS COMPARISON ════════════════ -->
+<section id="vs">
+  <div class="section-header">
+    <span class="section-icon">⚖️</span>
+    <h2>14. Dict vs List vs Set vs Tuple</h2>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <tr><th>Feature</th><th>dict</th><th>list</th><th>set</th><th>tuple</th></tr>
+        <tr><td>Ordered</td><td><span class="tag tag-yes">✅ Yes (3.7+)</span></td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-yes">✅ Yes</span></td></tr>
+        <tr><td>Mutable</td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-no">❌ No</span></td></tr>
+        <tr><td>Duplicates</td><td>Keys: No / Values: Yes</td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-yes">✅ Yes</span></td></tr>
+        <tr><td>Index access</td><td>By key</td><td>By index</td><td><span class="tag tag-no">❌ No</span></td><td>By index</td></tr>
+        <tr><td>Key→Value</td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-no">❌ No</span></td></tr>
+        <tr><td>Membership test</td><td>O(1) avg (keys)</td><td>O(n)</td><td>O(1) avg</td><td>O(n)</td></tr>
+        <tr><td>Hashable itself</td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-yes">✅ Yes</span></td></tr>
+        <tr><td>Set math</td><td>On keys (view)</td><td><span class="tag tag-no">❌ No</span></td><td><span class="tag tag-yes">✅ Yes</span></td><td><span class="tag tag-no">❌ No</span></td></tr>
+        <tr><td>Best for</td><td>Key→Value mapping</td><td>Ordered sequence</td><td>Unique items</td><td>Immutable record</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 15. PERFORMANCE ════════════════ -->
+<section id="perf">
+  <div class="section-header">
+    <span class="section-icon">🚀</span>
+    <h2>15. Memory &amp; Performance</h2>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <tr><th>Operation</th><th>Average</th><th>Worst</th><th>Note</th></tr>
+        <tr><td><code>d[k]</code> / <code>d.get(k)</code></td><td><strong>O(1)</strong></td><td>O(n)</td><td>Hash collision worst case</td></tr>
+        <tr><td><code>d[k] = v</code></td><td><strong>O(1)</strong></td><td>O(n)</td><td>Amortized (resize)</td></tr>
+        <tr><td><code>del d[k]</code> / <code>d.pop(k)</code></td><td><strong>O(1)</strong></td><td>O(n)</td><td>—</td></tr>
+        <tr><td><code>k in d</code></td><td><strong>O(1)</strong></td><td>O(n)</td><td>vs O(n) for lists</td></tr>
+        <tr><td><code>len(d)</code></td><td>O(1)</td><td>O(1)</td><td>Stored attribute</td></tr>
+        <tr><td><code>d.copy()</code></td><td>O(n)</td><td>O(n)</td><td>Shallow copy</td></tr>
+        <tr><td>Iteration</td><td>O(n)</td><td>O(n)</td><td>Over all keys/values/items</td></tr>
+        <tr><td>Memory</td><td>~200–400 bytes + 60–120 bytes/item</td><td>—</td><td>Hash table overhead</td></tr>
+      </table>
+    </div>
+    <div class="code-wrap" style="margin-top:1rem">
+      <pre><code><span class="kw">import</span> sys
+d = {i: i**<span class="nm">2</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="nm">1000</span>)}
+sys.<span class="fn">getsizeof</span>(d)      <span class="cm"># ~36,960 bytes  (Python 3.11)</span>
+
+<span class="cm"># Compact alternative for read-only mappings</span>
+<span class="kw">from</span> types <span class="kw">import</span> <span class="cl">MappingProxyType</span>
+proxy = <span class="cl">MappingProxyType</span>(d)   <span class="cm"># same memory, immutable</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 16. PATTERNS ════════════════ -->
+<section id="patterns">
+  <div class="section-header">
+    <span class="section-icon">🎯</span>
+    <h2>16. Common Patterns &amp; Recipes</h2>
+  </div>
+  <div class="section-body">
+
+    <h3>Frequency / Word Count</h3>
+    <div class="code-wrap">
+      <pre><code>words = [<span class="st">"the"</span>, <span class="st">"cat"</span>, <span class="st">"sat"</span>, <span class="st">"on"</span>, <span class="st">"the"</span>, <span class="st">"mat"</span>]
+
+<span class="cm"># Method 1 — get() with default</span>
+freq = {}
+<span class="kw">for</span> w <span class="kw">in</span> words:
+    freq[w] = freq.<span class="fn">get</span>(w, <span class="nm">0</span>) + <span class="nm">1</span>
+
+<span class="cm"># Method 2 — defaultdict</span>
+<span class="kw">from</span> collections <span class="kw">import</span> <span class="cl">defaultdict</span>
+freq = <span class="fn">defaultdict</span>(<span class="fn">int</span>)
+<span class="kw">for</span> w <span class="kw">in</span> words: freq[w] += <span class="nm">1</span>
+
+<span class="cm"># Method 3 — Counter (best)</span>
+<span class="kw">from</span> collections <span class="kw">import</span> <span class="cl">Counter</span>
+freq = <span class="cl">Counter</span>(words)</code></pre>
+    </div>
+
+    <h3>Grouping Items</h3>
+    <div class="code-wrap">
+      <pre><code>people = [
+    {<span class="st">"name"</span>: <span class="st">"Alice"</span>, <span class="st">"dept"</span>: <span class="st">"Eng"</span>},
+    {<span class="st">"name"</span>: <span class="st">"Bob"</span>,   <span class="st">"dept"</span>: <span class="st">"HR"</span>},
+    {<span class="st">"name"</span>: <span class="st">"Carol"</span>, <span class="st">"dept"</span>: <span class="st">"Eng"</span>},
+]
+by_dept = <span class="fn">defaultdict</span>(<span class="fn">list</span>)
+<span class="kw">for</span> p <span class="kw">in</span> people:
+    by_dept[p[<span class="st">"dept"</span>]].<span class="fn">append</span>(p[<span class="st">"name"</span>])
+<span class="cm"># {'Eng': ['Alice', 'Carol'], 'HR': ['Bob']}</span></code></pre>
+    </div>
+
+    <h3>Invert a Dictionary</h3>
+    <div class="code-wrap">
+      <pre><code><span class="cm"># Simple invert (unique values)</span>
+d   = {<span class="st">"a"</span>: <span class="nm">1</span>, <span class="st">"b"</span>: <span class="nm">2</span>, <span class="st">"c"</span>: <span class="nm">3</span>}
+inv = {v: k <span class="kw">for</span> k, v <span class="kw">in</span> d.<span class="fn">items</span>()}   <span class="cm"># {1:'a', 2:'b', 3:'c'}</span>
+
+<span class="cm"># Invert with duplicate values — collect keys in list</span>
+d   = {<span class="st">"a"</span>: <span class="nm">1</span>, <span class="st">"b"</span>: <span class="nm">2</span>, <span class="st">"c"</span>: <span class="nm">1</span>}
+inv = <span class="fn">defaultdict</span>(<span class="fn">list</span>)
+<span class="kw">for</span> k, v <span class="kw">in</span> d.<span class="fn">items</span>(): inv[v].<span class="fn">append</span>(k)
+<span class="cm"># {1: ['a', 'c'], 2: ['b']}</span></code></pre>
+    </div>
+
+    <h3>Sort a Dict by Value</h3>
+    <div class="code-wrap">
+      <pre><code>scores = {<span class="st">"Alice"</span>: <span class="nm">88</span>, <span class="st">"Bob"</span>: <span class="nm">55</span>, <span class="st">"Carol"</span>: <span class="nm">91</span>}
+
+<span class="cm"># Ascending</span>
+asc  = <span class="fn">dict</span>(<span class="fn">sorted</span>(scores.<span class="fn">items</span>(), key=<span class="kw">lambda</span> x: x[<span class="nm">1</span>]))
+<span class="cm"># Descending</span>
+desc = <span class="fn">dict</span>(<span class="fn">sorted</span>(scores.<span class="fn">items</span>(), key=<span class="kw">lambda</span> x: x[<span class="nm">1</span>], reverse=<span class="kw">True</span>))
+
+<span class="cm"># Top N items</span>
+top2 = <span class="fn">dict</span>(<span class="cl">Counter</span>(scores).<span class="fn">most_common</span>(<span class="nm">2</span>))</code></pre>
+    </div>
+
+    <h3>Caching / Memoisation</h3>
+    <div class="code-wrap">
+      <pre><code>cache = {}
+
+<span class="kw">def</span> <span class="fn">fib</span>(n):
+    <span class="kw">if</span> n <span class="kw">in</span> cache:
+        <span class="kw">return</span> cache[n]
+    <span class="kw">if</span> n <= <span class="nm">1</span>:
+        <span class="kw">return</span> n
+    cache[n] = <span class="fn">fib</span>(n-<span class="nm">1</span>) + <span class="fn">fib</span>(n-<span class="nm">2</span>)
+    <span class="kw">return</span> cache[n]
+
+<span class="cm"># Better: use functools.lru_cache</span>
+<span class="kw">from</span> functools <span class="kw">import</span> <span class="fn">lru_cache</span>
+<span class="op">@lru_cache</span>(maxsize=<span class="kw">None</span>)
+<span class="kw">def</span> <span class="fn">fib</span>(n):
+    <span class="kw">return</span> n <span class="kw">if</span> n <= <span class="nm">1</span> <span class="kw">else</span> <span class="fn">fib</span>(n-<span class="nm">1</span>) + <span class="fn">fib</span>(n-<span class="nm">2</span>)</code></pre>
+    </div>
+
+    <h3>Dispatch Table (replace if/elif chains)</h3>
+    <div class="code-wrap">
+      <pre><code><span class="kw">def</span> <span class="fn">add</span>(a, b): <span class="kw">return</span> a + b
+<span class="kw">def</span> <span class="fn">sub</span>(a, b): <span class="kw">return</span> a - b
+<span class="kw">def</span> <span class="fn">mul</span>(a, b): <span class="kw">return</span> a * b
+
+ops = {<span class="st">"+"</span>: add, <span class="st">"-"</span>: sub, <span class="st">"*"</span>: mul}
+
+result = ops.<span class="fn">get</span>(<span class="st">"+"</span>, <span class="kw">lambda</span> a, b: <span class="kw">None</span>)(<span class="nm">3</span>, <span class="nm">4</span>)   <span class="cm"># 7</span></code></pre>
+    </div>
+
+    <h3>Structural Pattern Matching (Python 3.10+)</h3>
+    <div class="code-wrap">
+      <pre><code>command = {<span class="st">"action"</span>: <span class="st">"move"</span>, <span class="st">"direction"</span>: <span class="st">"north"</span>, <span class="st">"steps"</span>: <span class="nm">3</span>}
+
+<span class="kw">match</span> command:
+    <span class="kw">case</span> {<span class="st">"action"</span>: <span class="st">"quit"</span>}:
+        <span class="fn">print</span>(<span class="st">"Quitting"</span>)
+    <span class="kw">case</span> {<span class="st">"action"</span>: <span class="st">"move"</span>, <span class="st">"direction"</span>: d, <span class="st">"steps"</span>: n}:
+        <span class="fn">print</span>(<span class="fn">f</span><span class="st">"Move {n} steps {d}"</span>)    <span class="cm"># Move 3 steps north</span>
+    <span class="kw">case</span> _:
+        <span class="fn">print</span>(<span class="st">"Unknown command"</span>)</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 17. PITFALLS ════════════════ -->
+<section id="pitfalls">
+  <div class="section-header">
+    <span class="section-icon">🪤</span>
+    <h2>17. Common Pitfalls</h2>
+  </div>
+  <div class="section-body">
+
+    <div class="callout callout-warn" style="margin-bottom:1rem">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 1 — KeyError on missing key</strong><br>
+      <code>d["missing"]</code> raises <code>KeyError</code>. Use <code>d.get("missing", default)</code> for safe access.</div>
+    </div>
+
+    <div class="callout callout-warn" style="margin-bottom:1rem">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 2 — Modifying a dict while iterating</strong><br>
+      <code>for k in d: del d[k]</code> → <code>RuntimeError</code>.<br>
+      Fix: <code>for k in list(d): del d[k]</code> or collect keys then delete.</div>
+    </div>
+
+    <div class="callout callout-warn" style="margin-bottom:1rem">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 3 — Unhashable key types</strong><br>
+      <code>{[1, 2]: "value"}</code> → <code>TypeError: unhashable type: 'list'</code>.<br>
+      Use tuples as keys: <code>{(1, 2): "value"}</code>.</div>
+    </div>
+
+    <div class="callout callout-warn" style="margin-bottom:1rem">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 4 — Shallow copy shares nested objects</strong><br>
+      <code>d2 = d.copy()</code>: top-level is copied but nested dicts/lists are still shared.<br>
+      Use <code>import copy; d2 = copy.deepcopy(d)</code> for full independence.</div>
+    </div>
+
+    <div class="callout callout-warn" style="margin-bottom:1rem">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 5 — <code>fromkeys</code> with mutable default</strong><br>
+      <code>dict.fromkeys(["a","b"], [])</code> — all keys reference the <em>same</em> list!<br>
+      Fix: <code>{k: [] for k in ["a","b"]}</code>.</div>
+    </div>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div><strong>Pitfall 6 — Comparing dicts with <code>is</code></strong><br>
+      <code>d1 is d2</code> checks identity (same object), not equality.<br>
+      Use <code>d1 == d2</code> to compare contents.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 18. QUICK REFERENCE ════════════════ -->
+<section id="ref">
+  <div class="section-header">
+    <span class="section-icon">📋</span>
+    <h2>18. Quick Reference Table</h2>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <tr><th>Task</th><th>Code</th><th>Notes</th></tr>
+        <tr><td>Create</td><td><code>{"a": 1, "b": 2}</code> / <code>dict(a=1)</code></td><td></td></tr>
+        <tr><td>Empty</td><td><code>{}</code> / <code>dict()</code></td><td>Both work for dicts</td></tr>
+        <tr><td>Get value</td><td><code>d["k"]</code> / <code>d.get("k", default)</code></td><td>get() is safe</td></tr>
+        <tr><td>Set value</td><td><code>d["k"] = v</code></td><td>Adds or updates</td></tr>
+        <tr><td>Conditional set</td><td><code>d.setdefault("k", v)</code></td><td>Only if missing</td></tr>
+        <tr><td>Delete key</td><td><code>del d["k"]</code> / <code>d.pop("k")</code></td><td>pop returns value</td></tr>
+        <tr><td>Safe delete</td><td><code>d.pop("k", None)</code></td><td>No KeyError</td></tr>
+        <tr><td>Remove last</td><td><code>d.popitem()</code></td><td>Returns (k, v)</td></tr>
+        <tr><td>Clear all</td><td><code>d.clear()</code></td><td></td></tr>
+        <tr><td>Key exists</td><td><code>"k" in d</code></td><td>O(1)</td></tr>
+        <tr><td>Iterate keys</td><td><code>for k in d</code> / <code>d.keys()</code></td><td></td></tr>
+        <tr><td>Iterate values</td><td><code>for v in d.values()</code></td><td></td></tr>
+        <tr><td>Iterate k+v</td><td><code>for k, v in d.items()</code></td><td>Most common</td></tr>
+        <tr><td>Merge (new)</td><td><code>d1 | d2</code> / <code>{**d1, **d2}</code></td><td>3.9+ / 3.5+</td></tr>
+        <tr><td>Merge (in-place)</td><td><code>d1 |= d2</code> / <code>d1.update(d2)</code></td><td></td></tr>
+        <tr><td>Copy (shallow)</td><td><code>d.copy()</code> / <code>{**d}</code></td><td></td></tr>
+        <tr><td>Copy (deep)</td><td><code>copy.deepcopy(d)</code></td><td>import copy</td></tr>
+        <tr><td>From keys</td><td><code>dict.fromkeys(iter, v)</code></td><td>Shared default!</td></tr>
+        <tr><td>Comprehension</td><td><code>{k: v for k, v in ...}</code></td><td></td></tr>
+        <tr><td>Sort by value</td><td><code>sorted(d.items(), key=lambda x: x[1])</code></td><td></td></tr>
+        <tr><td>Length</td><td><code>len(d)</code></td><td>O(1)</td></tr>
+        <tr><td>Frequency count</td><td><code>Counter(iterable)</code></td><td>from collections</td></tr>
+        <tr><td>Auto default</td><td><code>defaultdict(list/int/…)</code></td><td>from collections</td></tr>
+        <tr><td>Layer dicts</td><td><code>ChainMap(d1, d2, …)</code></td><td>from collections</td></tr>
+        <tr><td>Read-only dict</td><td><code>MappingProxyType(d)</code></td><td>from types</td></tr>
+        <tr><td>Type hint</td><td><code>dict[str, int]</code> / <code>TypedDict</code></td><td>3.9+ / typing</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ 19. CHEATSHEET ════════════════ -->
+<section id="cheat">
+  <div class="section-header">
+    <span class="section-icon">⚡</span>
+    <h2>19. Cheatsheet</h2>
+  </div>
+  <div class="section-body">
+    <div class="code-wrap">
+      <div class="code-label">quick reference</div>
+      <pre><code><span class="cm"># ── Create ─────────────────────────────────────────────────</span>
+d = {<span class="st">"a"</span>: <span class="nm">1</span>, <span class="st">"b"</span>: <span class="nm">2</span>}                    <span class="cm"># literal</span>
+d = <span class="fn">dict</span>(a=<span class="nm">1</span>, b=<span class="nm">2</span>)                     <span class="cm"># keyword args</span>
+d = <span class="fn">dict</span>.<span class="fn">fromkeys</span>([<span class="st">"x"</span>,<span class="st">"y"</span>], <span class="nm">0</span>)       <span class="cm"># all same value</span>
+d = {k: v <span class="kw">for</span> k, v <span class="kw">in</span> pairs}           <span class="cm"># comprehension</span>
+
+<span class="cm"># ── Access ─────────────────────────────────────────────────</span>
+d[<span class="st">"a"</span>]                                  <span class="cm"># KeyError if missing</span>
+d.<span class="fn">get</span>(<span class="st">"a"</span>, <span class="st">"default"</span>)                  <span class="cm"># safe — no error</span>
+d.<span class="fn">keys</span>()  /  d.<span class="fn">values</span>()  /  d.<span class="fn">items</span>()  <span class="cm"># views</span>
+
+<span class="cm"># ── Modify ─────────────────────────────────────────────────</span>
+d[<span class="st">"c"</span>] = <span class="nm">3</span>                              <span class="cm"># add / update</span>
+d.<span class="fn">update</span>({<span class="st">"d"</span>: <span class="nm">4</span>, <span class="st">"e"</span>: <span class="nm">5</span>})             <span class="cm"># bulk update</span>
+d.<span class="fn">setdefault</span>(<span class="st">"f"</span>, []).<span class="fn">append</span>(<span class="nm">1</span>)        <span class="cm"># insert if absent</span>
+
+<span class="cm"># ── Remove ─────────────────────────────────────────────────</span>
+<span class="kw">del</span> d[<span class="st">"a"</span>]                              <span class="cm"># KeyError if missing</span>
+d.<span class="fn">pop</span>(<span class="st">"b"</span>, <span class="kw">None</span>)                        <span class="cm"># safe remove</span>
+d.<span class="fn">popitem</span>()                             <span class="cm"># LIFO (k, v) pair</span>
+d.<span class="fn">clear</span>()                               <span class="cm"># empty</span>
+
+<span class="cm"># ── Check ──────────────────────────────────────────────────</span>
+<span class="st">"k"</span> <span class="kw">in</span> d                               <span class="cm"># O(1) key check</span>
+<span class="fn">len</span>(d)                                  <span class="cm"># count of pairs</span>
+<span class="kw">bool</span>(d)                                 <span class="cm"># False if empty</span>
+
+<span class="cm"># ── Iterate ────────────────────────────────────────────────</span>
+<span class="kw">for</span> k, v <span class="kw">in</span> d.<span class="fn">items</span>(): ...              <span class="cm"># most common</span>
+<span class="fn">sorted</span>(d.<span class="fn">items</span>(), key=<span class="kw">lambda</span> x: x[<span class="nm">1</span>])  <span class="cm"># sort by value</span>
+
+<span class="cm"># ── Merge ──────────────────────────────────────────────────</span>
+a | b                                   <span class="cm"># new dict (3.9+)</span>
+{**a, **b}                              <span class="cm"># new dict (3.5+)</span>
+a |= b ; a.<span class="fn">update</span>(b)                   <span class="cm"># in-place</span>
+
+<span class="cm"># ── Copy ───────────────────────────────────────────────────</span>
+d.<span class="fn">copy</span>()                                <span class="cm"># shallow</span>
+copy.<span class="fn">deepcopy</span>(d)                        <span class="cm"># deep</span>
+
+<span class="cm"># ── Special types ──────────────────────────────────────────</span>
+<span class="fn">defaultdict</span>(<span class="fn">list</span>)                       <span class="cm"># auto default</span>
+<span class="cl">Counter</span>(iterable)                       <span class="cm"># frequency count</span>
+<span class="cl">ChainMap</span>(d1, d2)                        <span class="cm"># layered lookup</span>
+<span class="cl">MappingProxyType</span>(d)                     <span class="cm"># read-only view</span>
+
+<span class="cm"># ── Recipes ────────────────────────────────────────────────</span>
+{v: k <span class="kw">for</span> k, v <span class="kw">in</span> d.<span class="fn">items</span>()}           <span class="cm"># invert dict</span>
+{k: v <span class="kw">for</span> k, v <span class="kw">in</span> d.<span class="fn">items</span>() <span class="kw">if</span> v > <span class="nm">0</span>}  <span class="cm"># filter by value</span>
+freq.<span class="fn">get</span>(w, <span class="nm">0</span>) + <span class="nm">1</span>                      <span class="cm"># count occurrences</span>
+ops[<span class="st">"+"</span>](a, b)                          <span class="cm"># dispatch table</span></code></pre>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  Python Dictionary — Complete Guide &nbsp;|&nbsp; Python 3.x &nbsp;|&nbsp; March 2026
+</footer>
+
+</body>
+</html>
