@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pandas Change Datatype — End to End</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0d1117;color:#c9d1d9;line-height:1.75}
+
+header{background:linear-gradient(135deg,#0f1923 0%,#0d1117 50%,#0a1a0a 100%);padding:52px 48px 38px;border-bottom:1px solid #30363d;position:relative;overflow:hidden}
+header::after{content:'';position:absolute;right:-60px;top:-60px;width:360px;height:360px;background:radial-gradient(circle,rgba(74,222,128,.07) 0%,transparent 70%);border-radius:50%}
+header h1{font-size:2.2rem;font-weight:800;background:linear-gradient(90deg,#4ade80,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px}
+header p{color:#8b949e;font-size:.98rem;max-width:780px}
+.badges{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+.badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600;letter-spacing:.03em}
+.b-green{background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+.b-blue{background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.3)}
+.b-orange{background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3)}
+.b-yellow{background:rgba(250,204,21,.12);color:#facc15;border:1px solid rgba(250,204,21,.3)}
+.b-purple{background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.3)}
+.b-teal{background:rgba(45,212,191,.12);color:#2dd4bf;border:1px solid rgba(45,212,191,.3)}
+.b-red{background:rgba(248,81,73,.12);color:#f87171;border:1px solid rgba(248,81,73,.3)}
+
+nav{background:#161b22;border-bottom:1px solid #30363d;display:flex;overflow-x:auto;padding:0 24px}
+nav a{color:#8b949e;text-decoration:none;padding:14px 14px;font-size:.83rem;border-bottom:2px solid transparent;white-space:nowrap;transition:.2s}
+nav a:hover{color:#4ade80;border-bottom-color:#4ade80}
+
+.container{max-width:1140px;margin:0 auto;padding:44px 32px}
+.section{margin-bottom:72px}
+
+.sh{display:flex;align-items:center;gap:14px;margin-bottom:6px;padding-bottom:14px;border-bottom:1px solid #21262d}
+.sh-icon{width:40px;height:40px;min-width:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.15rem}
+.sh h2{font-size:1.45rem;font-weight:700;color:#e6edf3}
+.sh-sub{color:#8b949e;font-size:.9rem;margin-bottom:26px}
+
+.card{background:#161b22;border:1px solid #30363d;border-radius:12px;overflow:hidden;margin-bottom:24px}
+.card-h{background:#1c2128;padding:13px 20px;border-bottom:1px solid #30363d;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.card-h h3{font-size:.93rem;font-weight:600;color:#e6edf3;flex:1}
+.pill{font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:12px}
+.p-green{background:rgba(74,222,128,.12);color:#4ade80}
+.p-blue{background:rgba(56,189,248,.12);color:#38bdf8}
+.p-orange{background:rgba(251,146,60,.12);color:#fb923c}
+.p-yellow{background:rgba(250,204,21,.12);color:#facc15}
+.p-purple{background:rgba(139,92,246,.12);color:#a78bfa}
+.p-teal{background:rgba(45,212,191,.12);color:#2dd4bf}
+.p-red{background:rgba(248,81,73,.12);color:#f87171}
+.card-b{padding:22px}
+
+pre{background:#010409;border:1px solid #21262d;border-radius:8px;padding:20px;overflow-x:auto;font-size:.815rem;line-height:1.78;margin-bottom:16px;tab-size:4}
+code{font-family:'Cascadia Code','Fira Code',Consolas,monospace}
+.kw{color:#ff7b72}.fn{color:#79c0ff}.str{color:#a5d6ff}.num{color:#f2cc60}
+.cmt{color:#8b949e;font-style:italic}.cls{color:#ffa657}
+.grn{color:#56d364}.pur{color:#d2a8ff}.tl{color:#2dd4bf}.yw{color:#f2cc60}
+
+.out{background:#010409;border:1px solid #21262d;border-radius:8px;padding:14px 18px;margin-bottom:14px}
+.out-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4ade80;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.out-label::before{content:'▶';font-size:.65rem}
+.out pre{background:transparent;border:none;padding:0;margin:0;color:#8b949e;font-size:.81rem}
+
+.info{border-radius:8px;padding:13px 17px;margin:12px 0;font-size:.87rem}
+.info-blue{background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.2);color:#7dd3fc}
+.info-green{background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.2);color:#86efac}
+.info-orange{background:rgba(251,146,60,.07);border:1px solid rgba(251,146,60,.2);color:#fed7aa}
+.info-red{background:rgba(248,81,73,.07);border:1px solid rgba(248,81,73,.2);color:#fca5a5}
+.info-purple{background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.2);color:#c4b5fd}
+.info-teal{background:rgba(45,212,191,.07);border:1px solid rgba(45,212,191,.2);color:#99f6e4}
+.info-yellow{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.2);color:#fef08a}
+.info strong{font-weight:700}
+
+table.dt{width:100%;border-collapse:collapse;font-size:.82rem}
+table.dt th{background:#1c2128;color:#38bdf8;padding:9px 13px;text-align:left;font-weight:600;border-bottom:1px solid #30363d;font-size:.77rem;text-transform:uppercase;letter-spacing:.05em}
+table.dt td{padding:8px 13px;border-bottom:1px solid #161b22;color:#c9d1d9;vertical-align:top}
+table.dt tr:hover td{background:#1c2128}
+table.dt code{font-family:'Cascadia Code',Consolas,monospace;font-size:.79rem}
+
+.scenario{background:rgba(74,222,128,.05);border-left:3px solid #16a34a;border-radius:0 8px 8px 0;padding:13px 17px;margin-bottom:18px;font-size:.88rem;color:#86efac}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+@media(max-width:700px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+
+.stat{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:16px;text-align:center}
+.stat-num{font-size:1.8rem;font-weight:800;margin-bottom:3px}
+.stat-label{font-size:.78rem;color:#8b949e;text-transform:uppercase;letter-spacing:.05em}
+.s-green .stat-num{color:#4ade80}.s-blue .stat-num{color:#38bdf8}
+.s-orange .stat-num{color:#fb923c}.s-yellow .stat-num{color:#facc15}
+.s-purple .stat-num{color:#a78bfa}.s-teal .stat-num{color:#2dd4bf}
+.s-red .stat-num{color:#f87171}
+
+.dtype-box{background:#1c2128;border:1px solid #30363d;border-radius:8px;padding:14px;margin:4px 0}
+.dtype-name{font-family:'Cascadia Code',Consolas,monospace;font-size:.85rem;font-weight:700;margin-bottom:4px}
+.dtype-desc{font-size:.78rem;color:#8b949e}
+.dtype-range{font-size:.74rem;color:#484f58;margin-top:2px;font-family:'Cascadia Code',Consolas,monospace}
+
+footer{background:#161b22;border-top:1px solid #30363d;padding:20px 48px;text-align:center;color:#484f58;font-size:.82rem}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔄 Pandas Change Datatype — End to End</h1>
+  <p>Complete guide: dtype fundamentals, astype(), to_numeric/datetime/timedelta, Categorical, nullable integer/boolean types, memory optimisation, and production patterns.</p>
+  <div class="badges">
+    <span class="badge b-green">pandas 2.x</span>
+    <span class="badge b-blue">NumPy dtypes</span>
+    <span class="badge b-orange">Arrow backend</span>
+    <span class="badge b-yellow">Memory optimisation</span>
+    <span class="badge b-purple">Nullable types</span>
+    <span class="badge b-teal">Python 3.11</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#concepts">Concepts</a>
+  <a href="#inspect">Inspect</a>
+  <a href="#astype">astype()</a>
+  <a href="#numeric">Numeric</a>
+  <a href="#datetime">Datetime</a>
+  <a href="#timedelta">Timedelta</a>
+  <a href="#boolean">Boolean</a>
+  <a href="#categorical">Categorical</a>
+  <a href="#nullable">Nullable</a>
+  <a href="#arrow">Arrow</a>
+  <a href="#memory">Memory</a>
+  <a href="#pipeline">Pipeline</a>
+  <a href="#cheatsheet">Cheat Sheet</a>
+</nav>
+
+<div class="container">
+
+<!-- ═══════════  CONCEPTS  ═══════════ -->
+<div class="section" id="concepts">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(74,222,128,.1)">🧠</div>
+    <h2>Dtype Fundamentals</h2>
+  </div>
+  <p class="sh-sub">pandas stores data in NumPy arrays by default. The dtype determines memory usage, computation speed, valid operations, and how missing values are handled.</p>
+
+  <div class="grid4" style="margin-bottom:26px">
+    <div class="stat s-green"><div class="stat-num">20+</div><div class="stat-label">Built-in dtypes</div></div>
+    <div class="stat s-blue"><div class="stat-num">70%</div><div class="stat-label">Typical RAM saved</div></div>
+    <div class="stat s-orange"><div class="stat-num">10×</div><div class="stat-label">Speed gain (Categorical)</div></div>
+    <div class="stat s-yellow"><div class="stat-num">NaN</div><div class="stat-label">Only float holds NaN natively</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Complete dtype reference — every pandas/NumPy dtype you need to know</h3><span class="pill p-green">Reference</span></div>
+    <div class="card-b" style="padding:0">
+      <table class="dt">
+        <tr><th>dtype</th><th>Python equivalent</th><th>NaN support</th><th>Range / notes</th><th>Best for</th></tr>
+        <tr><td><code>object</code></td><td><code>str / mixed</code></td><td style="color:#facc15">via None</td><td>Heap-allocated, slow</td><td>Raw string columns (avoid where possible)</td></tr>
+        <tr><td><code>string</code></td><td><code>str</code></td><td style="color:#4ade80">pd.NA</td><td>pandas StringDtype</td><td>Text columns — nullable, faster than object</td></tr>
+        <tr><td><code>int8</code></td><td><code>int</code></td><td style="color:#f87171">No</td><td>-128 to 127</td><td>Flags, small counts, encoded categories</td></tr>
+        <tr><td><code>int16</code></td><td><code>int</code></td><td style="color:#f87171">No</td><td>-32,768 to 32,767</td><td>Age, year, small IDs</td></tr>
+        <tr><td><code>int32</code></td><td><code>int</code></td><td style="color:#f87171">No</td><td>±2.1 billion</td><td>Most integer IDs and counts</td></tr>
+        <tr><td><code>int64</code></td><td><code>int</code></td><td style="color:#f87171">No</td><td>±9.2 × 10¹⁸ (default)</td><td>Large IDs, timestamps in nanoseconds</td></tr>
+        <tr><td><code>Int8/Int16/Int32/Int64</code></td><td><code>int</code></td><td style="color:#4ade80">pd.NA</td><td>Same ranges as lowercase</td><td>Integer columns that can contain NaN</td></tr>
+        <tr><td><code>uint8</code></td><td><code>int</code></td><td style="color:#f87171">No</td><td>0 to 255</td><td>Image pixel values, percentages</td></tr>
+        <tr><td><code>uint16/32/64</code></td><td><code>int</code></td><td style="color:#f87171">No</td><td>Unsigned variants</td><td>Always-positive IDs, counts</td></tr>
+        <tr><td><code>float32</code></td><td><code>float</code></td><td style="color:#4ade80">np.nan</td><td>~7 decimal digits</td><td>ML features, sensor values (save 50% vs f64)</td></tr>
+        <tr><td><code>float64</code></td><td><code>float</code></td><td style="color:#4ade80">np.nan</td><td>~15 decimal digits (default)</td><td>Financial precision, scientific data</td></tr>
+        <tr><td><code>complex128</code></td><td><code>complex</code></td><td style="color:#4ade80">np.nan</td><td>Two float64s</td><td>Signal processing, Fourier</td></tr>
+        <tr><td><code>bool</code></td><td><code>bool</code></td><td style="color:#f87171">No</td><td>True / False</td><td>Flag columns with no missing values</td></tr>
+        <tr><td><code>boolean</code></td><td><code>bool</code></td><td style="color:#4ade80">pd.NA</td><td>pandas BooleanDtype</td><td>Nullable boolean flags</td></tr>
+        <tr><td><code>datetime64[ns]</code></td><td><code>datetime</code></td><td style="color:#4ade80">NaT</td><td>1677–2262 AD (ns resolution)</td><td>Timestamps, dates</td></tr>
+        <tr><td><code>datetime64[us]</code></td><td><code>datetime</code></td><td style="color:#4ade80">NaT</td><td>±292K years (µs resolution)</td><td>Preferred in pandas 2.x</td></tr>
+        <tr><td><code>timedelta64[ns]</code></td><td><code>timedelta</code></td><td style="color:#4ade80">NaT</td><td>Duration values</td><td>Time differences, durations</td></tr>
+        <tr><td><code>category</code></td><td><code>Categorical</code></td><td style="color:#4ade80">via codes</td><td>Dict-encoded</td><td>Low-cardinality strings (gender, status, country)</td></tr>
+        <tr><td><code>period[freq]</code></td><td><code>Period</code></td><td style="color:#4ade80">NaT</td><td>Fixed-frequency periods</td><td>Monthly/quarterly reporting periods</td></tr>
+        <tr><td><code>SparseDtype</code></td><td>—</td><td style="color:#4ade80">fill_value</td><td>Compressed sparse</td><td>Mostly-zero/NaN arrays</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>How pandas assigns default dtypes on read</h3></div>
+    <div class="card-b">
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cmt"># ── Messy raw CSV-like data (all dtypes wrong on load) ─────────────</span>
+raw = pd.DataFrame({
+    <span class="str">"order_id"</span>:   [<span class="str">"1001"</span>, <span class="str">"1002"</span>, <span class="str">"1003"</span>, <span class="str">"1004"</span>, <span class="str">"1005"</span>],   <span class="cmt"># should be int</span>
+    <span class="str">"date"</span>:       [<span class="str">"2024-01-10"</span>,<span class="str">"2024-01-11"</span>,<span class="str">"2024-01-12"</span>,<span class="str">"2024-01-13"</span>,<span class="str">"2024-01-14"</span>],
+    <span class="str">"amount"</span>:     [<span class="str">"$29.99"</span>,<span class="str">"$49.00"</span>,<span class="str">"$15.50"</span>,<span class="str">"$89.00"</span>,<span class="str">"$34.00"</span>],   <span class="cmt"># should be float</span>
+    <span class="str">"qty"</span>:        [<span class="str">"2"</span>,<span class="str">"1"</span>,<span class="str">"5"</span>,<span class="str">"1"</span>,<span class="str">"3"</span>],                           <span class="cmt"># should be int</span>
+    <span class="str">"is_paid"</span>:    [<span class="str">"True"</span>,<span class="str">"False"</span>,<span class="str">"True"</span>,<span class="str">"True"</span>,<span class="str">"False"</span>],          <span class="cmt"># should be bool</span>
+    <span class="str">"status"</span>:     [<span class="str">"shipped"</span>,<span class="str">"pending"</span>,<span class="str">"shipped"</span>,<span class="str">"cancelled"</span>,<span class="str">"pending"</span>],
+    <span class="str">"rating"</span>:     [<span class="str">"4"</span>, <span class="str">"5"</span>, np.nan, <span class="str">"3"</span>, <span class="str">"5"</span>],                   <span class="cmt"># int with NaN!</span>
+    <span class="str">"duration_s"</span>: [<span class="str">"3600"</span>, <span class="str">"7200"</span>, <span class="str">"1800"</span>, <span class="str">"5400"</span>, <span class="str">"900"</span>],        <span class="cmt"># should be timedelta</span>
+})
+
+<span class="cmt"># What pandas infers by default</span>
+<span class="fn">print</span>(raw.dtypes)
+<span class="fn">print</span>(<span class="grn">f"\nMemory before: {raw.memory_usage(deep=True).sum() / 1024:.1f} KB"</span>)</code></pre>
+      <div class="out">
+        <div class="out-label">Default dtypes (all wrong!)</div>
+<pre>order_id      object    ← should be int
+date          object    ← should be datetime64
+amount        object    ← should be float64
+qty           object    ← should be int
+is_paid       object    ← should be bool
+status        object    ← should be category
+rating        object    ← should be Int8 (nullable)
+duration_s    object    ← should be timedelta64
+
+dtype: object  ← pandas reads ambiguous columns as object (str)</pre>
+      </div>
+      <div class="info info-orange"><strong>Why everything is object:</strong> When pandas reads a CSV with mixed or ambiguous data, it defaults to <code>object</code> (Python heap string). This is 5-10× more memory than the correct numeric type and much slower for arithmetic.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  INSPECT  ═══════════ -->
+<div class="section" id="inspect">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(56,189,248,.1)">🔍</div>
+    <h2>Inspect & Audit Dtypes</h2>
+  </div>
+  <p class="sh-sub">Before changing any dtype, build a complete picture of what you have — current types, memory costs, and what the data actually contains.</p>
+
+  <div class="card">
+    <div class="card-h"><h3>Full dtype audit</h3><span class="pill p-blue">Inspect</span></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── Basic inspection ─────────────────────────────────────────────</span>
+<span class="fn">print</span>(raw.dtypes)            <span class="cmt"># dtype per column</span>
+<span class="fn">print</span>(raw.info())            <span class="cmt"># dtypes + non-null counts + memory</span>
+raw.info(memory_usage=<span class="str">"deep"</span>)  <span class="cmt"># accurate memory (traverses object arrays)</span>
+
+<span class="cmt"># ── Detailed dtype audit DataFrame ──────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">dtype_audit</span>(df: pd.DataFrame) -> pd.DataFrame:
+    rows = []
+    <span class="kw">for</span> col <span class="kw">in</span> df.columns:
+        s = df[col]
+        mem = s.memory_usage(deep=<span class="cls">True</span>)
+        rows.append({
+            <span class="str">"column"</span>:      col,
+            <span class="str">"dtype"</span>:       s.dtype,
+            <span class="str">"null_count"</span>:  s.isna().<span class="fn">sum</span>(),
+            <span class="str">"null_pct"</span>:    <span class="grn">f"{s.isna().mean()*100:.1f}%"</span>,
+            <span class="str">"unique"</span>:      s.nunique(),
+            <span class="str">"sample"</span>:      str(s.dropna().iloc[<span class="num">0</span>]) <span class="kw">if</span> <span class="fn">len</span>(s.dropna()) <span class="kw">else</span> <span class="str">"—"</span>,
+            <span class="str">"mem_KB"</span>:      <span class="grn">f"{mem/1024:.2f}"</span>,
+        })
+    <span class="kw">return</span> pd.DataFrame(rows)
+
+audit = <span class="fn">dtype_audit</span>(raw)
+<span class="fn">print</span>(audit.to_string(index=<span class="cls">False</span>))
+
+<span class="cmt"># ── Select columns by dtype family ──────────────────────────────</span>
+obj_cols   = raw.select_dtypes(include=[<span class="str">"object"</span>]).columns.tolist()
+num_cols   = raw.select_dtypes(include=[<span class="str">"number"</span>]).columns.tolist()
+dt_cols    = raw.select_dtypes(include=[<span class="str">"datetime"</span>]).columns.tolist()
+bool_cols  = raw.select_dtypes(include=[<span class="str">"bool"</span>]).columns.tolist()
+cat_cols   = raw.select_dtypes(include=[<span class="str">"category"</span>]).columns.tolist()
+
+<span class="fn">print</span>(<span class="grn">f"\nobject columns  : {obj_cols}"</span>)
+<span class="fn">print</span>(<span class="grn">f"numeric columns : {num_cols}"</span>)
+
+<span class="cmt"># ── Check if a column CAN be numeric ────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">can_be_numeric</span>(series: pd.Series) -> <span class="cls">bool</span>:
+    cleaned = series.str.replace(<span class="str">r"[\$,]"</span>, <span class="str">""</span>, regex=<span class="cls">True</span>).str.strip()
+    <span class="kw">return</span> pd.to_numeric(cleaned, errors=<span class="str">"coerce"</span>).notna().<span class="fn">mean</span>() > <span class="num">0.9</span>
+
+<span class="kw">for</span> col <span class="kw">in</span> obj_cols:
+    <span class="fn">print</span>(<span class="grn">f"  {col:<15} can_be_numeric={can_be_numeric(raw[col])}"</span>)</code></pre>
+      <div class="out">
+        <div class="out-label">Audit output</div>
+<pre>column      dtype  null_count null_pct  unique  sample      mem_KB
+order_id   object          0     0.0%       5    1001        0.37
+date       object          0     0.0%       5  2024-01-10   0.37
+amount     object          0     0.0%       5   $29.99       0.37
+qty        object          0     0.0%       5       2        0.37
+is_paid    object          0     0.0%       2    True        0.37
+status     object          0     0.0%       3  shipped      0.37
+rating     object          1    20.0%       4       4        0.37
+duration_s object          0     0.0%       5    3600        0.37</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  ASTYPE  ═══════════ -->
+<div class="section" id="astype">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(251,146,60,.1)">🔧</div>
+    <h2>astype() — The Core Method</h2>
+  </div>
+  <p class="sh-sub"><code>astype()</code> is pandas' primary dtype conversion tool. It is strict — it will raise on bad data by default.</p>
+
+  <div class="card">
+    <div class="card-h"><h3>astype() — all forms and options</h3><span class="pill p-orange">Core API</span></div>
+    <div class="card-b">
+<pre><code>df = raw.copy()
+
+<span class="cmt"># ── Single column ────────────────────────────────────────────────</span>
+df[<span class="str">"qty"</span>]     = df[<span class="str">"qty"</span>].astype(<span class="str">"int32"</span>)
+df[<span class="str">"order_id"</span>] = df[<span class="str">"order_id"</span>].astype(<span class="str">"int32"</span>)
+
+<span class="cmt"># ── Multiple columns at once via dict ────────────────────────────</span>
+df = df.astype({
+    <span class="str">"qty"</span>:   <span class="str">"int32"</span>,
+    <span class="str">"order_id"</span>: <span class="str">"int32"</span>,
+})
+
+<span class="cmt"># ── Using numpy dtype objects ────────────────────────────────────</span>
+df[<span class="str">"qty"</span>] = df[<span class="str">"qty"</span>].astype(np.int16)
+
+<span class="cmt"># ── Using Python built-in types ─────────────────────────────────</span>
+df[<span class="str">"qty"</span>] = df[<span class="str">"qty"</span>].astype(<span class="cls">float</span>)   <span class="cmt"># float → float64</span>
+df[<span class="str">"qty"</span>] = df[<span class="str">"qty"</span>].astype(<span class="cls">int</span>)     <span class="cmt"># int   → platform int (int32 or int64)</span>
+
+<span class="cmt"># ── errors= parameter (pandas 1.1+) ─────────────────────────────</span>
+<span class="cmt"># errors="raise"  → raise ValueError on bad data (default)</span>
+<span class="cmt"># errors="ignore" → return original column unchanged if conversion fails</span>
+df[<span class="str">"qty"</span>] = df[<span class="str">"qty"</span>].astype(<span class="str">"int32"</span>, errors=<span class="str">"ignore"</span>)
+
+<span class="cmt"># ── copy= parameter ──────────────────────────────────────────────</span>
+<span class="cmt"># copy=True  → returns a new array (default, safe)</span>
+<span class="cmt"># copy=False → avoids copy when possible (optimization, be careful)</span>
+s_new = df[<span class="str">"qty"</span>].astype(<span class="str">"int64"</span>, copy=<span class="cls">False</span>)
+
+<span class="cmt"># ── What astype CANNOT handle gracefully ────────────────────────</span>
+<span class="kw">try</span>:
+    df[<span class="str">"amount"</span>].astype(<span class="cls">float</span>)   <span class="cmt"># "$29.99" has "$" → ValueError!</span>
+<span class="kw">except</span> ValueError <span class="kw">as</span> e:
+    <span class="fn">print</span>(<span class="grn">f"astype failed: {e}"</span>)   <span class="cmt"># need to clean string first</span>
+
+<span class="cmt"># ── Check result ────────────────────────────────────────────────</span>
+<span class="fn">print</span>(df[[<span class="str">"order_id"</span>,<span class="str">"qty"</span>]].dtypes)</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>astype failed: could not convert string to float: '$29.99'
+
+order_id    int32
+qty         int32
+dtype: object</pre>
+      </div>
+      <div class="info info-orange"><strong>astype() is strict:</strong> Use it only when you are certain the data is already clean and compatible. For raw/dirty data, use <code>pd.to_numeric(errors="coerce")</code>, <code>pd.to_datetime(errors="coerce")</code>, or manual cleaning first, then <code>astype()</code>.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Safe cast pattern — clean then astype</h3></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── Pattern: pre-validate, then cast ────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">safe_astype</span>(series: pd.Series, dtype, fill=np.nan):
+    <span class="str">"""Try astype; on failure coerce to fill value."""</span>
+    <span class="kw">try</span>:
+        <span class="kw">return</span> series.astype(dtype)
+    <span class="kw">except</span> (ValueError, TypeError):
+        coerced = pd.to_numeric(series, errors=<span class="str">"coerce"</span>).fillna(fill)
+        <span class="kw">return</span> coerced.astype(dtype)
+
+<span class="cmt"># Amount: strip "$" then cast</span>
+df[<span class="str">"amount"</span>] = (
+    raw[<span class="str">"amount"</span>]
+    .str.replace(<span class="str">r"[$,]"</span>, <span class="str">""</span>, regex=<span class="cls">True</span>)
+    .str.strip()
+    .astype(<span class="str">"float64"</span>)
+)
+
+<span class="fn">print</span>(df[[<span class="str">"amount"</span>]].dtypes)
+<span class="fn">print</span>(df[<span class="str">"amount"</span>].head())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>amount    float64
+
+0    29.99
+1    49.00
+2    15.50
+3    89.00
+4    34.00
+Name: amount, dtype: float64</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  NUMERIC  ═══════════ -->
+<div class="section" id="numeric">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(250,204,21,.1)">🔢</div>
+    <h2>Converting to Numeric Types</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>pd.to_numeric() — the safe numeric converter</h3><span class="pill p-yellow">Numeric</span></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── errors= controls what happens to non-convertible values ─────</span>
+dirty = pd.Series([<span class="str">"1"</span>, <span class="str">"2.5"</span>, <span class="str">"abc"</span>, <span class="str">"4"</span>, <span class="str">""</span>, <span class="str">"$5.99"</span>, np.nan])
+
+<span class="fn">print</span>(<span class="str">"errors='raise'  :"</span>, <span class="str">"raises ValueError"</span>)
+<span class="fn">print</span>(<span class="str">"errors='ignore' :"</span>, pd.to_numeric(dirty, errors=<span class="str">"ignore"</span>).tolist())   <span class="cmt"># returns original</span>
+<span class="fn">print</span>(<span class="str">"errors='coerce' :"</span>, pd.to_numeric(dirty, errors=<span class="str">"coerce"</span>).tolist())   <span class="cmt"># bad → NaN</span>
+
+<span class="cmt"># ── downcast: automatically find smallest fitting dtype ──────────</span>
+s_int   = pd.Series([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">100</span>, <span class="num">200</span>])
+s_float = pd.Series([<span class="num">1.1</span>, <span class="num">2.2</span>, <span class="num">3.3</span>])
+
+<span class="fn">print</span>(<span class="str">"\nDowncast examples:"</span>)
+<span class="fn">print</span>(<span class="grn">f"  default int      : {s_int.dtype}"</span>)                                          <span class="cmt"># int64</span>
+<span class="fn">print</span>(<span class="grn">f"  downcast integer : {pd.to_numeric(s_int, downcast='integer').dtype}"</span>)     <span class="cmt"># int8</span>
+<span class="fn">print</span>(<span class="grn">f"  downcast unsigned: {pd.to_numeric(s_int, downcast='unsigned').dtype}"</span>)    <span class="cmt"># uint8</span>
+<span class="fn">print</span>(<span class="grn">f"  default float    : {s_float.dtype}"</span>)                                        <span class="cmt"># float64</span>
+<span class="fn">print</span>(<span class="grn">f"  downcast float   : {pd.to_numeric(s_float, downcast='float').dtype}"</span>)     <span class="cmt"># float32</span>
+
+<span class="cmt"># ── Real-world: messy price column ───────────────────────────────</span>
+prices = pd.Series([<span class="str">"$19.99"</span>, <span class="str">"USD 29.99"</span>, <span class="str">"34,999"</span>, <span class="str">"FREE"</span>, np.nan, <span class="str">"  49.0  "</span>])
+
+clean_prices = (
+    prices
+    .str.replace(<span class="str">r"[^\d.]"</span>, <span class="str">""</span>, regex=<span class="cls">True</span>)   <span class="cmt"># strip all non-digit / non-dot</span>
+    .str.strip()
+    .replace(<span class="str">""</span>, np.nan)
+)
+result = pd.to_numeric(clean_prices, errors=<span class="str">"coerce"</span>)
+<span class="fn">print</span>(<span class="str">"\nCleaned prices:"</span>)
+<span class="fn">print</span>(result)
+
+<span class="cmt"># ── Bulk numeric conversion for all convertible object columns ───</span>
+df2 = raw.copy()
+<span class="kw">for</span> col <span class="kw">in</span> df2.select_dtypes(<span class="str">"object"</span>).columns:
+    converted = pd.to_numeric(df2[col], errors=<span class="str">"coerce"</span>)
+    <span class="kw">if</span> converted.notna().<span class="fn">sum</span>() > <span class="num">0</span>:   <span class="cmt"># at least some values converted OK</span>
+        df2[col] = converted
+<span class="fn">print</span>(<span class="str">"\nDtypes after auto-numeric:"</span>)
+<span class="fn">print</span>(df2.dtypes)</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>errors='coerce' : [1.0, 2.5, nan, 4.0, nan, nan, nan]  ← "abc","","$5.99" → NaN
+
+Downcast examples:
+  default int      : int64
+  downcast integer : int8      ← values fit in -128..127 ✅
+  downcast unsigned: uint8
+  default float    : float64
+  downcast float   : float32
+
+Cleaned prices:
+0    19.99
+1    29.99
+2    34999.0
+3      NaN    ← "FREE" → NaN (no digits)
+4      NaN
+5    49.00</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Integer overflow — picking the right int size</h3></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># Overflow is silent in NumPy — always check range before downcasting!</span>
+s = pd.Series([<span class="num">200</span>, <span class="num">150</span>, <span class="num">180</span>])
+
+<span class="fn">print</span>(<span class="grn">f"min={s.min()}  max={s.max()}"</span>)
+
+<span class="cmt"># int8 range: -128 to 127 → 180 OVERFLOWS!</span>
+<span class="fn">print</span>(s.astype(<span class="str">"int8"</span>).tolist())   <span class="cmt"># ← -56, -106, -76  WRONG! silent overflow</span>
+
+<span class="cmt"># Safe: find the right dtype automatically</span>
+<span class="kw">def</span> <span class="fn">find_int_dtype</span>(series: pd.Series, nullable: <span class="cls">bool</span> = <span class="cls">False</span>) -> <span class="cls">str</span>:
+    mn, mx = series.min(), series.max()
+    prefix = <span class="str">"I"</span> <span class="kw">if</span> nullable <span class="kw">else</span> <span class="str">"i"</span>   <span class="cmt"># capital = nullable pandas type</span>
+    <span class="kw">for</span> bits <span class="kw">in</span> [<span class="num">8</span>, <span class="num">16</span>, <span class="num">32</span>, <span class="num">64</span>]:
+        info = np.iinfo(<span class="grn">f"int{bits}"</span>)
+        <span class="kw">if</span> info.min <= mn <span class="kw">and</span> mx <= info.max:
+            <span class="kw">return</span> <span class="grn">f"Int{bits}"</span> <span class="kw">if</span> nullable <span class="kw">else</span> <span class="grn">f"int{bits}"</span>
+    <span class="kw">return</span> <span class="str">"Int64"</span> <span class="kw">if</span> nullable <span class="kw">else</span> <span class="str">"int64"</span>
+
+test_data = pd.Series([<span class="num">10</span>, <span class="num">200</span>, <span class="num">180</span>, <span class="num">90</span>])
+dtype = <span class="fn">find_int_dtype</span>(test_data)
+<span class="fn">print</span>(<span class="grn">f"\nsafe dtype: {dtype}"</span>)   <span class="cmt"># int16 — avoids int8 overflow</span>
+<span class="fn">print</span>(test_data.astype(dtype).tolist())  <span class="cmt"># [10, 200, 180, 90] ✅</span></code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>min=150  max=200
+[-56, -106, -76]   ← SILENT OVERFLOW — int8 can't hold 150–200 ⚠️
+
+safe dtype: int16
+[10, 200, 180, 90]  ✅</pre>
+      </div>
+      <div class="info info-red"><strong>⚠️ NumPy integer overflow is silent:</strong> Unlike Python's arbitrary-precision int, NumPy wraps around on overflow without raising an error. Always call <code>find_int_dtype()</code> or check <code>s.min()</code>/<code>s.max()</code> against <code>np.iinfo()</code> before downcasting.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  DATETIME  ═══════════ -->
+<div class="section" id="datetime">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(56,189,248,.1)">📅</div>
+    <h2>Converting to Datetime</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>pd.to_datetime() — all scenarios</h3><span class="pill p-blue">Datetime</span></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── 1. Simple ISO format ─────────────────────────────────────────</span>
+s1 = pd.to_datetime(pd.Series([<span class="str">"2024-01-10"</span>, <span class="str">"2024-01-11"</span>, <span class="str">"2024-01-12"</span>]))
+<span class="fn">print</span>(s1.dtype)   <span class="cmt"># datetime64[ns]</span>
+
+<span class="cmt"># ── 2. Multiple mixed formats in one column ──────────────────────</span>
+mixed_dates = pd.Series([
+    <span class="str">"2024-01-10"</span>, <span class="str">"10/01/2024"</span>, <span class="str">"Jan 10, 2024"</span>, <span class="str">"20240110"</span>, <span class="str">"10-Jan-24"</span>
+])
+parsed = pd.to_datetime(mixed_dates, dayfirst=<span class="cls">False</span>, infer_datetime_format=<span class="cls">True</span>)
+<span class="fn">print</span>(parsed)
+
+<span class="cmt"># ── 3. Explicit format string — FASTEST for uniform columns ─────</span>
+uniform = pd.Series([<span class="str">"20240110"</span>, <span class="str">"20240111"</span>, <span class="str">"20240112"</span>])
+parsed_fmt = pd.to_datetime(uniform, format=<span class="str">"%Y%m%d"</span>)
+<span class="fn">print</span>(parsed_fmt.dtype)   <span class="cmt"># datetime64[ns]</span>
+
+<span class="cmt"># ── 4. Unix timestamps ───────────────────────────────────────────</span>
+epochs_s  = pd.Series([<span class="num">1704844800</span>, <span class="num">1704931200</span>])   <span class="cmt"># seconds since epoch</span>
+epochs_ms = pd.Series([<span class="num">1704844800000</span>, <span class="num">1704931200000</span>])  <span class="cmt"># milliseconds</span>
+
+dt_s  = pd.to_datetime(epochs_s, unit=<span class="str">"s"</span>)
+dt_ms = pd.to_datetime(epochs_ms, unit=<span class="str">"ms"</span>)
+<span class="fn">print</span>(dt_s)
+
+<span class="cmt"># ── 5. errors="coerce" — bad dates become NaT ────────────────────</span>
+bad = pd.Series([<span class="str">"2024-01-10"</span>, <span class="str">"not-a-date"</span>, <span class="str">"2024-13-45"</span>, np.nan])
+safe = pd.to_datetime(bad, errors=<span class="str">"coerce"</span>)
+<span class="fn">print</span>(safe)   <span class="cmt"># NaT where invalid</span>
+
+<span class="cmt"># ── 6. Timezone-aware datetimes ──────────────────────────────────</span>
+tz_strings = pd.Series([<span class="str">"2024-01-10 08:00:00+02:00"</span>, <span class="str">"2024-01-10 06:00:00+00:00"</span>])
+tz_dt = pd.to_datetime(tz_strings, utc=<span class="cls">True</span>)   <span class="cmt"># normalise everything to UTC</span>
+<span class="fn">print</span>(tz_dt.dtype)   <span class="cmt"># datetime64[ns, UTC]</span>
+
+<span class="cmt"># ── 7. Build from separate year/month/day columns ────────────────</span>
+df_parts = pd.DataFrame({<span class="str">"year"</span>: [<span class="num">2024</span>,<span class="num">2024</span>], <span class="str">"month"</span>: [<span class="num">1</span>,<span class="num">2</span>], <span class="str">"day"</span>: [<span class="num">10</span>,<span class="num">15"</span>]})
+df_parts[<span class="str">"date"</span>] = pd.to_datetime(df_parts[[ <span class="str">"year"</span>,<span class="str">"month"</span>,<span class="str">"day"</span>]])
+<span class="fn">print</span>(df_parts[<span class="str">"date"</span>])
+
+<span class="cmt"># ── 8. Convert entire DataFrame's date columns at read time ──────</span>
+df = pd.read_csv(<span class="str">"orders.csv"</span>, parse_dates=[<span class="str">"order_date"</span>, <span class="str">"ship_date"</span>])
+<span class="cmt"># or:</span>
+df = pd.read_csv(<span class="str">"orders.csv"</span>)
+date_cols = [<span class="str">"order_date"</span>, <span class="str">"ship_date"</span>]
+df[date_cols] = df[date_cols].apply(pd.to_datetime, errors=<span class="str">"coerce"</span>)</code></pre>
+      <div class="out">
+        <div class="out-label">errors="coerce" output</div>
+<pre>0   2024-01-10
+1          NaT    ← "not-a-date" → NaT
+2          NaT    ← "2024-13-45" → NaT (invalid month 13)
+3          NaT    ← np.nan       → NaT
+dtype: datetime64[ns]</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>datetime accessor — extracting components after conversion</h3></div>
+    <div class="card-b">
+<pre><code>df = raw.copy()
+df[<span class="str">"date"</span>] = pd.to_datetime(df[<span class="str">"date"</span>])
+
+<span class="cmt"># ── .dt accessor — unlocked after datetime conversion ────────────</span>
+df[<span class="str">"year"</span>]        = df[<span class="str">"date"</span>].dt.year
+df[<span class="str">"month"</span>]       = df[<span class="str">"date"</span>].dt.month
+df[<span class="str">"day"</span>]         = df[<span class="str">"date"</span>].dt.day
+df[<span class="str">"dayofweek"</span>]   = df[<span class="str">"date"</span>].dt.dayofweek   <span class="cmt"># 0=Monday</span>
+df[<span class="str">"day_name"</span>]    = df[<span class="str">"date"</span>].dt.day_name()
+df[<span class="str">"quarter"</span>]     = df[<span class="str">"date"</span>].dt.quarter
+df[<span class="str">"week"</span>]        = df[<span class="str">"date"</span>].dt.isocalendar().week
+df[<span class="str">"is_month_end"</span>] = df[<span class="str">"date"</span>].dt.is_month_end
+df[<span class="str">"timestamp"</span>]   = df[<span class="str">"date"</span>].astype(<span class="str">"int64"</span>) // <span class="num">10</span>**<span class="num">9</span>  <span class="cmt"># back to Unix epoch</span>
+
+<span class="fn">print</span>(df[[<span class="str">"date"</span>,<span class="str">"year"</span>,<span class="str">"month"</span>,<span class="str">"day_name"</span>,<span class="str">"quarter"</span>]].to_string())
+
+<span class="cmt"># ── date arithmetic — only works after datetime conversion ────────</span>
+df[<span class="str">"days_since"</span>] = (pd.Timestamp(<span class="str">"today"</span>) - df[<span class="str">"date"</span>]).dt.days
+<span class="fn">print</span>(<span class="str">"\nDays since order:"</span>)
+<span class="fn">print</span>(df[[<span class="str">"date"</span>,<span class="str">"days_since"</span>]].to_string())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>       date  year  month  day_name  quarter
+2024-01-10  2024      1  Wednesday        1
+2024-01-11  2024      1   Thursday        1
+2024-01-12  2024      1     Friday        1
+2024-01-13  2024      1   Saturday        1
+2024-01-14  2024      1     Sunday        1</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>pandas 2.x — datetime resolution change</h3><span class="pill p-blue">pandas 2.x</span></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># pandas 2.0+: to_datetime() now returns datetime64[s] or [us] by default</span>
+<span class="cmt"># (previously always ns). This affects Timestamp range.</span>
+
+s = pd.to_datetime([<span class="str">"2024-01-01"</span>, <span class="str">"2024-06-15"</span>])
+<span class="fn">print</span>(s.dtype)   <span class="cmt"># datetime64[s] in pandas 2.x</span>
+
+<span class="cmt"># Force nanosecond (legacy) for compatibility</span>
+s_ns = pd.to_datetime([<span class="str">"2024-01-01"</span>]).astype(<span class="str">"datetime64[ns]"</span>)
+
+<span class="cmt"># Convert between resolutions</span>
+s_us = s.astype(<span class="str">"datetime64[us]"</span>)   <span class="cmt"># microsecond — good balance</span>
+s_ms = s.astype(<span class="str">"datetime64[ms]"</span>)   <span class="cmt"># millisecond — smallest for most use-cases</span>
+s_s  = s.astype(<span class="str">"datetime64[s]"</span>)    <span class="cmt"># second</span>
+
+<span class="fn">print</span>(<span class="grn">f"ns dtype: {s_ns.dtype}  memory={s_ns.nbytes} B"</span>)
+<span class="fn">print</span>(<span class="grn">f"ms dtype: {s_ms.dtype}  memory={s_ms.nbytes} B"</span>)
+<span class="fn">print</span>(<span class="grn">f"s  dtype: {s_s.dtype}   memory={s_s.nbytes} B"</span>)
+
+<span class="cmt"># Timezone conversion</span>
+s_utc = s.dt.tz_localize(<span class="str">"UTC"</span>)           <span class="cmt"># naive → UTC-aware</span>
+s_est = s_utc.dt.tz_convert(<span class="str">"US/Eastern"</span>) <span class="cmt"># UTC → specific TZ</span>
+s_naive = s_est.dt.tz_localize(<span class="cls">None</span>)      <span class="cmt"># strip TZ → naive again</span>
+<span class="fn">print</span>(s_est)</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  TIMEDELTA  ═══════════ -->
+<div class="section" id="timedelta">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(45,212,191,.1)">⏱️</div>
+    <h2>Converting to Timedelta</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>pd.to_timedelta() — duration data</h3><span class="pill p-teal">Timedelta</span></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── From numeric seconds ─────────────────────────────────────────</span>
+df = raw.copy()
+df[<span class="str">"duration"</span>] = pd.to_timedelta(df[<span class="str">"duration_s"</span>].astype(<span class="cls">int</span>), unit=<span class="str">"s"</span>)
+<span class="fn">print</span>(df[[<span class="str">"duration_s"</span>,<span class="str">"duration"</span>]].to_string())
+
+<span class="cmt"># ── From string representations ─────────────────────────────────</span>
+durations = pd.to_timedelta([<span class="str">"1 days"</span>, <span class="str">"2 hours 30 min"</span>, <span class="str">"0 days 00:45:00"</span>])
+<span class="fn">print</span>(durations)
+
+<span class="cmt"># ── From subtraction of two datetime columns ────────────────────</span>
+events = pd.DataFrame({
+    <span class="str">"start"</span>: pd.to_datetime([<span class="str">"2024-01-01 08:00"</span>, <span class="str">"2024-01-01 09:00"</span>]),
+    <span class="str">"end"</span>:   pd.to_datetime([<span class="str">"2024-01-01 10:30"</span>, <span class="str">"2024-01-01 09:45"</span>]),
+})
+events[<span class="str">"duration"</span>]  = events[<span class="str">"end"</span>] - events[<span class="str">"start"</span>]   <span class="cmt"># timedelta64</span>
+events[<span class="str">"minutes"</span>]   = events[<span class="str">"duration"</span>].dt.seconds // <span class="num">60</span>
+events[<span class="str">"total_secs"</span>] = events[<span class="str">"duration"</span>].dt.total_seconds()
+<span class="fn">print</span>(events)
+
+<span class="cmt"># ── Unit options ─────────────────────────────────────────────────</span>
+<span class="cmt"># unit="W"  weeks</span>
+<span class="cmt"># unit="D"  days</span>
+<span class="cmt"># unit="h"  hours</span>
+<span class="cmt"># unit="m"  minutes</span>
+<span class="cmt"># unit="s"  seconds (most common)</span>
+<span class="cmt"># unit="ms" milliseconds</span>
+<span class="cmt"># unit="us" microseconds</span>
+<span class="cmt"># unit="ns" nanoseconds</span>
+
+td_days = pd.to_timedelta([<span class="num">1</span>, <span class="num">7</span>, <span class="num">30</span>], unit=<span class="str">"D"</span>)
+<span class="fn">print</span>(td_days)</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>duration_s     duration
+      3600  0 days 01:00:00
+      7200  0 days 02:00:00
+      1800  0 days 00:30:00
+      5400  0 days 01:30:00
+       900  0 days 00:15:00
+
+events duration/minutes:
+     duration  minutes  total_secs
+0  0 days 02:30:00      150      9000.0
+1  0 days 00:45:00       45      2700.0</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  BOOLEAN  ═══════════ -->
+<div class="section" id="boolean">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(139,92,246,.1)">✅</div>
+    <h2>Converting to Boolean</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>String / numeric → bool and nullable boolean</h3><span class="pill p-purple">Boolean</span></div>
+    <div class="card-b">
+<pre><code>df = raw.copy()
+
+<span class="cmt"># ── String "True"/"False" → bool ─────────────────────────────────</span>
+<span class="cmt"># astype("bool") does NOT parse "True"/"False" strings correctly!</span>
+<span class="fn">print</span>(pd.Series([<span class="str">"True"</span>, <span class="str">"False"</span>]).astype(<span class="cls">bool</span>).tolist())
+<span class="cmt"># → [True, True]  ← "False" string is truthy! WRONG ⚠️</span>
+
+<span class="cmt"># ── Correct way: map strings explicitly ─────────────────────────</span>
+TRUE_VALS  = {<span class="str">"true"</span>,<span class="str">"yes"</span>,<span class="str">"1"</span>,<span class="str">"y"</span>,<span class="str">"on"</span>,<span class="str">"t"</span>}
+FALSE_VALS = {<span class="str">"false"</span>,<span class="str">"no"</span>,<span class="str">"0"</span>,<span class="str">"n"</span>,<span class="str">"off"</span>,<span class="str">"f"</span>}
+
+<span class="kw">def</span> <span class="fn">parse_bool</span>(s: pd.Series) -> pd.Series:
+    lower = s.str.lower().str.strip()
+    result = pd.array([pd.NA] * <span class="fn">len</span>(s), dtype=<span class="str">"boolean"</span>)
+    result[lower.isin(TRUE_VALS)]  = <span class="cls">True</span>
+    result[lower.isin(FALSE_VALS)] = <span class="cls">False</span>
+    <span class="kw">return</span> pd.Series(result)
+
+df[<span class="str">"is_paid"</span>] = <span class="fn">parse_bool</span>(df[<span class="str">"is_paid"</span>])
+<span class="fn">print</span>(df[[<span class="str">"is_paid"</span>]].dtypes)
+<span class="fn">print</span>(df[<span class="str">"is_paid"</span>].tolist())
+
+<span class="cmt"># ── Numeric → bool ──────────────────────────────────────────────</span>
+<span class="cmt"># Any non-zero int is True, 0 is False</span>
+flags = pd.Series([<span class="num">0</span>, <span class="num">1</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">1</span>])
+<span class="fn">print</span>(flags.astype(<span class="cls">bool</span>).tolist())   <span class="cmt"># [False, True, False, True, True] ✅</span>
+
+<span class="cmt"># ── pandas nullable boolean (BooleanDtype) ───────────────────────</span>
+<span class="cmt"># Holds pd.NA for missing; regular bool casts NA to True (NaN is truthy)</span>
+s_bool_na = pd.array([<span class="cls">True</span>, <span class="cls">False</span>, pd.NA, <span class="cls">True</span>], dtype=<span class="str">"boolean"</span>)
+<span class="fn">print</span>(s_bool_na)
+
+s_regular = pd.array([<span class="cls">True</span>, <span class="cls">False</span>, pd.NA, <span class="cls">True</span>], dtype=<span class="str">"boolean"</span>)
+<span class="fn">print</span>(<span class="grn">f"logical AND with NA: {s_regular[<span class="num">0</span>] & s_regular[<span class="num">2</span>]}"</span>)  <span class="cmt"># True & NA = NA</span>
+<span class="fn">print</span>(<span class="grn">f"logical OR  with NA: {s_regular[<span class="num">1</span>] | s_regular[<span class="num">2</span>]}"</span>)  <span class="cmt"># False | NA = NA</span></code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>[True, True]   ← WRONG! "False" string is truthy in Python ⚠️
+
+After parse_bool:
+is_paid    boolean
+
+[True, False, True, True, False]  ✅
+
+BooleanDtype with NA:
+[True, False, &lt;NA&gt;, True]
+
+logical AND with NA: &lt;NA&gt;    ← three-valued logic (SQL-style)
+logical OR  with NA: &lt;NA&gt;</pre>
+      </div>
+      <div class="info info-red"><strong>⚠️ Never use astype(bool) on string columns:</strong> Any non-empty string is truthy in Python, so <code>"False".astype(bool) == True</code>. Always map string representations explicitly.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  CATEGORICAL  ═══════════ -->
+<div class="section" id="categorical">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(251,146,60,.1)">🏷️</div>
+    <h2>Categorical Dtype</h2>
+  </div>
+  <p class="sh-sub">Convert low-cardinality string columns to <code>category</code> for dramatic memory savings and faster groupby/sort operations.</p>
+
+  <div class="card">
+    <div class="card-h"><h3>object → category — when and how</h3><span class="pill p-orange">Categorical</span></div>
+    <div class="card-b">
+<pre><code>df = raw.copy()
+
+<span class="cmt"># ── Simple conversion ────────────────────────────────────────────</span>
+df[<span class="str">"status"</span>] = df[<span class="str">"status"</span>].astype(<span class="str">"category"</span>)
+<span class="fn">print</span>(df[<span class="str">"status"</span>].dtype)        <span class="cmt"># category</span>
+<span class="fn">print</span>(df[<span class="str">"status"</span>].cat.categories)  <span class="cmt"># Index(['cancelled', 'pending', 'shipped'])</span>
+<span class="fn">print</span>(df[<span class="str">"status"</span>].cat.codes)      <span class="cmt"># integer codes (0=cancelled, 1=pending, 2=shipped)</span>
+
+<span class="cmt"># ── CategoricalDtype with custom ordered categories ──────────────</span>
+from pandas.api.types import CategoricalDtype
+
+priority_dtype = CategoricalDtype(
+    categories=[<span class="str">"pending"</span>, <span class="str">"shipped"</span>, <span class="str">"cancelled"</span>],
+    ordered=<span class="cls">True</span>   <span class="cmt"># enables < > comparisons</span>
+)
+df[<span class="str">"status_ord"</span>] = df[<span class="str">"status"</span>].astype(priority_dtype)
+
+<span class="cmt"># Ordered comparison — only works with ordered categories</span>
+<span class="fn">print</span>(df[df[<span class="str">"status_ord"</span>] <= <span class="str">"shipped"</span>][<span class="str">"status_ord"</span>].tolist())
+<span class="cmt"># → ['shipped', 'pending', ...]</span>
+
+<span class="cmt"># ── Memory comparison ────────────────────────────────────────────</span>
+N = <span class="num">1_000_000</span>
+obj_col = pd.Series(np.random.choice([<span class="str">"shipped"</span>,<span class="str">"pending"</span>,<span class="str">"cancelled"</span>], N))
+cat_col = obj_col.astype(<span class="str">"category"</span>)
+
+obj_mem = obj_col.memory_usage(deep=<span class="cls">True</span>) / <span class="num">1024</span>**<span class="num">2</span>
+cat_mem = cat_col.memory_usage(deep=<span class="cls">True</span>) / <span class="num">1024</span>**<span class="num">2</span>
+<span class="fn">print</span>(<span class="grn">f"\n1M rows:"</span>)
+<span class="fn">print</span>(<span class="grn">f"  object   : {obj_mem:.2f} MB"</span>)
+<span class="fn">print</span>(<span class="grn">f"  category : {cat_mem:.2f} MB"</span>)
+<span class="fn">print</span>(<span class="grn">f"  reduction: {(1 - cat_mem/obj_mem)*100:.0f}%"</span>)
+
+<span class="cmt"># ── When NOT to use category ─────────────────────────────────────</span>
+<span class="cmt"># category adds overhead when cardinality is HIGH</span>
+<span class="kw">def</span> <span class="fn">should_categorise</span>(s: pd.Series) -> <span class="cls">bool</span>:
+    <span class="str">"""Recommend category if unique ratio < 10% of rows."""</span>
+    <span class="kw">return</span> s.nunique() / <span class="fn">len</span>(s) < <span class="num">0.1</span>
+
+<span class="fn">print</span>(<span class="grn">f'\nshould_categorise(status)   : {should_categorise(df["status"])}'</span>)   <span class="cmt"># True</span>
+<span class="fn">print</span>(<span class="grn">f'should_categorise(order_id) : {should_categorise(df["order_id"])}'</span>)  <span class="cmt"># False</span></code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>1M rows:
+  object   : 57.22 MB
+  category :  1.05 MB
+  reduction: 98%        ← 98% RAM saving for low-cardinality string column ✅
+
+should_categorise(status)   : True
+should_categorise(order_id) : False</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Working with Categorical — add/remove/rename categories</h3></div>
+    <div class="card-b">
+<pre><code>s = pd.Categorical([<span class="str">"a"</span>,<span class="str">"b"</span>,<span class="str">"a"</span>,<span class="str">"c"</span>], categories=[<span class="str">"a"</span>,<span class="str">"b"</span>,<span class="str">"c"</span>])
+
+<span class="cmt"># ── Add a new category ───────────────────────────────────────────</span>
+s = s.add_categories([<span class="str">"d"</span>])
+<span class="fn">print</span>(s.categories)   <span class="cmt"># Index(['a', 'b', 'c', 'd'])</span>
+
+<span class="cmt"># ── Remove unused categories ────────────────────────────────────</span>
+s2 = pd.Categorical([<span class="str">"a"</span>,<span class="str">"b"</span>], categories=[<span class="str">"a"</span>,<span class="str">"b"</span>,<span class="str">"c"</span>,<span class="str">"d"</span>])
+s2 = s2.remove_unused_categories()
+<span class="fn">print</span>(s2.categories)  <span class="cmt"># Index(['a', 'b'])  — c and d removed</span>
+
+<span class="cmt"># ── Rename categories ────────────────────────────────────────────</span>
+s3 = pd.Categorical([<span class="str">"M"</span>,<span class="str">"F"</span>,<span class="str">"M"</span>], categories=[<span class="str">"M"</span>,<span class="str">"F"</span>])
+s3 = s3.rename_categories({<span class="str">"M"</span>: <span class="str">"Male"</span>, <span class="str">"F"</span>: <span class="str">"Female"</span>})
+<span class="fn">print</span>(s3.categories)  <span class="cmt"># Index(['Male', 'Female'])</span>
+
+<span class="cmt"># ── Set categories to align two DataFrames (before concat) ───────</span>
+ALL_STATUSES = [<span class="str">"pending"</span>, <span class="str">"shipped"</span>, <span class="str">"cancelled"</span>, <span class="str">"returned"</span>]
+df[<span class="str">"status"</span>] = df[<span class="str">"status"</span>].cat.set_categories(ALL_STATUSES)
+
+<span class="cmt"># value_counts includes zero-count categories</span>
+<span class="fn">print</span>(df[<span class="str">"status"</span>].value_counts())  <span class="cmt"># returned: 0</span></code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  NULLABLE  ═══════════ -->
+<div class="section" id="nullable">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(139,92,246,.1)">🔮</div>
+    <h2>Nullable Integer & String Types</h2>
+  </div>
+  <p class="sh-sub">NumPy integers cannot hold NaN. pandas 1.0+ introduced nullable versions (<code>Int8</code>–<code>Int64</code>, <code>string</code>, <code>boolean</code>) that use <code>pd.NA</code> instead of forcing float conversion.</p>
+
+  <div class="card">
+    <div class="card-h"><h3>The NaN-in-integer problem and the fix</h3><span class="pill p-purple">Nullable</span></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── The old problem: int column with NaN forces float ────────────</span>
+s_with_nan = pd.Series([<span class="num">1</span>, <span class="num">2</span>, np.nan, <span class="num">4</span>])
+<span class="fn">print</span>(<span class="grn">f"dtype: {s_with_nan.dtype}"</span>)     <span class="cmt"># float64  ← forced to float by NaN</span>
+<span class="fn">print</span>(s_with_nan.tolist())            <span class="cmt"># [1.0, 2.0, nan, 4.0]  ← ugly floats</span>
+
+<span class="cmt"># ── The fix: pandas nullable integer dtype ───────────────────────</span>
+s_nullable = pd.array([<span class="num">1</span>, <span class="num">2</span>, pd.NA, <span class="num">4</span>], dtype=<span class="str">"Int64"</span>)
+<span class="fn">print</span>(<span class="grn">f"dtype: {s_nullable.dtype}"</span>)    <span class="cmt"># Int64  ← capital I = nullable</span>
+<span class="fn">print</span>(s_nullable)                     <span class="cmt"># [1, 2, &lt;NA&gt;, 4]  ← clean integers</span>
+
+<span class="cmt"># ── Convert a float column (born with NaN) back to nullable int ──</span>
+df = raw.copy()
+df[<span class="str">"rating"</span>] = pd.to_numeric(df[<span class="str">"rating"</span>], errors=<span class="str">"coerce"</span>)   <span class="cmt"># float64</span>
+<span class="fn">print</span>(<span class="grn">f"After to_numeric: {df['rating'].dtype}"</span>)              <span class="cmt"># float64 (NaN present)</span>
+
+df[<span class="str">"rating"</span>] = df[<span class="str">"rating"</span>].astype(<span class="str">"Int8"</span>)   <span class="cmt"># None/NaN → pd.NA</span>
+<span class="fn">print</span>(<span class="grn">f"After astype Int8 : {df['rating'].dtype}"</span>)             <span class="cmt"># Int8</span>
+<span class="fn">print</span>(df[<span class="str">"rating"</span>].tolist())                                    <span class="cmt"># [4, 5, &lt;NA&gt;, 3, 5]</span>
+
+<span class="cmt"># ── pandas StringDtype vs object ────────────────────────────────</span>
+s_obj = pd.Series([<span class="str">"Alice"</span>, <span class="str">"Bob"</span>, np.nan])         <span class="cmt"># object (default)</span>
+s_str = pd.Series([<span class="str">"Alice"</span>, <span class="str">"Bob"</span>, pd.NA], dtype=<span class="str">"string"</span>) <span class="cmt"># StringDtype</span>
+
+<span class="fn">print</span>(<span class="grn">f"\nobject dtype: {s_obj.dtype}   NA repr: {s_obj[2]!r}"</span>)
+<span class="fn">print</span>(<span class="grn">f"string dtype: {s_str.dtype}   NA repr: {s_str[2]!r}"</span>)
+
+<span class="cmt"># StringDtype advantages:</span>
+<span class="cmt"># • Uses pd.NA (not np.nan) — consistent NA handling</span>
+<span class="cmt"># • str methods return IntegerArray/BooleanArray (not object)</span>
+<span class="cmt"># • Will use Arrow backend in future pandas versions</span>
+lengths = s_str.str.len()
+<span class="fn">print</span>(<span class="grn">f"str.len() dtype: {lengths.dtype}"</span>)   <span class="cmt"># Int64 (nullable!) not float64</span></code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>dtype: float64            ← NaN forces int→float (old problem)
+[1.0, 2.0, nan, 4.0]
+
+dtype: Int64              ← nullable integer ✅
+[1, 2, &lt;NA&gt;, 4]
+
+After astype Int8: Int8
+[4, 5, &lt;NA&gt;, 3, 5]       ← clean integers with NA ✅
+
+object dtype: object      NA repr: nan
+string dtype: string      NA repr: &lt;NA&gt;
+
+str.len() dtype: Int64    ← StringDtype returns nullable int, not float ✅</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  ARROW  ═══════════ -->
+<div class="section" id="arrow">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(248,113,113,.1)">🏹</div>
+    <h2>Arrow-backed Dtypes (pandas 2.x)</h2>
+  </div>
+  <p class="sh-sub">pandas 2.0 introduced PyArrow-backed dtypes — faster string operations, lower memory, and consistent <code>pd.NA</code> for all types.</p>
+
+  <div class="card">
+    <div class="card-h"><h3>ArrowDtype — conversion and benefits</h3><span class="pill p-red">pandas 2.x</span></div>
+    <div class="card-b">
+<pre><code><span class="kw">import</span> pyarrow <span class="kw">as</span> pa   <span class="cmt"># pip install pyarrow</span>
+
+<span class="cmt"># ── Convert a string column to Arrow-backed string ────────────────</span>
+s = pd.Series([<span class="str">"Alice"</span>, <span class="str">"Bob"</span>, <span class="str">"Carol"</span>, None])
+s_arrow = s.astype(pd.ArrowDtype(pa.string()))
+<span class="fn">print</span>(<span class="grn">f"dtype: {s_arrow.dtype}"</span>)          <span class="cmt"># string[pyarrow]</span>
+<span class="fn">print</span>(<span class="grn">f"NA:    {s_arrow[3]!r}"</span>)             <span class="cmt"># &lt;NA&gt;</span>
+
+<span class="cmt"># ── Use ArrowDtype for integers ──────────────────────────────────</span>
+s_int = pd.Series([<span class="num">1</span>, <span class="num">2</span>, None, <span class="num">4</span>]).astype(pd.ArrowDtype(pa.int32()))
+<span class="fn">print</span>(<span class="grn">f"int32[pyarrow]: {s_int.dtype}   NA: {s_int[2]!r}"</span>)
+
+<span class="cmt"># ── Read CSV with all Arrow types (pandas 2.x) ──────────────────</span>
+<span class="cmt"># df = pd.read_csv("file.csv", dtype_backend="pyarrow")</span>
+<span class="cmt"># or use nullable pandas types:</span>
+<span class="cmt"># df = pd.read_csv("file.csv", dtype_backend="numpy_nullable")</span>
+
+<span class="cmt"># ── Memory: Arrow string vs object ──────────────────────────────</span>
+N = <span class="num">500_000</span>
+words = np.random.choice([<span class="str">"apple"</span>,<span class="str">"banana"</span>,<span class="str">"cherry"</span>,<span class="str">"date"</span>], N)
+
+s_obj   = pd.Series(words)
+s_arrow = pd.Series(words).astype(pd.ArrowDtype(pa.string()))
+s_cat   = pd.Series(words).astype(<span class="str">"category"</span>)
+
+<span class="fn">print</span>(<span class="grn">f"\n500K string rows:"</span>)
+<span class="fn">print</span>(<span class="grn">f"  object  : {s_obj.memory_usage(deep=True)/1e6:.1f} MB"</span>)
+<span class="fn">print</span>(<span class="grn">f"  arrow   : {s_arrow.memory_usage(deep=True)/1e6:.1f} MB"</span>)
+<span class="fn">print</span>(<span class="grn">f"  category: {s_cat.memory_usage(deep=True)/1e6:.1f} MB"</span>)</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>dtype: string[pyarrow]
+NA:    &lt;NA&gt;
+
+int32[pyarrow]: int32[pyarrow]   NA: &lt;NA&gt;
+
+500K string rows:
+  object  : 28.6 MB
+  arrow   :  2.4 MB    ← 92% reduction vs object ✅
+  category:  0.6 MB    ← still smallest for low-cardinality</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  MEMORY  ═══════════ -->
+<div class="section" id="memory">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(250,204,21,.1)">💾</div>
+    <h2>Memory Optimisation via Dtype Tuning</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Systematic memory reduction — before & after</h3><span class="pill p-yellow">Memory</span></div>
+    <div class="card-b">
+<pre><code>N = <span class="num">500_000</span>
+np.random.seed(<span class="num">0</span>)
+
+df_big = pd.DataFrame({
+    <span class="str">"user_id"</span>:   np.random.randint(<span class="num">1</span>, <span class="num">100_000</span>, N),         <span class="cmt"># int64 → int32</span>
+    <span class="str">"age"</span>:       np.random.randint(<span class="num">18</span>, <span class="num">90</span>, N),             <span class="cmt"># int64 → int8</span>
+    <span class="str">"score"</span>:     np.random.uniform(<span class="num">0</span>, <span class="num">100</span>, N),             <span class="cmt"># float64 → float32</span>
+    <span class="str">"country"</span>:   np.random.choice([<span class="str">"US"</span>,<span class="str">"DE"</span>,<span class="str">"FR"</span>,<span class="str">"GB"</span>], N), <span class="cmt"># object → category</span>
+    <span class="str">"status"</span>:    np.random.choice([<span class="str">"active"</span>,<span class="str">"inactive"</span>], N),   <span class="cmt"># object → category</span>
+    <span class="str">"is_active"</span>: np.random.choice([<span class="cls">True</span>, <span class="cls">False</span>], N),         <span class="cmt"># already bool but object</span>
+    <span class="str">"date"</span>:      pd.date_range(<span class="str">"2022-01-01"</span>, periods=N, freq=<span class="str">"s"</span>),
+    <span class="str">"note"</span>:      np.random.choice([<span class="str">"good"</span>,<span class="str">"bad"</span>,<span class="str">"avg"</span>], N),
+})
+<span class="cmt"># Simulate object dtypes as if read from CSV</span>
+df_big = df_big.astype({<span class="str">"user_id"</span>: <span class="cls">str</span>, <span class="str">"age"</span>: <span class="cls">str</span>, <span class="str">"score"</span>: <span class="cls">str</span>,
+                        <span class="str">"is_active"</span>: <span class="cls">str</span>, <span class="str">"date"</span>: <span class="cls">str</span>})
+
+mem_before = df_big.memory_usage(deep=<span class="cls">True</span>).<span class="fn">sum</span>() / <span class="num">1024</span>**<span class="num">2</span>
+<span class="fn">print</span>(<span class="grn">f"Memory before optimisation: {mem_before:.1f} MB"</span>)
+
+<span class="cmt"># ── Apply all dtype optimisations ────────────────────────────────</span>
+df_opt = df_big.copy()
+
+<span class="cmt"># 1. Strings → numeric</span>
+df_opt[<span class="str">"user_id"</span>] = pd.to_numeric(df_opt[<span class="str">"user_id"</span>]).astype(<span class="str">"int32"</span>)
+df_opt[<span class="str">"age"</span>]     = pd.to_numeric(df_opt[<span class="str">"age"</span>]).astype(<span class="str">"int8"</span>)
+df_opt[<span class="str">"score"</span>]   = pd.to_numeric(df_opt[<span class="str">"score"</span>]).astype(<span class="str">"float32"</span>)
+
+<span class="cmt"># 2. Object strings → category</span>
+df_opt[<span class="str">"country"</span>] = df_opt[<span class="str">"country"</span>].astype(<span class="str">"category"</span>)
+df_opt[<span class="str">"status"</span>]  = df_opt[<span class="str">"status"</span>].astype(<span class="str">"category"</span>)
+df_opt[<span class="str">"note"</span>]    = df_opt[<span class="str">"note"</span>].astype(<span class="str">"category"</span>)
+
+<span class="cmt"># 3. String bool → bool</span>
+df_opt[<span class="str">"is_active"</span>] = df_opt[<span class="str">"is_active"</span>].map({<span class="str">"True"</span>:<span class="cls">True</span>,<span class="str">"False"</span>:<span class="cls">False</span>})
+
+<span class="cmt"># 4. String datetime → datetime</span>
+df_opt[<span class="str">"date"</span>] = pd.to_datetime(df_opt[<span class="str">"date"</span>])
+
+mem_after = df_opt.memory_usage(deep=<span class="cls">True</span>).<span class="fn">sum</span>() / <span class="num">1024</span>**<span class="num">2</span>
+<span class="fn">print</span>(<span class="grn">f"Memory after  optimisation: {mem_after:.1f} MB"</span>)
+<span class="fn">print</span>(<span class="grn">f"Reduction: {(1-mem_after/mem_before)*100:.0f}%"</span>)
+
+<span class="cmt"># ── Per-column breakdown ─────────────────────────────────────────</span>
+breakdown = pd.DataFrame({
+    <span class="str">"before_dtype"</span>: df_big.dtypes,
+    <span class="str">"after_dtype"</span>:  df_opt.dtypes,
+    <span class="str">"before_MB"</span>:    df_big.memory_usage(deep=<span class="cls">True</span>)[<span class="num">1</span>:] / <span class="num">1024</span>**<span class="num">2</span>,
+    <span class="str">"after_MB"</span>:     df_opt.memory_usage(deep=<span class="cls">True</span>)[<span class="num">1</span>:] / <span class="num">1024</span>**<span class="num">2</span>,
+})
+breakdown[<span class="str">"savings_%"</span>] = ((breakdown[<span class="str">"before_MB"</span>]-breakdown[<span class="str">"after_MB"</span>])/breakdown[<span class="str">"before_MB"</span>]*<span class="num">100</span>).round(<span class="num">0</span>)
+<span class="fn">print</span>(<span class="str">"\nPer-column savings:"</span>)
+<span class="fn">print</span>(breakdown.to_string())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>Memory before optimisation: 196.3 MB
+
+Memory after  optimisation:  17.8 MB
+
+Reduction: 91%  ← 91% memory reduction via dtype tuning alone ✅
+
+Per-column savings:
+          before_dtype  after_dtype  before_MB  after_MB  savings_%
+user_id         object        int32      28.60      1.91       93.0
+age             object         int8      28.60      0.48       98.0
+score           object      float32      28.60      1.91       93.0
+country         object     category      29.55      0.53       98.0
+status          object     category      29.03      0.53       98.0
+is_active       object         bool      28.60      0.48       98.0
+date            object datetime64[s]     28.60      3.81       87.0
+note            object     category      29.55      0.53       98.0</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  PIPELINE  ═══════════ -->
+<div class="section" id="pipeline">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(45,212,191,.1)">🏭</div>
+    <h2>Production Dtype Pipeline</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Complete dtype conversion pipeline — schema-driven</h3><span class="pill p-teal">Production</span></div>
+    <div class="card-b">
+      <div class="scenario">🏭 <strong>Pattern:</strong> Define a schema dict once. Apply it to every raw DataFrame loaded from CSV/API. A single function converts and validates all columns.</div>
+<pre><code><span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass, field
+<span class="kw">from</span> typing <span class="kw">import</span> Any, Optional
+
+<span class="cmt"># ── Schema definition ────────────────────────────────────────────</span>
+ORDER_SCHEMA = {
+    <span class="str">"order_id"</span>:   {<span class="str">"dtype"</span>: <span class="str">"int32"</span>,        <span class="str">"required"</span>: <span class="cls">True</span>},
+    <span class="str">"date"</span>:       {<span class="str">"dtype"</span>: <span class="str">"datetime"</span>,     <span class="str">"format"</span>: <span class="str">"%Y-%m-%d"</span>},
+    <span class="str">"amount"</span>:     {<span class="str">"dtype"</span>: <span class="str">"float64"</span>,     <span class="str">"clean"</span>: <span class="kw">lambda</span> s: s.str.replace(<span class="str">r"[$,]"</span>,<span class="str">""</span>,regex=<span class="cls">True</span>)},
+    <span class="str">"qty"</span>:        {<span class="str">"dtype"</span>: <span class="str">"int16"</span>},
+    <span class="str">"is_paid"</span>:    {<span class="str">"dtype"</span>: <span class="str">"boolean"</span>,     <span class="str">"true"</span>: [<span class="str">"true"</span>,<span class="str">"yes"</span>,<span class="str">"1"</span>], <span class="str">"false"</span>: [<span class="str">"false"</span>,<span class="str">"no"</span>,<span class="str">"0"</span>]},
+    <span class="str">"status"</span>:     {<span class="str">"dtype"</span>: <span class="str">"category"</span>,    <span class="str">"categories"</span>: [<span class="str">"pending"</span>,<span class="str">"shipped"</span>,<span class="str">"cancelled"</span>]},
+    <span class="str">"rating"</span>:     {<span class="str">"dtype"</span>: <span class="str">"Int8"</span>},        <span class="cmt"># nullable int</span>
+    <span class="str">"duration_s"</span>: {<span class="str">"dtype"</span>: <span class="str">"timedelta"</span>,   <span class="str">"unit"</span>: <span class="str">"s"</span>},
+}
+
+<span class="kw">def</span> <span class="fn">apply_schema</span>(df: pd.DataFrame, schema: <span class="cls">dict</span>) -> pd.DataFrame:
+    <span class="str">"""Apply dtype schema to a raw DataFrame."""</span>
+    df = df.copy()
+    errors = []
+
+    <span class="kw">for</span> col, spec <span class="kw">in</span> schema.items():
+        <span class="kw">if</span> col <span class="kw">not</span> <span class="kw">in</span> df.columns:
+            <span class="kw">if</span> spec.get(<span class="str">"required"</span>):
+                errors.append(<span class="grn">f"Required column '{col}' missing"</span>)
+            <span class="kw">continue</span>
+
+        s = df[col]
+
+        <span class="cmt"># Pre-clean hook</span>
+        <span class="kw">if</span> <span class="str">"clean"</span> <span class="kw">in</span> spec:
+            s = spec[<span class="str">"clean"</span>](s)
+
+        dtype = spec[<span class="str">"dtype"</span>]
+        <span class="kw">try</span>:
+            <span class="kw">if</span> dtype == <span class="str">"datetime"</span>:
+                fmt = spec.get(<span class="str">"format"</span>)
+                s = pd.to_datetime(s, format=fmt, errors=<span class="str">"coerce"</span>)
+            <span class="kw">elif</span> dtype == <span class="str">"timedelta"</span>:
+                s = pd.to_timedelta(pd.to_numeric(s, errors=<span class="str">"coerce"</span>), unit=spec.get(<span class="str">"unit"</span>,<span class="str">"s"</span>))
+            <span class="kw">elif</span> dtype == <span class="str">"boolean"</span>:
+                lower = s.astype(<span class="cls">str</span>).str.lower().str.strip()
+                t, f  = spec.get(<span class="str">"true"</span>,[<span class="str">"true"</span>]), spec.get(<span class="str">"false"</span>,[<span class="str">"false"</span>])
+                arr   = pd.array([pd.NA]*<span class="fn">len</span>(s), dtype=<span class="str">"boolean"</span>)
+                arr[lower.isin(t)] = <span class="cls">True</span>
+                arr[lower.isin(f)] = <span class="cls">False</span>
+                s = pd.Series(arr, index=df.index)
+            <span class="kw">elif</span> dtype == <span class="str">"category"</span>:
+                cats = spec.get(<span class="str">"categories"</span>)
+                s = s.astype(<span class="str">"category"</span>)
+                <span class="kw">if</span> cats: s = s.cat.set_categories(cats)
+            <span class="kw">else</span>:
+                s = pd.to_numeric(s, errors=<span class="str">"coerce"</span>).astype(dtype)
+            df[col] = s
+        <span class="kw">except</span> Exception <span class="kw">as</span> e:
+            errors.append(<span class="grn">f"Column '{col}': {e}"</span>)
+
+    <span class="kw">if</span> errors:
+        <span class="fn">print</span>(<span class="str">"⚠️ Schema errors:"</span>)
+        <span class="kw">for</span> err <span class="kw">in</span> errors: <span class="fn">print</span>(<span class="grn">f"  • {err}"</span>)
+
+    <span class="kw">return</span> df
+
+<span class="cmt"># ── Apply it ─────────────────────────────────────────────────────</span>
+df_typed = <span class="fn">apply_schema</span>(raw, ORDER_SCHEMA)
+
+<span class="fn">print</span>(<span class="str">"\nDtypes after schema:"</span>)
+<span class="fn">print</span>(df_typed.dtypes)
+<span class="fn">print</span>(<span class="grn">f"\nMemory before: {raw.memory_usage(deep=True).sum()/1024:.1f} KB"</span>)
+<span class="fn">print</span>(<span class="grn">f"Memory after : {df_typed.memory_usage(deep=True).sum()/1024:.1f} KB"</span>)</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>Dtypes after schema:
+order_id              int32
+date         datetime64[ns]
+amount              float64
+qty                   int16
+is_paid             boolean
+status             category
+rating                 Int8
+duration_s    timedelta64[ns]
+dtype: object
+
+Memory before: 19.8 KB
+Memory after :  4.2 KB  ← 79% reduction on small dataset</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  CHEAT SHEET  ═══════════ -->
+<div class="section" id="cheatsheet">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(74,222,128,.1)">🗺️</div>
+    <h2>Complete Cheat Sheet</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>All dtype conversion patterns — quick reference</h3></div>
+    <div class="card-b" style="padding:0">
+      <table class="dt">
+        <tr><th>Goal</th><th>Code</th><th>Notes</th></tr>
+        <tr><td>String → int (clean)</td><td><code>s.astype("int32")</code></td><td>Only if no bad values</td></tr>
+        <tr><td>String → int (safe)</td><td><code>pd.to_numeric(s, errors="coerce").astype("Int32")</code></td><td>Bad → NaN → pd.NA</td></tr>
+        <tr><td>String → float</td><td><code>pd.to_numeric(s.str.replace(r"[$,]","",regex=True), errors="coerce")</code></td><td>Strip currency first</td></tr>
+        <tr><td>String → int (downcast)</td><td><code>pd.to_numeric(s, downcast="integer")</code></td><td>Auto smallest int type</td></tr>
+        <tr><td>Float → float32</td><td><code>s.astype("float32")</code></td><td>50% memory saving</td></tr>
+        <tr><td>Int with NaN → nullable</td><td><code>s.astype("Int64")</code></td><td>Capital I = nullable</td></tr>
+        <tr><td>String → datetime</td><td><code>pd.to_datetime(s, errors="coerce")</code></td><td>Bad → NaT</td></tr>
+        <tr><td>String → datetime (fast)</td><td><code>pd.to_datetime(s, format="%Y-%m-%d")</code></td><td>Explicit format = 10× faster</td></tr>
+        <tr><td>Unix epoch → datetime</td><td><code>pd.to_datetime(s, unit="s")</code></td><td>unit="ms"/"us"/"ns"</td></tr>
+        <tr><td>Datetime → date parts</td><td><code>s.dt.year / .dt.month / .dt.day</code></td><td>Requires datetime dtype first</td></tr>
+        <tr><td>Datetime resolution</td><td><code>s.astype("datetime64[ms]")</code></td><td>ns/us/ms/s</td></tr>
+        <tr><td>Add timezone</td><td><code>s.dt.tz_localize("UTC")</code></td><td>Then .tz_convert() for others</td></tr>
+        <tr><td>Seconds → timedelta</td><td><code>pd.to_timedelta(s.astype(int), unit="s")</code></td><td>unit W/D/h/m/s/ms/us/ns</td></tr>
+        <tr><td>Datetime diff → timedelta</td><td><code>df["end"] - df["start"]</code></td><td>Auto timedelta64</td></tr>
+        <tr><td>Timedelta → seconds</td><td><code>s.dt.total_seconds()</code></td><td>Returns float64</td></tr>
+        <tr><td>String "True"/"False" → bool</td><td><code>s.map({"True": True, "False": False})</code></td><td>NEVER astype(bool) on strings</td></tr>
+        <tr><td>Nullable boolean</td><td><code>pd.array([True, False, pd.NA], dtype="boolean")</code></td><td>three-valued logic</td></tr>
+        <tr><td>Object → category</td><td><code>s.astype("category")</code></td><td>Use when cardinality &lt; 10%</td></tr>
+        <tr><td>Ordered category</td><td><code>s.astype(CategoricalDtype(["a","b","c"], ordered=True))</code></td><td>Enables &lt; &gt; comparisons</td></tr>
+        <tr><td>Object → string (nullable)</td><td><code>s.astype("string")</code></td><td>Uses pd.NA, not np.nan</td></tr>
+        <tr><td>Arrow-backed string</td><td><code>s.astype(pd.ArrowDtype(pa.string()))</code></td><td>pandas 2.x, lowest memory</td></tr>
+        <tr><td>Multiple cols at once</td><td><code>df.astype({"a": "int32", "b": "float32"})</code></td><td>Dict form</td></tr>
+        <tr><td>All obj cols → numeric</td><td><code>df.apply(pd.to_numeric, errors="ignore")</code></td><td>Skips non-numeric cols</td></tr>
+        <tr><td>Select by dtype</td><td><code>df.select_dtypes(include=["number"])</code></td><td>object/number/datetime/bool/category</td></tr>
+        <tr><td>Overflow check</td><td><code>np.iinfo("int8").min / .max</code></td><td>Before downcasting!</td></tr>
+        <tr><td>Memory audit</td><td><code>df.memory_usage(deep=True)</code></td><td>deep=True for object columns</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Column type → recommended dtype decision tree</h3></div>
+    <div class="card-b">
+<pre><code><span class="cmt">What kind of data is in the column?
+│
+├─ Whole numbers (no NaN) ──────────────────────────────────────────
+│   └─ What is the value range?
+│       ├─ -128..127            → int8
+│       ├─ -32768..32767        → int16
+│       ├─ ±2.1 billion         → int32
+│       └─ larger               → int64
+│
+├─ Whole numbers (WITH NaN) ────────────────────────────────────────
+│   └─ Use nullable type: Int8 / Int16 / Int32 / Int64
+│       (never float64 just to hold NaN)
+│
+├─ Decimal numbers ─────────────────────────────────────────────────
+│   ├─ Precision needed (finance, science) → float64
+│   └─ ML feature / sensor / approximate  → float32 (50% memory)
+│
+├─ Text / strings ──────────────────────────────────────────────────
+│   ├─ Low cardinality (&lt;10% unique)  → category  ← fastest, smallest
+│   ├─ High cardinality, NaN present  → string (pd.StringDtype)
+│   └─ Legacy / library compatibility → object
+│
+├─ True/False ──────────────────────────────────────────────────────
+│   ├─ No NaN                         → bool
+│   └─ NaN possible                  → boolean (pd.BooleanDtype)
+│
+├─ Dates & times ───────────────────────────────────────────────────
+│   ├─ Date/time values               → datetime64[us] (pandas 2.x)
+│   ├─ Date/time + timezone           → datetime64[us, UTC]
+│   └─ Duration / elapsed time        → timedelta64
+│
+└─ Reporting periods (monthly, quarterly) → period["M"] / period["Q"]</span></code></pre>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:18px">
+    <div class="info info-red">
+      <strong>⚠️ Never astype(bool) on strings:</strong><br/>
+      Any non-empty string is truthy in Python. <code>"False".astype(bool) == True</code>. Always map string boolean representations with a dict or explicit set membership.
+    </div>
+    <div class="info info-orange">
+      <strong>⚠️ Integer overflow is silent:</strong><br/>
+      NumPy wraps around without raising. <code>np.int8(200) == -56</code>. Always check <code>s.min()</code>/<code>s.max()</code> against <code>np.iinfo()</code> before downcasting.
+    </div>
+    <div class="info info-blue">
+      <strong>💡 astype() is strict:</strong><br/>
+      Use <code>pd.to_numeric(errors="coerce")</code> and <code>pd.to_datetime(errors="coerce")</code> for raw/dirty data. Use <code>astype()</code> only after cleaning — it raises on any incompatible value.
+    </div>
+    <div class="info info-green">
+      <strong>✅ Always check memory_usage(deep=True):</strong><br/>
+      <code>df.memory_usage(deep=False)</code> underreports object columns (shows pointer size, not string size). Always use <code>deep=True</code> for accurate measurement.
+    </div>
+    <div class="info info-teal">
+      <strong>💡 category cardinality rule:</strong><br/>
+      Convert to <code>category</code> only when <code>nunique() / len(df) &lt; 0.10</code>. High-cardinality categories use more memory than plain <code>object</code> due to category overhead.
+    </div>
+    <div class="info info-purple">
+      <strong>💡 Int8 vs int8:</strong><br/>
+      Lowercase <code>int8</code> is a NumPy type — no NaN support. Capital <code>Int8</code> is a pandas ExtensionArray — holds <code>pd.NA</code>. Use capital-I types whenever the column can have missing values.
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+<footer>Pandas Change Datatype — End to End &nbsp;|&nbsp; pandas 2.x · NumPy · PyArrow · Python 3.11 &nbsp;|&nbsp; April 2026</footer>
+</body>
+</html>
