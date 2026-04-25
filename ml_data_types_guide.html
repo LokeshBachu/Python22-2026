@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ML Data Types – End-to-End Guide</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --card2: #21253a;
+      --accent: #7c6af7;
+      --accent2: #4fc3f7;
+      --accent3: #81c784;
+      --accent4: #ffb74d;
+      --accent5: #f06292;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #2d3148;
+      --code-bg: #12151f;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.7;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #1a1040 0%, #0f1a3a 50%, #0a2020 100%);
+      padding: 60px 40px 50px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero h1 { font-size: 2.6rem; font-weight: 800; letter-spacing: -1px; }
+    .hero h1 span { color: var(--accent); }
+    .hero p  { color: var(--muted); font-size: 1.1rem; margin-top: 12px; max-width: 700px; margin-inline: auto; }
+
+    /* ── TOC ── */
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 32px;
+      margin: 36px auto;
+      max-width: 900px;
+    }
+    .toc h2 { color: var(--accent2); margin-bottom: 14px; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+    .toc ol  { padding-left: 20px; }
+    .toc li  { margin: 5px 0; }
+    .toc a   { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+
+    /* ── Section wrappers ── */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px 60px; }
+    section { margin-bottom: 56px; }
+    section h2 {
+      font-size: 1.7rem; font-weight: 700;
+      border-left: 4px solid var(--accent);
+      padding-left: 16px;
+      margin-bottom: 24px;
+      scroll-margin-top: 80px;
+    }
+    section h3 { font-size: 1.2rem; font-weight: 600; color: var(--accent2); margin: 24px 0 12px; }
+    section h4 { font-size: 1rem; font-weight: 600; color: var(--accent4); margin: 16px 0 8px; }
+    p  { color: var(--muted); margin-bottom: 12px; }
+    ul, ol { color: var(--muted); padding-left: 22px; margin-bottom: 12px; }
+    li { margin: 4px 0; }
+    strong { color: var(--text); }
+
+    /* ── Cards / grids ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .card.accent-purple { border-top: 3px solid var(--accent); }
+    .card.accent-blue   { border-top: 3px solid var(--accent2); }
+    .card.accent-green  { border-top: 3px solid var(--accent3); }
+    .card.accent-orange { border-top: 3px solid var(--accent4); }
+    .card.accent-pink   { border-top: 3px solid var(--accent5); }
+    .card h3 { margin-top: 0; font-size: 1.05rem; }
+    .card p  { font-size: 0.92rem; }
+
+    /* ── Compare table ── */
+    .compare-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.93rem; }
+    .compare-table th {
+      background: var(--card2);
+      color: var(--accent2);
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 2px solid var(--border);
+    }
+    .compare-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
+    .compare-table tr:hover td { background: var(--card2); }
+    .compare-table .label { color: var(--text); font-weight: 600; }
+
+    /* ── Code blocks ── */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      overflow-x: auto;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      margin: 16px 0;
+    }
+    code { font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace; }
+    .kw  { color: #c792ea; }
+    .fn  { color: #82aaff; }
+    .str { color: #c3e88d; }
+    .cm  { color: #546e7a; font-style: italic; }
+    .num { color: #f78c6c; }
+    .cls { color: #ffcb6b; }
+
+    /* ── Badge / pill ── */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin: 2px;
+    }
+    .badge-purple { background: #3d2b8e; color: #c4b5fd; }
+    .badge-blue   { background: #1a3a5c; color: #7dd3fc; }
+    .badge-green  { background: #1a3a20; color: #86efac; }
+    .badge-orange { background: #3d2000; color: #fed7aa; }
+    .badge-pink   { background: #3d1a2e; color: #f9a8d4; }
+    .badge-red    { background: #3d1a1a; color: #fca5a5; }
+
+    /* ── Flow diagram (pure CSS) ── */
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0;
+      margin: 20px 0;
+      overflow-x: auto;
+    }
+    .flow-box {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 18px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .flow-arrow {
+      color: var(--accent);
+      font-size: 1.3rem;
+      padding: 0 6px;
+      font-weight: 700;
+    }
+
+    /* ── Callout ── */
+    .callout {
+      border-left: 4px solid var(--accent4);
+      background: #1e1a0e;
+      border-radius: 0 8px 8px 0;
+      padding: 14px 20px;
+      margin: 16px 0;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+    .callout.info  { border-color: var(--accent2); background: #0e1a26; }
+    .callout.warn  { border-color: var(--accent4); background: #1e1a0e; }
+    .callout.good  { border-color: var(--accent3); background: #0e1a10; }
+    .callout strong { color: var(--text); }
+
+    /* ── Section divider ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 40px 0;
+    }
+
+    /* ── Sticky nav ── */
+    .sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15,17,23,0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 24px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 0.82rem;
+    }
+    .sticky-nav a { color: var(--muted); text-decoration: none; }
+    .sticky-nav a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <h1>ML Data Types <span>&amp;</span> End-to-End Pipeline</h1>
+  <p>Labeled · Unlabeled · Continuous · Categorical — everything you need to know to build production-ready ML models</p>
+</div>
+
+<!-- Sticky Nav -->
+<nav class="sticky-nav">
+  <a href="#s1">1. Data Types Overview</a>
+  <a href="#s2">2. Labeled Data</a>
+  <a href="#s3">3. Unlabeled Data</a>
+  <a href="#s4">4. Continuous Values</a>
+  <a href="#s5">5. Categorical Data</a>
+  <a href="#s6">6. Preprocessing</a>
+  <a href="#s7">7. Model Selection</a>
+  <a href="#s8">8. Training</a>
+  <a href="#s9">9. Evaluation</a>
+  <a href="#s10">10. Full Pipeline</a>
+</nav>
+
+<!-- TOC -->
+<div class="toc container">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#s1">Data Types Overview</a></li>
+    <li><a href="#s2">Labeled Data — Supervised Learning</a></li>
+    <li><a href="#s3">Unlabeled Data — Unsupervised & Semi-supervised</a></li>
+    <li><a href="#s4">Continuous (Numerical) Values</a></li>
+    <li><a href="#s5">Categorical Data</a></li>
+    <li><a href="#s6">Preprocessing & Feature Engineering</a></li>
+    <li><a href="#s7">Model Selection by Data Type</a></li>
+    <li><a href="#s8">Training, Validation & Hyperparameter Tuning</a></li>
+    <li><a href="#s9">Evaluation Metrics</a></li>
+    <li><a href="#s10">End-to-End Pipeline Code</a></li>
+  </ol>
+</div>
+
+<div class="container">
+
+  <!-- ─────────────────────────────────────────────
+       SECTION 1 – DATA TYPES OVERVIEW
+  ───────────────────────────────────────────── -->
+  <section id="s1">
+    <h2>1. Data Types Overview</h2>
+    <p>Every ML problem starts with understanding your data. Two fundamental distinctions drive model choice and preprocessing strategy:</p>
+
+    <div class="card-grid">
+      <div class="card accent-purple">
+        <h3>🏷️ Labeled Data</h3>
+        <p>Each record includes an input <strong>X</strong> and a known output/target <strong>y</strong>.</p>
+        <p>Enables <strong>supervised learning</strong> — the model learns the input→output mapping.</p>
+        <div><span class="badge badge-purple">Classification</span><span class="badge badge-purple">Regression</span></div>
+      </div>
+      <div class="card accent-blue">
+        <h3>🔍 Unlabeled Data</h3>
+        <p>Records have inputs <strong>X</strong> only — no ground-truth target provided.</p>
+        <p>Requires <strong>unsupervised</strong> or <strong>semi-supervised</strong> methods to find structure.</p>
+        <div><span class="badge badge-blue">Clustering</span><span class="badge badge-blue">Anomaly Detection</span></div>
+      </div>
+      <div class="card accent-green">
+        <h3>📈 Continuous Values</h3>
+        <p>Numeric features that can take any value along a range (real numbers).</p>
+        <p>Examples: price, temperature, age, salary.</p>
+        <div><span class="badge badge-green">Normalization</span><span class="badge badge-green">Scaling</span></div>
+      </div>
+      <div class="card accent-orange">
+        <h3>🗂️ Categorical Data</h3>
+        <p>Features that represent discrete groups or labels — no natural numeric order (nominal) or with order (ordinal).</p>
+        <p>Examples: color, country, gender, size (S/M/L).</p>
+        <div><span class="badge badge-orange">Encoding</span><span class="badge badge-orange">Embedding</span></div>
+      </div>
+    </div>
+
+    <h3>Big-Picture Taxonomy</h3>
+    <table class="compare-table">
+      <thead>
+        <tr><th>Dimension</th><th>Type A</th><th>Type B</th><th>Key Impact</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="label">Labels</td><td>Labeled</td><td>Unlabeled</td><td>Determines learning paradigm (supervised vs unsupervised)</td></tr>
+        <tr><td class="label">Feature scale</td><td>Continuous</td><td>Categorical</td><td>Drives preprocessing strategy (scaling vs encoding)</td></tr>
+        <tr><td class="label">Target type</td><td>Regression (continuous)</td><td>Classification (categorical)</td><td>Determines loss function and evaluation metric</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- ─────────────────────────────────────────────
+       SECTION 2 – LABELED DATA
+  ───────────────────────────────────────────── -->
+  <section id="s2">
+    <h2>2. Labeled Data — Supervised Learning</h2>
+
+    <h3>What is Labeled Data?</h3>
+    <p>Labeled data is a dataset of <strong>(input, output)</strong> pairs. The "label" is the answer the model should learn to predict.</p>
+
+    <div class="card-grid">
+      <div class="card accent-purple">
+        <h3>Classification Labels</h3>
+        <p>The target <strong>y</strong> is a discrete class.</p>
+        <ul>
+          <li><strong>Binary:</strong> spam / not-spam, fraud / legit</li>
+          <li><strong>Multi-class:</strong> cat / dog / bird</li>
+          <li><strong>Multi-label:</strong> an email tagged with multiple topics</li>
+        </ul>
+      </div>
+      <div class="card accent-green">
+        <h3>Regression Labels</h3>
+        <p>The target <strong>y</strong> is a continuous numeric value.</p>
+        <ul>
+          <li>House price prediction</li>
+          <li>Stock price forecasting</li>
+          <li>Temperature estimation</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>How to Obtain Labels</h3>
+    <ul>
+      <li><strong>Manual annotation</strong> — human experts label each record (costly, accurate)</li>
+      <li><strong>Crowdsourcing</strong> — platforms like Amazon Mechanical Turk</li>
+      <li><strong>Programmatic labeling</strong> — rule-based heuristics (Snorkel / LabelStudio)</li>
+      <li><strong>Weak supervision</strong> — noisy, imperfect labels as training signal</li>
+      <li><strong>Natural labels</strong> — user clicks, purchase history, star ratings</li>
+    </ul>
+
+    <h3>Label Quality Issues</h3>
+    <table class="compare-table">
+      <thead><tr><th>Problem</th><th>Cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>Label noise</td><td>Inconsistent annotation</td><td>Label cleaning, confidence learning (cleanlab)</td></tr>
+        <tr><td>Class imbalance</td><td>Skewed real-world distribution</td><td>SMOTE, class weights, oversampling</td></tr>
+        <tr><td>Ambiguous labels</td><td>Vague task definition</td><td>Better annotation guidelines, inter-annotator agreement</td></tr>
+        <tr><td>Label leakage</td><td>Future info in features</td><td>Strict train/test time-based splits</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Labeled Data — Python Example</h3>
+    <pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> load_iris
+
+<span class="cm"># Labeled dataset: X = features, y = class label</span>
+iris = load_iris(as_frame=<span class="cls">True</span>)
+df = iris.frame
+<span class="fn">print</span>(df.head())
+
+<span class="cm"># X → 4 continuous features</span>
+<span class="cm"># y → target (0=setosa, 1=versicolor, 2=virginica) — categorical label</span>
+X = df.drop(columns=[<span class="str">'target'</span>])
+y = df[<span class="str">'target'</span>]
+
+<span class="fn">print</span>(<span class="str">f"Samples: {len(df)}, Classes: {y.nunique()}"</span>)
+<span class="fn">print</span>(<span class="str">f"Class distribution:\n{y.value_counts()}"</span>)
+</code></pre>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- ─────────────────────────────────────────────
+       SECTION 3 – UNLABELED DATA
+  ───────────────────────────────────────────── -->
+  <section id="s3">
+    <h2>3. Unlabeled Data — Unsupervised &amp; Semi-Supervised</h2>
+
+    <h3>Unsupervised Learning</h3>
+    <p>No labels available. The model finds hidden patterns, structure, or representations in raw data.</p>
+
+    <div class="card-grid">
+      <div class="card accent-blue">
+        <h3>Clustering</h3>
+        <p>Group similar records together.</p>
+        <ul>
+          <li><strong>K-Means</strong> — partition into k clusters by centroid distance</li>
+          <li><strong>DBSCAN</strong> — density-based, handles noise/outliers</li>
+          <li><strong>Hierarchical</strong> — build a tree of clusters (dendrogram)</li>
+          <li><strong>Gaussian Mixture</strong> — soft probabilistic cluster assignment</li>
+        </ul>
+      </div>
+      <div class="card accent-pink">
+        <h3>Dimensionality Reduction</h3>
+        <p>Compress high-dimensional data to fewer dimensions for visualization or downstream ML.</p>
+        <ul>
+          <li><strong>PCA</strong> — linear projection to maximize variance</li>
+          <li><strong>t-SNE</strong> — non-linear, great for 2D visualization</li>
+          <li><strong>UMAP</strong> — faster than t-SNE, preserves global structure</li>
+          <li><strong>Autoencoders</strong> — neural network encoder/decoder</li>
+        </ul>
+      </div>
+      <div class="card accent-orange">
+        <h3>Anomaly Detection</h3>
+        <p>Find rare/unusual points that deviate from the norm.</p>
+        <ul>
+          <li><strong>Isolation Forest</strong> — isolates anomalies via random trees</li>
+          <li><strong>One-Class SVM</strong> — learns a boundary around normal data</li>
+          <li><strong>LOF</strong> — Local Outlier Factor (density-based)</li>
+          <li><strong>Autoencoder reconstruction error</strong></li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Semi-Supervised Learning</h3>
+    <p>A <strong>small labeled set</strong> + <strong>large unlabeled set</strong> — common in real-world scenarios where labeling is expensive.</p>
+
+    <table class="compare-table">
+      <thead><tr><th>Method</th><th>Idea</th><th>Use Case</th></tr></thead>
+      <tbody>
+        <tr><td>Self-training</td><td>Train on labeled, pseudo-label confident unlabeled, retrain</td><td>Text classification with few labels</td></tr>
+        <tr><td>Label Propagation</td><td>Spread labels through a graph of similar points</td><td>Image segmentation</td></tr>
+        <tr><td>Co-training</td><td>Two models trained on different feature views, teach each other</td><td>Web page classification</td></tr>
+        <tr><td>Contrastive Learning</td><td>Learn embeddings by pulling similar apart and dissimilar close (SimCLR, MoCo)</td><td>Vision, NLP pretraining</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Unsupervised — Python Example</h3>
+    <pre><code><span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cm"># Unlabeled data — only X available</span>
+np.random.seed(<span class="num">42</span>)
+X = np.random.randn(<span class="num">300</span>, <span class="num">10</span>)
+
+<span class="cm"># Step 1: Scale features</span>
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+<span class="cm"># Step 2: Dimensionality reduction</span>
+pca = PCA(n_components=<span class="num">2</span>)
+X_2d = pca.fit_transform(X_scaled)
+
+<span class="cm"># Step 3: Clustering</span>
+kmeans = KMeans(n_clusters=<span class="num">3</span>, random_state=<span class="num">42</span>)
+labels = kmeans.fit_predict(X_scaled)
+
+<span class="cm"># Step 4: Visualize</span>
+plt.scatter(X_2d[:, <span class="num">0</span>], X_2d[:, <span class="num">1</span>], c=labels, cmap=<span class="str">'viridis'</span>, alpha=<span class="num">0.7</span>)
+plt.title(<span class="str">'K-Means Clustering (PCA 2D)'</span>)
+plt.show()
+
+<span class="cm"># Elbow method to choose k</span>
+inertias = [KMeans(n_clusters=k, random_state=<span class="num">42</span>).fit(X_scaled).inertia_
+            <span class="kw">for</span> k <span class="kw">in</span> range(<span class="num">1</span>, <span class="num">11</span>)]
+</code></pre>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- ─────────────────────────────────────────────
+       SECTION 4 – CONTINUOUS VALUES
+  ───────────────────────────────────────────── -->
+  <section id="s4">
+    <h2>4. Continuous (Numerical) Values</h2>
+
+    <h3>What are Continuous Features?</h3>
+    <p>Features measured on a numeric scale where the gap between values is meaningful. Can be <strong>interval</strong> (no true zero — e.g., temperature °C) or <strong>ratio</strong> (true zero — e.g., salary).</p>
+
+    <div class="card-grid">
+      <div class="card accent-green">
+        <h3>Examples</h3>
+        <ul>
+          <li>Age: 25.5, 34, 67.2</li>
+          <li>Income: 45000, 120000</li>
+          <li>Sensor readings: 98.6°F, 1013 hPa</li>
+          <li>Pixel intensity: 0–255</li>
+          <li>Latitude / Longitude</li>
+        </ul>
+      </div>
+      <div class="card accent-blue">
+        <h3>Characteristics</h3>
+        <ul>
+          <li>Meaningful arithmetic operations</li>
+          <li>May have skewed distributions</li>
+          <li>Sensitive to outliers</li>
+          <li>Require scaling for distance-based models</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Common Issues with Continuous Data</h3>
+    <table class="compare-table">
+      <thead><tr><th>Issue</th><th>Detection</th><th>Treatment</th></tr></thead>
+      <tbody>
+        <tr><td>Outliers</td><td>Boxplot, z-score &gt; 3, IQR rule</td><td>Clip, log transform, robust scaler, removal</td></tr>
+        <tr><td>Skewness</td><td>skew() &gt; 1 or &lt; -1</td><td>log1p, sqrt, Box-Cox, Yeo-Johnson</td></tr>
+        <tr><td>Different scales</td><td>df.describe() — large variance differences</td><td>StandardScaler, MinMaxScaler, RobustScaler</td></tr>
+        <tr><td>Missing values</td><td>df.isnull().sum()</td><td>Mean/median/KNN imputation</td></tr>
+        <tr><td>Multicollinearity</td><td>Correlation matrix, VIF &gt; 5</td><td>PCA, drop correlated features, Ridge regression</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Scaling Methods Compared</h3>
+    <table class="compare-table">
+      <thead><tr><th>Scaler</th><th>Formula</th><th>Output Range</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td><strong>StandardScaler</strong></td><td>(x − μ) / σ</td><td>~[-3, 3]</td><td>Normally distributed, SVM, Linear</td></tr>
+        <tr><td><strong>MinMaxScaler</strong></td><td>(x − min) / (max − min)</td><td>[0, 1]</td><td>Neural networks, image pixels</td></tr>
+        <tr><td><strong>RobustScaler</strong></td><td>(x − median) / IQR</td><td>Varies</td><td>Data with many outliers</td></tr>
+        <tr><td><strong>MaxAbsScaler</strong></td><td>x / |max|</td><td>[-1, 1]</td><td>Sparse data (NLP)</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Continuous Preprocessing — Python Example</h3>
+    <pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler, PowerTransformer
+<span class="kw">from</span> sklearn.impute <span class="kw">import</span> SimpleImputer
+
+df = pd.DataFrame({
+    <span class="str">'age'</span>:    [<span class="num">25</span>, <span class="num">34</span>, np.nan, <span class="num">45</span>, <span class="num">200</span>],  <span class="cm"># outlier at 200</span>
+    <span class="str">'income'</span>: [<span class="num">30000</span>, <span class="num">80000</span>, <span class="num">55000</span>, np.nan, <span class="num">120000</span>],
+    <span class="str">'score'</span>:  [<span class="num">0.5</span>, <span class="num">0.9</span>, <span class="num">0.1</span>, <span class="num">0.7</span>, <span class="num">0.3</span>]
+})
+
+<span class="cm"># 1. Impute missing values</span>
+imputer = SimpleImputer(strategy=<span class="str">'median'</span>)
+df_imputed = pd.DataFrame(imputer.fit_transform(df), columns=df.columns)
+
+<span class="cm"># 2. Clip outliers using IQR</span>
+Q1 = df_imputed[<span class="str">'age'</span>].quantile(<span class="num">0.25</span>)
+Q3 = df_imputed[<span class="str">'age'</span>].quantile(<span class="num">0.75</span>)
+IQR = Q3 - Q1
+df_imputed[<span class="str">'age'</span>] = df_imputed[<span class="str">'age'</span>].clip(Q1 - <span class="num">1.5</span>*IQR, Q3 + <span class="num">1.5</span>*IQR)
+
+<span class="cm"># 3. Fix skewness with Yeo-Johnson</span>
+pt = PowerTransformer(method=<span class="str">'yeo-johnson'</span>)
+df_transformed = pd.DataFrame(pt.fit_transform(df_imputed), columns=df.columns)
+
+<span class="cm"># 4. Scale</span>
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(df_transformed)
+<span class="fn">print</span>(<span class="str">"Scaled shape:"</span>, X_scaled.shape)
+</code></pre>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- ─────────────────────────────────────────────
+       SECTION 5 – CATEGORICAL DATA
+  ───────────────────────────────────────────── -->
+  <section id="s5">
+    <h2>5. Categorical Data</h2>
+
+    <h3>Types of Categorical Data</h3>
+    <div class="card-grid">
+      <div class="card accent-orange">
+        <h3>Nominal (No Order)</h3>
+        <p>Categories with no natural ranking.</p>
+        <ul>
+          <li>Color: Red, Green, Blue</li>
+          <li>Country: USA, UK, India</li>
+          <li>Gender: Male, Female, Other</li>
+          <li>Payment: Cash, Card, Crypto</li>
+        </ul>
+      </div>
+      <div class="card accent-pink">
+        <h3>Ordinal (Has Order)</h3>
+        <p>Categories with a meaningful ranking but unequal intervals.</p>
+        <ul>
+          <li>Size: S &lt; M &lt; L &lt; XL</li>
+          <li>Rating: 1★ &lt; 2★ &lt; 3★ &lt; 4★ &lt; 5★</li>
+          <li>Education: High School &lt; Bachelor &lt; Master &lt; PhD</li>
+          <li>Severity: Low &lt; Medium &lt; High</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Encoding Strategies</h3>
+    <table class="compare-table">
+      <thead><tr><th>Encoding</th><th>When to Use</th><th>Pros</th><th>Cons</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Label Encoding</strong></td>
+          <td>Ordinal data; tree-based models</td>
+          <td>Simple, memory efficient</td>
+          <td>Implies false order for nominal data</td>
+        </tr>
+        <tr>
+          <td><strong>One-Hot Encoding</strong></td>
+          <td>Nominal with low cardinality (&lt;20 categories)</td>
+          <td>No false ordering; works for linear models</td>
+          <td>High-dimensional with many categories</td>
+        </tr>
+        <tr>
+          <td><strong>Ordinal Encoding</strong></td>
+          <td>Ordinal data with a known order</td>
+          <td>Preserves order</td>
+          <td>Requires defining order explicitly</td>
+        </tr>
+        <tr>
+          <td><strong>Target Encoding</strong></td>
+          <td>High-cardinality nominal (e.g., zip codes)</td>
+          <td>Compact; captures signal</td>
+          <td>Target leakage risk; needs cross-validation</td>
+        </tr>
+        <tr>
+          <td><strong>Binary Encoding</strong></td>
+          <td>High cardinality, avoid OHE explosion</td>
+          <td>Less dimensions than OHE</td>
+          <td>Less interpretable</td>
+        </tr>
+        <tr>
+          <td><strong>Embeddings</strong></td>
+          <td>Very high cardinality (NLP, IDs)</td>
+          <td>Dense, learnable, semantic</td>
+          <td>Needs deep learning framework</td>
+        </tr>
+        <tr>
+          <td><strong>Frequency Encoding</strong></td>
+          <td>High cardinality; tree models</td>
+          <td>Single column, no leakage</td>
+          <td>Loses category distinction for equal-freq categories</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Categorical Preprocessing — Python Example</h3>
+    <pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> LabelEncoder, OrdinalEncoder
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> category_encoders <span class="kw">import</span> TargetEncoder  <span class="cm"># pip install category_encoders</span>
+
+df = pd.DataFrame({
+    <span class="str">'color'</span>:  [<span class="str">'red'</span>, <span class="str">'blue'</span>, <span class="str">'green'</span>, <span class="str">'red'</span>, <span class="str">'blue'</span>],
+    <span class="str">'size'</span>:   [<span class="str">'S'</span>, <span class="str">'M'</span>, <span class="str">'L'</span>, <span class="str">'XL'</span>, <span class="str">'M'</span>],
+    <span class="str">'city'</span>:   [<span class="str">'NYC'</span>, <span class="str">'LA'</span>, <span class="str">'NYC'</span>, <span class="str">'CHI'</span>, <span class="str">'LA'</span>],
+    <span class="str">'target'</span>: [<span class="num">1</span>, <span class="num">0</span>, <span class="num">1</span>, <span class="num">0</span>, <span class="num">1</span>]
+})
+
+<span class="cm"># --- 1. One-Hot Encoding (nominal, low cardinality) ---</span>
+ohe = pd.get_dummies(df[<span class="str">'color'</span>], prefix=<span class="str">'color'</span>)
+
+<span class="cm"># --- 2. Ordinal Encoding (ordered categories) ---</span>
+oe = OrdinalEncoder(categories=[[<span class="str">'S'</span>, <span class="str">'M'</span>, <span class="str">'L'</span>, <span class="str">'XL'</span>]])
+df[<span class="str">'size_encoded'</span>] = oe.fit_transform(df[[<span class="str">'size'</span>]])
+
+<span class="cm"># --- 3. Target Encoding (high cardinality nominal) ---</span>
+te = TargetEncoder(cols=[<span class="str">'city'</span>])
+df[<span class="str">'city_encoded'</span>] = te.fit_transform(df[<span class="str">'city'</span>], df[<span class="str">'target'</span>])
+
+<span class="cm"># --- 4. Frequency Encoding ---</span>
+freq_map = df[<span class="str">'city'</span>].value_counts(normalize=<span class="cls">True</span>)
+df[<span class="str">'city_freq'</span>] = df[<span class="str">'city'</span>].map(freq_map)
+
+<span class="fn">print</span>(df.head())
+</code></pre>
+
+    <div class="callout warn">
+      <strong>⚠️ High Cardinality Warning:</strong> One-Hot Encoding on columns with hundreds of categories (e.g., ZIP codes, user IDs) creates a very sparse matrix. Use Target Encoding or Embeddings instead.
+    </div>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- ─────────────────────────────────────────────
+       SECTION 6 – PREPROCESSING
+  ───────────────────────────────────────────── -->
+  <section id="s6">
+    <h2>6. Preprocessing &amp; Feature Engineering</h2>
+
+    <h3>The Preprocessing Pipeline</h3>
+    <div class="flow">
+      <div class="flow-box">Raw Data</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">EDA</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Handle Missing</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Fix Outliers</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Encode Cats</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Scale Nums</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Feature Engineering</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Feature Selection</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box">Train/Test Split</div>
+    </div>
+
+    <h3>Missing Value Strategies</h3>
+    <table class="compare-table">
+      <thead><tr><th>Strategy</th><th>Method</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td>Deletion</td><td>Drop rows/cols with nulls</td><td>Very small % missing, MCAR data</td></tr>
+        <tr><td>Mean/Median Impute</td><td>SimpleImputer</td><td>Continuous features with few nulls</td></tr>
+        <tr><td>Mode Impute</td><td>SimpleImputer(strategy='most_frequent')</td><td>Categorical features</td></tr>
+        <tr><td>KNN Impute</td><td>KNNImputer</td><td>Data with strong local patterns</td></tr>
+        <tr><td>Model-based</td><td>IterativeImputer (MICE)</td><td>Complex MAR missingness</td></tr>
+        <tr><td>Add indicator</td><td>Add binary col `feature_was_null`</td><td>When missingness itself is a signal</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Feature Engineering Examples</h3>
+
+    <h4>Continuous → New Features</h4>
+    <pre><code>df[<span class="str">'bmi'</span>] = df[<span class="str">'weight_kg'</span>] / (df[<span class="str">'height_m'</span>] ** <span class="num">2</span>)            <span class="cm"># ratio</span>
+df[<span class="str">'age_squared'</span>] = df[<span class="str">'age'</span>] ** <span class="num">2</span>                            <span class="cm"># polynomial</span>
+df[<span class="str">'log_income'</span>] = np.log1p(df[<span class="str">'income'</span>])                    <span class="cm"># log transform</span>
+df[<span class="str">'age_bin'</span>] = pd.cut(df[<span class="str">'age'</span>], bins=[<span class="num">0</span>,<span class="num">18</span>,<span class="num">35</span>,<span class="num">60</span>,<span class="num">100</span>],        <span class="cm"># binning</span>
+                      labels=[<span class="str">'child'</span>,<span class="str">'young'</span>,<span class="str">'adult'</span>,<span class="str">'senior'</span>])
+</code></pre>
+
+    <h4>Categorical → New Features</h4>
+    <pre><code>df[<span class="str">'city_high_value'</span>] = df[<span class="str">'city'</span>].isin([<span class="str">'NYC'</span>, <span class="str">'SF'</span>]).astype(int)  <span class="cm"># group rare cats</span>
+df[<span class="str">'region'</span>] = df[<span class="str">'country'</span>].map(country_to_region_dict)          <span class="cm"># map to broader</span>
+df[<span class="str">'channel_x_device'</span>] = df[<span class="str">'channel'</span>] + <span class="str">'_'</span> + df[<span class="str">'device'</span>]        <span class="cm"># interaction feature</span>
+</code></pre>
+
+    <h3>ColumnTransformer (sklearn best practice)</h3>
+    <pre><code><span class="kw">from</span> sklearn.compose <span class="kw">import</span> ColumnTransformer
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler, OneHotEncoder, OrdinalEncoder
+<span class="kw">from</span> sklearn.impute <span class="kw">import</span> SimpleImputer
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+
+numeric_features  = [<span class="str">'age'</span>, <span class="str">'income'</span>, <span class="str">'score'</span>]
+nominal_features  = [<span class="str">'color'</span>, <span class="str">'city'</span>]
+ordinal_features  = [<span class="str">'size'</span>]
+
+numeric_transformer = Pipeline([
+    (<span class="str">'imputer'</span>, SimpleImputer(strategy=<span class="str">'median'</span>)),
+    (<span class="str">'scaler'</span>,  StandardScaler())
+])
+
+nominal_transformer = Pipeline([
+    (<span class="str">'imputer'</span>, SimpleImputer(strategy=<span class="str">'most_frequent'</span>)),
+    (<span class="str">'ohe'</span>,     OneHotEncoder(handle_unknown=<span class="str">'ignore'</span>, sparse_output=<span class="cls">False</span>))
+])
+
+ordinal_transformer = Pipeline([
+    (<span class="str">'imputer'</span>, SimpleImputer(strategy=<span class="str">'most_frequent'</span>)),
+    (<span class="str">'oe'</span>,      OrdinalEncoder(categories=[[<span class="str">'S'</span>,<span class="str">'M'</span>,<span class="str">'L'</span>,<span class="str">'XL'</span>]]))
+])
+
+preprocessor = ColumnTransformer([
+    (<span class="str">'num'</span>, numeric_transformer, numeric_features),
+    (<span class="str">'nom'</span>, nominal_transformer,  nominal_features),
+    (<span class="str">'ord'</span>, ordinal_transformer,  ordinal_features)
+])
+</code></pre>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- ─────────────────────────────────────────────
+       SECTION 7 – MODEL SELECTION
+  ───────────────────────────────────────────── -->
+  <section id="s7">
+    <h2>7. Model Selection by Data Type</h2>
+
+    <h3>Supervised — Classification Models</h3>
+    <table class="compare-table">
+      <thead><tr><th>Model</th><th>Best For</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Logistic Regression</td><td>Linear separable, baseline</td><td>Needs scaling; interpretable</td></tr>
+        <tr><td>Decision Tree</td><td>Non-linear, interpretable</td><td>Tends to overfit; no scaling needed</td></tr>
+        <tr><td>Random Forest</td><td>General purpose, robust</td><td>Handle mixed data well</td></tr>
+        <tr><td>Gradient Boosting (XGBoost, LightGBM)</td><td>Tabular data, competitions</td><td>Best-in-class for structured data</td></tr>
+        <tr><td>SVM</td><td>High-dim, clear margin</td><td>Needs scaling; slow on large data</td></tr>
+        <tr><td>Neural Network</td><td>Complex patterns, large data</td><td>Needs scaling; interpretable with SHAP</td></tr>
+        <tr><td>k-NN</td><td>Low-dim, small datasets</td><td>Needs scaling; lazy learning</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Supervised — Regression Models</h3>
+    <table class="compare-table">
+      <thead><tr><th>Model</th><th>Best For</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Linear Regression</td><td>Linear relationships, baseline</td><td>Needs scaling, feature selection</td></tr>
+        <tr><td>Ridge / Lasso</td><td>Multicollinearity, feature selection</td><td>Ridge=L2, Lasso=L1(sparse)</td></tr>
+        <tr><td>Random Forest Regressor</td><td>Non-linear, general</td><td>Robust to outliers</td></tr>
+        <tr><td>XGBoost / LightGBM</td><td>Tabular regression</td><td>Best performance on structured data</td></tr>
+        <tr><td>SVR</td><td>Small datasets, non-linear</td><td>Epsilon-insensitive loss</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Unsupervised Model Guide</h3>
+    <table class="compare-table">
+      <thead><tr><th>Task</th><th>Models</th><th>Key Parameter</th></tr></thead>
+      <tbody>
+        <tr><td>Clustering</td><td>K-Means, DBSCAN, Hierarchical, GMM</td><td>n_clusters, eps & min_samples</td></tr>
+        <tr><td>Dim Reduction</td><td>PCA, t-SNE, UMAP, Autoencoders</td><td>n_components, perplexity</td></tr>
+        <tr><td>Anomaly Detection</td><td>Isolation Forest, LOF, One-Class SVM</td><td>contamination, n_neighbors</td></tr>
+        <tr><td>Association Rules</td><td>Apriori, FP-Growth</td><td>min_support, min_confidence</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout info">
+      <strong>💡 Tip:</strong> For tabular data with mixed numeric and categorical features, <strong>LightGBM</strong> or <strong>XGBoost</strong> with proper encoding are usually the strongest starting point. They handle missing values natively and are robust to feature scale.
+    </div>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- ─────────────────────────────────────────────
+       SECTION 8 – TRAINING
+  ───────────────────────────────────────────── -->
+  <section id="s8">
+    <h2>8. Training, Validation &amp; Hyperparameter Tuning</h2>
+
+    <h3>Train / Validation / Test Split</h3>
+    <pre><code><span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split, StratifiedKFold
+
+<span class="cm"># Standard split (80/10/10)</span>
+X_temp, X_test, y_temp, y_test = train_test_split(
+    X, y, test_size=<span class="num">0.1</span>, random_state=<span class="num">42</span>, stratify=y  <span class="cm"># stratify for classification</span>
+)
+X_train, X_val, y_train, y_val = train_test_split(
+    X_temp, y_temp, test_size=<span class="num">0.111</span>, random_state=<span class="num">42</span>, stratify=y_temp
+)
+
+<span class="cm"># Cross-validation (no separate val set needed)</span>
+cv = StratifiedKFold(n_splits=<span class="num">5</span>, shuffle=<span class="cls">True</span>, random_state=<span class="num">42</span>)
+</code></pre>
+
+    <h3>Building a Full Pipeline + Tuning</h3>
+    <pre><code><span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> GradientBoostingClassifier
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> RandomizedSearchCV, cross_val_score
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> randint, uniform
+
+<span class="cm"># Full pipeline: preprocessor + model</span>
+model_pipeline = Pipeline([
+    (<span class="str">'preprocessor'</span>, preprocessor),   <span class="cm"># ColumnTransformer from Section 6</span>
+    (<span class="str">'classifier'</span>,  GradientBoostingClassifier(random_state=<span class="num">42</span>))
+])
+
+<span class="cm"># Hyperparameter search space</span>
+param_dist = {
+    <span class="str">'classifier__n_estimators'</span>:   randint(<span class="num">100</span>, <span class="num">500</span>),
+    <span class="str">'classifier__learning_rate'</span>:  uniform(<span class="num">0.01</span>, <span class="num">0.3</span>),
+    <span class="str">'classifier__max_depth'</span>:      randint(<span class="num">2</span>, <span class="num">8</span>),
+    <span class="str">'classifier__min_samples_split'</span>: randint(<span class="num">2</span>, <span class="num">20</span>)
+}
+
+<span class="cm"># RandomizedSearch with cross-validation</span>
+search = RandomizedSearchCV(
+    model_pipeline,
+    param_distributions=param_dist,
+    n_iter=<span class="num">30</span>,
+    cv=<span class="num">5</span>,
+    scoring=<span class="str">'roc_auc'</span>,
+    n_jobs=-<span class="num">1</span>,
+    random_state=<span class="num">42</span>,
+    verbose=<span class="num">1</span>
+)
+search.fit(X_train, y_train)
+
+<span class="fn">print</span>(<span class="str">f"Best AUC: {search.best_score_:.4f}"</span>)
+<span class="fn">print</span>(<span class="str">f"Best params: {search.best_params_}"</span>)
+
+best_model = search.best_estimator_
+</code></pre>
+
+    <h3>Overfitting vs Underfitting</h3>
+    <table class="compare-table">
+      <thead><tr><th>Problem</th><th>Symptoms</th><th>Fixes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Underfitting</strong></td><td>Train loss high, Val loss high</td><td>More features, complex model, less regularization, more epochs</td></tr>
+        <tr><td><strong>Overfitting</strong></td><td>Train loss low, Val loss high</td><td>More data, regularization (L1/L2), dropout, early stopping, simpler model</td></tr>
+        <tr><td><strong>Good fit</strong></td><td>Train ≈ Val, both low</td><td>You're in the goldilocks zone ✓</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- ─────────────────────────────────────────────
+       SECTION 9 – EVALUATION
+  ───────────────────────────────────────────── -->
+  <section id="s9">
+    <h2>9. Evaluation Metrics</h2>
+
+    <h3>Classification Metrics</h3>
+    <table class="compare-table">
+      <thead><tr><th>Metric</th><th>Formula</th><th>Best When</th></tr></thead>
+      <tbody>
+        <tr><td>Accuracy</td><td>(TP+TN) / Total</td><td>Balanced classes</td></tr>
+        <tr><td>Precision</td><td>TP / (TP+FP)</td><td>Cost of false positive is high (spam detection)</td></tr>
+        <tr><td>Recall (Sensitivity)</td><td>TP / (TP+FN)</td><td>Cost of false negative is high (cancer detection)</td></tr>
+        <tr><td>F1 Score</td><td>2 × (P×R) / (P+R)</td><td>Imbalanced classes, need balance</td></tr>
+        <tr><td>ROC-AUC</td><td>Area under ROC curve</td><td>Binary, threshold-independent</td></tr>
+        <tr><td>PR-AUC</td><td>Area under Precision-Recall</td><td>Highly imbalanced (fraud, rare disease)</td></tr>
+        <tr><td>Log Loss</td><td>−(y log p + (1−y) log(1−p))</td><td>Probabilistic predictions</td></tr>
+        <tr><td>Cohen's Kappa</td><td>Accounts for chance agreement</td><td>Multi-class, imbalanced</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Regression Metrics</h3>
+    <table class="compare-table">
+      <thead><tr><th>Metric</th><th>Formula</th><th>Sensitivity</th></tr></thead>
+      <tbody>
+        <tr><td>MAE (Mean Absolute Error)</td><td>mean(|y − ŷ|)</td><td>Robust to outliers</td></tr>
+        <tr><td>MSE (Mean Squared Error)</td><td>mean((y − ŷ)²)</td><td>Penalizes large errors heavily</td></tr>
+        <tr><td>RMSE</td><td>√MSE</td><td>Same units as target</td></tr>
+        <tr><td>MAPE</td><td>mean(|y − ŷ| / y) × 100</td><td>Percentage error; fails at y≈0</td></tr>
+        <tr><td>R² (Coefficient of Determination)</td><td>1 − SS_res/SS_tot</td><td>Proportion of variance explained [0,1]</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Unsupervised Metrics</h3>
+    <table class="compare-table">
+      <thead><tr><th>Metric</th><th>Used With</th><th>Range / Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Silhouette Score</td><td>Clustering</td><td>[-1, 1]; higher is better</td></tr>
+        <tr><td>Davies-Bouldin Index</td><td>Clustering</td><td>Lower is better</td></tr>
+        <tr><td>Inertia (within-cluster SSE)</td><td>K-Means</td><td>Lower is better; used in elbow method</td></tr>
+        <tr><td>Explained Variance Ratio</td><td>PCA</td><td>% of variance retained</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Evaluation — Python Example</h3>
+    <pre><code><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> (
+    classification_report, confusion_matrix,
+    roc_auc_score, average_precision_score,
+    mean_absolute_error, r2_score
+)
+
+<span class="cm"># Classification</span>
+y_pred  = best_model.predict(X_test)
+y_proba = best_model.predict_proba(X_test)[:, <span class="num">1</span>]
+
+<span class="fn">print</span>(classification_report(y_test, y_pred, digits=<span class="num">4</span>))
+<span class="fn">print</span>(<span class="str">f"ROC-AUC: {roc_auc_score(y_test, y_proba):.4f}"</span>)
+<span class="fn">print</span>(<span class="str">f"PR-AUC:  {average_precision_score(y_test, y_proba):.4f}"</span>)
+<span class="fn">print</span>(<span class="str">"Confusion Matrix:\n"</span>, confusion_matrix(y_test, y_pred))
+
+<span class="cm"># Regression</span>
+<span class="cm"># print(f"MAE:  {mean_absolute_error(y_test, y_pred):.4f}")</span>
+<span class="cm"># print(f"R²:   {r2_score(y_test, y_pred):.4f}")</span>
+</code></pre>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- ─────────────────────────────────────────────
+       SECTION 10 – FULL PIPELINE
+  ───────────────────────────────────────────── -->
+  <section id="s10">
+    <h2>10. Full End-to-End Pipeline Code</h2>
+
+    <h3>Complete Example — Mixed Data (Continuous + Categorical + Labeled)</h3>
+    <pre><code><span class="cm">"""
+End-to-End ML Pipeline
+Features: continuous + categorical | Target: binary label
+"""</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.datasets <span class="kw">import</span> fetch_openml
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split, cross_val_score
+<span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.compose <span class="kw">import</span> ColumnTransformer
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler, OneHotEncoder, OrdinalEncoder
+<span class="kw">from</span> sklearn.impute <span class="kw">import</span> SimpleImputer
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> classification_report, roc_auc_score
+<span class="kw">import</span> warnings
+warnings.filterwarnings(<span class="str">'ignore'</span>)
+
+<span class="cm"># ── 1. LOAD DATA ────────────────────────────────────────────</span>
+titanic = fetch_openml(<span class="str">'titanic'</span>, version=<span class="num">1</span>, as_frame=<span class="cls">True</span>)
+df = titanic.frame.copy()
+df[<span class="str">'survived'</span>] = df[<span class="str">'survived'</span>].astype(int)
+<span class="fn">print</span>(<span class="str">f"Shape: {df.shape}\nClasses: {df['survived'].value_counts().to_dict()}"</span>)
+
+<span class="cm"># ── 2. DEFINE FEATURES ──────────────────────────────────────</span>
+numeric_cols  = [<span class="str">'age'</span>, <span class="str">'fare'</span>, <span class="str">'sibsp'</span>, <span class="str">'parch'</span>]
+nominal_cols  = [<span class="str">'embarked'</span>, <span class="str">'sex'</span>]
+ordinal_cols  = [<span class="str">'pclass'</span>]   <span class="cm"># 1 > 2 > 3 (reverse order by class)</span>
+
+X = df[numeric_cols + nominal_cols + ordinal_cols]
+y = df[<span class="str">'survived'</span>]
+
+<span class="cm"># ── 3. SPLIT ────────────────────────────────────────────────</span>
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>, stratify=y
+)
+
+<span class="cm"># ── 4. BUILD PREPROCESSOR ───────────────────────────────────</span>
+num_pipe = Pipeline([
+    (<span class="str">'imputer'</span>, SimpleImputer(strategy=<span class="str">'median'</span>)),
+    (<span class="str">'scaler'</span>,  StandardScaler())
+])
+
+nom_pipe = Pipeline([
+    (<span class="str">'imputer'</span>, SimpleImputer(strategy=<span class="str">'most_frequent'</span>)),
+    (<span class="str">'ohe'</span>,     OneHotEncoder(handle_unknown=<span class="str">'ignore'</span>, sparse_output=<span class="cls">False</span>))
+])
+
+ord_pipe = Pipeline([
+    (<span class="str">'imputer'</span>, SimpleImputer(strategy=<span class="str">'most_frequent'</span>)),
+    (<span class="str">'oe'</span>,      OrdinalEncoder(categories=[[<span class="num">3</span>, <span class="num">2</span>, <span class="num">1</span>]]))
+])
+
+preprocessor = ColumnTransformer([
+    (<span class="str">'num'</span>, num_pipe, numeric_cols),
+    (<span class="str">'nom'</span>, nom_pipe, nominal_cols),
+    (<span class="str">'ord'</span>, ord_pipe, ordinal_cols)
+], remainder=<span class="str">'drop'</span>)
+
+<span class="cm"># ── 5. BUILD & TRAIN FULL PIPELINE ──────────────────────────</span>
+full_pipeline = Pipeline([
+    (<span class="str">'prep'</span>,  preprocessor),
+    (<span class="str">'model'</span>, RandomForestClassifier(
+        n_estimators=<span class="num">200</span>, max_depth=<span class="num">6</span>,
+        class_weight=<span class="str">'balanced'</span>, random_state=<span class="num">42</span>
+    ))
+])
+
+full_pipeline.fit(X_train, y_train)
+
+<span class="cm"># ── 6. CROSS-VALIDATION ─────────────────────────────────────</span>
+cv_scores = cross_val_score(full_pipeline, X_train, y_train, cv=<span class="num">5</span>, scoring=<span class="str">'roc_auc'</span>)
+<span class="fn">print</span>(<span class="str">f"CV ROC-AUC: {cv_scores.mean():.4f} ± {cv_scores.std():.4f}"</span>)
+
+<span class="cm"># ── 7. EVALUATE ON TEST SET ─────────────────────────────────</span>
+y_pred  = full_pipeline.predict(X_test)
+y_proba = full_pipeline.predict_proba(X_test)[:, <span class="num">1</span>]
+
+<span class="fn">print</span>(<span class="str">"\n── Test Set Results ──"</span>)
+<span class="fn">print</span>(classification_report(y_test, y_pred))
+<span class="fn">print</span>(<span class="str">f"Test ROC-AUC: {roc_auc_score(y_test, y_proba):.4f}"</span>)
+
+<span class="cm"># ── 8. FEATURE IMPORTANCE ───────────────────────────────────</span>
+rf = full_pipeline.named_steps[<span class="str">'model'</span>]
+feature_names = (
+    numeric_cols
+    + full_pipeline.named_steps[<span class="str">'prep'</span>].named_transformers_[<span class="str">'nom'</span>]
+      .named_steps[<span class="str">'ohe'</span>].get_feature_names_out(nominal_cols).tolist()
+    + ordinal_cols
+)
+importance_df = pd.DataFrame({
+    <span class="str">'feature'</span>: feature_names,
+    <span class="str">'importance'</span>: rf.feature_importances_
+}).sort_values(<span class="str">'importance'</span>, ascending=<span class="cls">False</span>)
+<span class="fn">print</span>(<span class="str">"\nTop 5 Features:\n"</span>, importance_df.head())
+</code></pre>
+
+    <h3>Completely Unlabeled — Unsupervised Pipeline</h3>
+    <pre><code><span class="kw">from</span> sklearn.pipeline <span class="kw">import</span> Pipeline
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.decomposition <span class="kw">import</span> PCA
+<span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> silhouette_score
+
+<span class="cm"># Unlabeled pipeline: scale → reduce → cluster</span>
+unsupervised_pipe = Pipeline([
+    (<span class="str">'scaler'</span>,  StandardScaler()),
+    (<span class="str">'reducer'</span>, PCA(n_components=<span class="num">5</span>, random_state=<span class="num">42</span>)),
+    (<span class="str">'cluster'</span>, KMeans(n_clusters=<span class="num">4</span>, random_state=<span class="num">42</span>, n_init=<span class="num">10</span>))
+])
+
+labels = unsupervised_pipe.fit_predict(X_raw)
+
+<span class="cm"># Evaluate cluster quality (no labels needed)</span>
+X_transformed = unsupervised_pipe[:-<span class="num">1</span>].transform(X_raw)  <span class="cm"># up to PCA step</span>
+score = silhouette_score(X_transformed, labels)
+<span class="fn">print</span>(<span class="str">f"Silhouette Score: {score:.4f}"</span>)
+</code></pre>
+
+    <h3>Pipeline Diagram</h3>
+    <div class="card" style="background: var(--code-bg); font-size: 0.85rem; font-family: monospace; line-height: 2; color: var(--muted);">
+      <div style="color:#7c6af7; font-weight:700; margin-bottom:8px;">SUPERVISED (Labeled) PIPELINE</div>
+      Raw CSV → EDA → Train/Test Split → ColumnTransformer
+      <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      ├── Numeric:  Impute → Scale
+      <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      ├── Nominal:  Impute → OHE
+      <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      └── Ordinal:  Impute → OrdinalEnc
+      <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ Model (RF / XGB / LR)
+      → CV Score → Hyperparameter Tuning → Final Evaluate → Deploy
+      <br><br>
+      <div style="color:#4fc3f7; font-weight:700; margin-bottom:8px;">UNSUPERVISED (Unlabeled) PIPELINE</div>
+      Raw Data → Scale → Dim Reduction (PCA/UMAP) → Cluster/Detect
+      → Silhouette / Inertia → Interpret Clusters → Act on Insights
+    </div>
+
+    <div class="callout good">
+      <strong>✅ Key Takeaways:</strong><br>
+      • Always fit preprocessors on <strong>training data only</strong>, then transform test data — prevents data leakage.<br>
+      • Use <strong>sklearn Pipeline</strong> to bundle preprocessing + model — enables safe cross-validation.<br>
+      • For labeled data → supervised; for unlabeled → unsupervised; when both → semi-supervised.<br>
+      • Continuous features need <strong>scaling + imputation</strong>; categorical need <strong>encoding + imputation</strong>.<br>
+      • Choose metrics based on <strong>class balance and business cost</strong> of error types.
+    </div>
+  </section>
+
+</div>
+
+<footer style="text-align:center; padding: 32px; color: var(--muted); border-top: 1px solid var(--border); font-size: 0.85rem;">
+  ML Data Types &amp; End-to-End Pipeline Reference Guide
+</footer>
+
+</body>
+</html>
