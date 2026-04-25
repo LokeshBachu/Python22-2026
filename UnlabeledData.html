@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unlabeled Data Presentation</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    background: #0b132b;
+    color: #ffffff;
+}
+
+.slide {
+    display: none;
+    height: 100vh;
+    width: 100vw;
+    padding: 60px;
+    box-sizing: border-box;
+}
+
+.active { display: block; }
+
+h1 { font-size: 48px; color: #5bc0be; }
+h2 { font-size: 36px; color: #5bc0be; }
+
+ul {
+    font-size: 22px;
+    line-height: 1.6;
+}
+
+.box {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(255,255,255,0.1);
+    border-left: 5px solid #5bc0be;
+}
+
+.footer {
+    position: absolute;
+    bottom: 20px;
+    right: 40px;
+    font-size: 14px;
+    opacity: 0.6;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Slide 1 -->
+<div class="slide active">
+    <h1>Unlabeled Data in Machine Learning</h1>
+    <p>End-to-End Pipeline</p>
+    <div class="footer">Slide 1</div>
+</div>
+
+<!-- Slide 2 -->
+<div class="slide">
+    <h2>What is Unlabeled Data?</h2>
+    <ul>
+        <li>Data without predefined labels</li>
+        <li>No correct output provided</li>
+        <li>Used in unsupervised learning</li>
+    </ul>
+    <div class="box">
+        Example: Customer data without categories
+    </div>
+    <div class="footer">Slide 2</div>
+</div>
+
+<!-- Slide 3 -->
+<div class="slide">
+    <h2>Why Use Unlabeled Data?</h2>
+    <ul>
+        <li>Large amounts available</li>
+        <li>Low cost (no labeling needed)</li>
+        <li>Helps discover hidden patterns</li>
+    </ul>
+    <div class="footer">Slide 3</div>
+</div>
+
+<!-- Slide 4 -->
+<div class="slide">
+    <h2>Step 1: Problem Definition</h2>
+    <ul>
+        <li>Clustering</li>
+        <li>Pattern discovery</li>
+        <li>Dimensionality reduction</li>
+    </ul>
+    <div class="footer">Slide 4</div>
+</div>
+
+<!-- Slide 5 -->
+<div class="slide">
+    <h2>Step 2: Data Collection</h2>
+    <ul>
+        <li>User behavior logs</li>
+        <li>Images, text, audio</li>
+        <li>Sensor data</li>
+    </ul>
+    <div class="footer">Slide 5</div>
+</div>
+
+<!-- Slide 6 -->
+<div class="slide">
+    <h2>Step 3: Data Preprocessing</h2>
+    <ul>
+        <li>Remove noise</li>
+        <li>Normalize data</li>
+        <li>Feature extraction</li>
+    </ul>
+    <div class="footer">Slide 6</div>
+</div>
+
+<!-- Slide 7 -->
+<div class="slide">
+    <h2>Step 4: Feature Engineering</h2>
+    <ul>
+        <li>Select important features</li>
+        <li>Reduce dimensionality</li>
+        <li>Transform data</li>
+    </ul>
+    <div class="footer">Slide 7</div>
+</div>
+
+<!-- Slide 8 -->
+<div class="slide">
+    <h2>Step 5: Model Selection</h2>
+    <ul>
+        <li>K-Means Clustering</li>
+        <li>Hierarchical Clustering</li>
+        <li>PCA (Dimensionality Reduction)</li>
+    </ul>
+    <div class="footer">Slide 8</div>
+</div>
+
+<!-- Slide 9 -->
+<div class="slide">
+    <h2>Step 6: Model Training</h2>
+    <ul>
+        <li>Group similar data points</li>
+        <li>Find hidden structures</li>
+    </ul>
+    <div class="footer">Slide 9</div>
+</div>
+
+<!-- Slide 10 -->
+<div class="slide">
+    <h2>Step 7: Evaluation</h2>
+    <ul>
+        <li>Silhouette Score</li>
+        <li>Cluster validation</li>
+        <li>Visual inspection</li>
+    </ul>
+    <div class="footer">Slide 10</div>
+</div>
+
+<!-- Slide 11 -->
+<div class="slide">
+    <h2>Step 8: Deployment</h2>
+    <ul>
+        <li>Recommendation systems</li>
+        <li>Customer segmentation</li>
+    </ul>
+    <div class="footer">Slide 11</div>
+</div>
+
+<!-- Slide 12 -->
+<div class="slide">
+    <h2>Step 9: Monitoring</h2>
+    <ul>
+        <li>Track pattern changes</li>
+        <li>Update models</li>
+    </ul>
+    <div class="footer">Slide 12</div>
+</div>
+
+<!-- Slide 13 -->
+<div class="slide">
+    <h2>Applications</h2>
+    <ul>
+        <li>Customer segmentation</li>
+        <li>Anomaly detection</li>
+        <li>Recommendation systems</li>
+    </ul>
+    <div class="footer">Slide 13</div>
+</div>
+
+<!-- Slide 14 -->
+<div class="slide">
+    <h2>Challenges</h2>
+    <ul>
+        <li>No ground truth</li>
+        <li>Difficult evaluation</li>
+        <li>Interpretation issues</li>
+    </ul>
+    <div class="footer">Slide 14</div>
+</div>
+
+<!-- Slide 15 -->
+<div class="slide">
+    <h2>Real-Life Example</h2>
+    <div class="box">
+        Customer Segmentation:
+        <ol>
+            <li>Collect user data</li>
+            <li>Clean data</li>
+            <li>Apply clustering</li>
+            <li>Group customers</li>
+            <li>Use for marketing</li>
+        </ol>
+    </div>
+    <div class="footer">Slide 15</div>
+</div>
+
+<script>
+let current = 0;
+const slides = document.querySelectorAll(".slide");
+
+document.addEventListener("keydown", (e) => {
+    slides[current].classList.remove("active");
+
+    if (e.key === "ArrowRight") {
+        current = (current + 1) % slides.length;
+    } else if (e.key === "ArrowLeft") {
+        current = (current - 1 + slides.length) % slides.length;
+    }
+
+    slides[current].classList.add("active");
+});
+</script>
+
+</body>
+</html>

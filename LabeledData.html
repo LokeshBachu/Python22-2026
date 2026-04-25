@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ML Labeled Data Presentation</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+    background: #111;
+    color: white;
+}
+
+.slide {
+    display: none;
+    height: 100vh;
+    width: 100vw;
+    padding: 60px;
+    box-sizing: border-box;
+}
+
+.active {
+    display: block;
+}
+
+h1 {
+    font-size: 48px;
+    color: #00d4ff;
+}
+
+h2 {
+    font-size: 36px;
+    color: #00d4ff;
+}
+
+ul {
+    font-size: 22px;
+    line-height: 1.6;
+}
+
+.example {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(255,255,255,0.1);
+    border-left: 5px solid #00d4ff;
+}
+
+.footer {
+    position: absolute;
+    bottom: 20px;
+    right: 40px;
+    font-size: 14px;
+    opacity: 0.6;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Slide 1 -->
+<div class="slide active">
+    <h1>Labeled Data in Machine Learning</h1>
+    <p>End-to-End Overview</p>
+    <div class="footer">Slide 1</div>
+</div>
+
+<!-- Slide 2 -->
+<div class="slide">
+    <h2>What is Labeled Data?</h2>
+    <ul>
+        <li>Input data paired with correct output (label)</li>
+        <li>Used in supervised learning</li>
+        <li>Examples:</li>
+        <ul>
+            <li>Image → Cat</li>
+            <li>Email → Spam</li>
+            <li>House → Price</li>
+        </ul>
+    </ul>
+    <div class="footer">Slide 2</div>
+</div>
+
+<!-- Slide 3 -->
+<div class="slide">
+    <h2>Step 1: Problem Definition</h2>
+    <ul>
+        <li>Define goal of prediction</li>
+        <li>Classification (categories)</li>
+        <li>Regression (numeric values)</li>
+    </ul>
+    <div class="footer">Slide 3</div>
+</div>
+
+<!-- Slide 4 -->
+<div class="slide">
+    <h2>Step 2: Data Collection</h2>
+    <ul>
+        <li>Databases</li>
+        <li>APIs</li>
+        <li>Sensors</li>
+        <li>User logs</li>
+    </ul>
+    <div class="footer">Slide 4</div>
+</div>
+
+<!-- Slide 5 -->
+<div class="slide">
+    <h2>Step 3: Data Labeling</h2>
+    <ul>
+        <li>Manual labeling</li>
+        <li>Crowdsourcing</li>
+        <li>Semi-automated tools</li>
+    </ul>
+    <div class="example">
+        Example: Image → Object labels<br>
+        Text → Sentiment
+    </div>
+    <div class="footer">Slide 5</div>
+</div>
+
+<!-- Slide 6 -->
+<div class="slide">
+    <h2>Step 4: Data Cleaning</h2>
+    <ul>
+        <li>Handle missing values</li>
+        <li>Remove duplicates</li>
+        <li>Normalize data</li>
+    </ul>
+    <div class="footer">Slide 6</div>
+</div>
+
+<!-- Slide 7 -->
+<div class="slide">
+    <h2>Step 5: Train-Test Split</h2>
+    <ul>
+        <li>Training: 70–80%</li>
+        <li>Validation: 10–15%</li>
+        <li>Test: 10–15%</li>
+    </ul>
+    <div class="footer">Slide 7</div>
+</div>
+
+<!-- Slide 8 -->
+<div class="slide">
+    <h2>Step 6: Model Selection</h2>
+    <ul>
+        <li>Linear Regression</li>
+        <li>Decision Trees</li>
+        <li>Neural Networks</li>
+    </ul>
+    <div class="footer">Slide 8</div>
+</div>
+
+<!-- Slide 9 -->
+<div class="slide">
+    <h2>Step 7: Model Training</h2>
+    <ul>
+        <li>Learn input-output mapping</li>
+        <li>Uses loss functions</li>
+    </ul>
+    <div class="footer">Slide 9</div>
+</div>
+
+<!-- Slide 10 -->
+<div class="slide">
+    <h2>Step 8: Evaluation</h2>
+    <ul>
+        <li>Accuracy</li>
+        <li>Precision</li>
+        <li>Recall</li>
+        <li>F1 Score</li>
+    </ul>
+    <div class="footer">Slide 10</div>
+</div>
+
+<!-- Slide 11 -->
+<div class="slide">
+    <h2>Step 9: Deployment</h2>
+    <ul>
+        <li>Web apps</li>
+        <li>Mobile apps</li>
+        <li>APIs</li>
+    </ul>
+    <div class="footer">Slide 11</div>
+</div>
+
+<!-- Slide 12 -->
+<div class="slide">
+    <h2>Step 10: Monitoring</h2>
+    <ul>
+        <li>Track performance</li>
+        <li>Retrain model</li>
+        <li>Handle data drift</li>
+    </ul>
+    <div class="footer">Slide 12</div>
+</div>
+
+<!-- Slide 13 -->
+<div class="slide">
+    <h2>Types of Labeling</h2>
+    <ul>
+        <li>Classification</li>
+        <li>Regression</li>
+        <li>Bounding Boxes</li>
+        <li>Segmentation Masks</li>
+    </ul>
+    <div class="footer">Slide 13</div>
+</div>
+
+<!-- Slide 14 -->
+<div class="slide">
+    <h2>Challenges</h2>
+    <ul>
+        <li>Expensive</li>
+        <li>Time-consuming</li>
+        <li>Human errors</li>
+        <li>Bias</li>
+    </ul>
+    <div class="footer">Slide 14</div>
+</div>
+
+<!-- Slide 15 -->
+<div class="slide">
+    <h2>Real-Life Example</h2>
+    <div class="example">
+        Spam Detection System:
+        <ol>
+            <li>Collect emails</li>
+            <li>Label data</li>
+            <li>Clean data</li>
+            <li>Train model</li>
+            <li>Evaluate</li>
+            <li>Deploy</li>
+            <li>Update regularly</li>
+        </ol>
+    </div>
+    <div class="footer">Slide 15</div>
+</div>
+
+<script>
+let current = 0;
+const slides = document.querySelectorAll(".slide");
+
+document.addEventListener("keydown", (e) => {
+    slides[current].classList.remove("active");
+
+    if (e.key === "ArrowRight") {
+        current = (current + 1) % slides.length;
+    } else if (e.key === "ArrowLeft") {
+        current = (current - 1 + slides.length) % slides.length;
+    }
+
+    slides[current].classList.add("active");
+});
+</script>
+
+</body>
+</html>
