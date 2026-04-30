@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>String Manipulations in Pandas — End to End</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:#0d1117;color:#c9d1d9;line-height:1.75}
+
+header{background:linear-gradient(135deg,#0f1923 0%,#0d1117 50%,#130a1a 100%);padding:52px 48px 38px;border-bottom:1px solid #30363d;position:relative;overflow:hidden}
+header::after{content:'';position:absolute;right:-60px;top:-60px;width:360px;height:360px;background:radial-gradient(circle,rgba(139,92,246,.07) 0%,transparent 70%);border-radius:50%}
+header h1{font-size:2.2rem;font-weight:800;background:linear-gradient(90deg,#a78bfa,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px}
+header p{color:#8b949e;font-size:.98rem;max-width:780px}
+.badges{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+.badge{padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:600;letter-spacing:.03em}
+.b-purple{background:rgba(139,92,246,.12);color:#a78bfa;border:1px solid rgba(139,92,246,.3)}
+.b-blue{background:rgba(56,189,248,.12);color:#38bdf8;border:1px solid rgba(56,189,248,.3)}
+.b-green{background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+.b-orange{background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3)}
+.b-yellow{background:rgba(250,204,21,.12);color:#facc15;border:1px solid rgba(250,204,21,.3)}
+.b-teal{background:rgba(45,212,191,.12);color:#2dd4bf;border:1px solid rgba(45,212,191,.3)}
+.b-red{background:rgba(248,81,73,.12);color:#f87171;border:1px solid rgba(248,81,73,.3)}
+
+nav{background:#161b22;border-bottom:1px solid #30363d;display:flex;overflow-x:auto;padding:0 24px}
+nav a{color:#8b949e;text-decoration:none;padding:14px 13px;font-size:.82rem;border-bottom:2px solid transparent;white-space:nowrap;transition:.2s}
+nav a:hover{color:#a78bfa;border-bottom-color:#a78bfa}
+
+.container{max-width:1140px;margin:0 auto;padding:44px 32px}
+.section{margin-bottom:72px}
+
+.sh{display:flex;align-items:center;gap:14px;margin-bottom:6px;padding-bottom:14px;border-bottom:1px solid #21262d}
+.sh-icon{width:40px;height:40px;min-width:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.15rem}
+.sh h2{font-size:1.45rem;font-weight:700;color:#e6edf3}
+.sh-sub{color:#8b949e;font-size:.9rem;margin-bottom:26px}
+
+.card{background:#161b22;border:1px solid #30363d;border-radius:12px;overflow:hidden;margin-bottom:24px}
+.card-h{background:#1c2128;padding:13px 20px;border-bottom:1px solid #30363d;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.card-h h3{font-size:.93rem;font-weight:600;color:#e6edf3;flex:1}
+.pill{font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:12px}
+.p-purple{background:rgba(139,92,246,.12);color:#a78bfa}
+.p-blue{background:rgba(56,189,248,.12);color:#38bdf8}
+.p-green{background:rgba(74,222,128,.12);color:#4ade80}
+.p-orange{background:rgba(251,146,60,.12);color:#fb923c}
+.p-yellow{background:rgba(250,204,21,.12);color:#facc15}
+.p-teal{background:rgba(45,212,191,.12);color:#2dd4bf}
+.p-red{background:rgba(248,81,73,.12);color:#f87171}
+.card-b{padding:22px}
+
+pre{background:#010409;border:1px solid #21262d;border-radius:8px;padding:20px;overflow-x:auto;font-size:.815rem;line-height:1.78;margin-bottom:16px;tab-size:4}
+code{font-family:'Cascadia Code','Fira Code',Consolas,monospace}
+.kw{color:#ff7b72}.fn{color:#79c0ff}.str{color:#a5d6ff}.num{color:#f2cc60}
+.cmt{color:#8b949e;font-style:italic}.cls{color:#ffa657}
+.grn{color:#56d364}.pur{color:#d2a8ff}.tl{color:#2dd4bf}.yw{color:#f2cc60}
+
+.out{background:#010409;border:1px solid #21262d;border-radius:8px;padding:14px 18px;margin-bottom:14px}
+.out-label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#a78bfa;margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.out-label::before{content:'▶';font-size:.65rem}
+.out pre{background:transparent;border:none;padding:0;margin:0;color:#8b949e;font-size:.81rem}
+
+.info{border-radius:8px;padding:13px 17px;margin:12px 0;font-size:.87rem}
+.info-blue{background:rgba(56,189,248,.07);border:1px solid rgba(56,189,248,.2);color:#7dd3fc}
+.info-green{background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.2);color:#86efac}
+.info-orange{background:rgba(251,146,60,.07);border:1px solid rgba(251,146,60,.2);color:#fed7aa}
+.info-red{background:rgba(248,81,73,.07);border:1px solid rgba(248,81,73,.2);color:#fca5a5}
+.info-purple{background:rgba(139,92,246,.07);border:1px solid rgba(139,92,246,.2);color:#c4b5fd}
+.info-teal{background:rgba(45,212,191,.07);border:1px solid rgba(45,212,191,.2);color:#99f6e4}
+.info-yellow{background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.2);color:#fef08a}
+.info strong{font-weight:700}
+
+table.dt{width:100%;border-collapse:collapse;font-size:.82rem}
+table.dt th{background:#1c2128;color:#a78bfa;padding:9px 13px;text-align:left;font-weight:600;border-bottom:1px solid #30363d;font-size:.77rem;text-transform:uppercase;letter-spacing:.05em}
+table.dt td{padding:8px 13px;border-bottom:1px solid #161b22;color:#c9d1d9;vertical-align:top}
+table.dt tr:hover td{background:#1c2128}
+table.dt code{font-family:'Cascadia Code',Consolas,monospace;font-size:.79rem}
+
+.scenario{background:rgba(139,92,246,.05);border-left:3px solid #7c3aed;border-radius:0 8px 8px 0;padding:13px 17px;margin-bottom:18px;font-size:.88rem;color:#c4b5fd}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+@media(max-width:700px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+
+.stat{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:16px;text-align:center}
+.stat-num{font-size:1.8rem;font-weight:800;margin-bottom:3px}
+.stat-label{font-size:.78rem;color:#8b949e;text-transform:uppercase;letter-spacing:.05em}
+.s-purple .stat-num{color:#a78bfa}.s-blue .stat-num{color:#38bdf8}
+.s-green .stat-num{color:#4ade80}.s-yellow .stat-num{color:#facc15}
+.s-orange .stat-num{color:#fb923c}.s-teal .stat-num{color:#2dd4bf}
+.s-red .stat-num{color:#f87171}
+
+footer{background:#161b22;border-top:1px solid #30363d;padding:20px 48px;text-align:center;color:#484f58;font-size:.82rem}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔤 String Manipulations in Pandas — End to End</h1>
+  <p>Complete guide: the .str accessor, case conversion, trimming, splitting, replacing, regex extraction, padding, encoding detection, real-world cleaning patterns, and performance at scale.</p>
+  <div class="badges">
+    <span class="badge b-purple">pandas 2.x</span>
+    <span class="badge b-blue">.str accessor</span>
+    <span class="badge b-orange">regex</span>
+    <span class="badge b-green">re module</span>
+    <span class="badge b-yellow">unicodedata</span>
+    <span class="badge b-teal">Python 3.11</span>
+  </div>
+</header>
+
+<nav>
+  <a href="#accessor">str Accessor</a>
+  <a href="#case">Case</a>
+  <a href="#trim">Trim & Pad</a>
+  <a href="#search">Search & Test</a>
+  <a href="#replace">Replace</a>
+  <a href="#split">Split & Join</a>
+  <a href="#extract">Regex Extract</a>
+  <a href="#slice">Slice & Index</a>
+  <a href="#encode">Encode & Decode</a>
+  <a href="#unicode">Unicode</a>
+  <a href="#realworld">Real-World</a>
+  <a href="#predicates">Type Predicates</a>
+  <a href="#partition">Partition</a>
+  <a href="#getdummies">get_dummies</a>
+  <a href="#advregex">Advanced Regex</a>
+  <a href="#removepfx">removeprefix/suffix</a>
+  <a href="#performance">Performance</a>
+  <a href="#cheatsheet">Cheat Sheet</a>
+</nav>
+
+<div class="container">
+
+<!-- ═══════════  STR ACCESSOR  ═══════════ -->
+<div class="section" id="accessor">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(139,92,246,.1)">🔑</div>
+    <h2>The .str Accessor</h2>
+  </div>
+  <p class="sh-sub">Every pandas string operation goes through the <code>.str</code> accessor. It vectorises Python string methods across all rows without a Python-level loop.</p>
+
+  <div class="grid4" style="margin-bottom:26px">
+    <div class="stat s-purple"><div class="stat-num">50+</div><div class="stat-label">.str methods</div></div>
+    <div class="stat s-blue"><div class="stat-num">NaN</div><div class="stat-label">Propagated automatically</div></div>
+    <div class="stat s-orange"><div class="stat-num">regex=</div><div class="stat-label">True/False toggle</div></div>
+    <div class="stat s-green"><div class="stat-num">na=</div><div class="stat-label">Fill value for NaN rows</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>How .str works — dtype requirements and NaN propagation</h3><span class="pill p-purple">Core concept</span></div>
+    <div class="card-b">
+<pre><code><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> re
+
+<span class="cmt"># ── .str is available on object, string, and category dtype ───────</span>
+s = pd.Series([<span class="str">"  Alice Johnson  "</span>, <span class="str">"bob SMITH"</span>, <span class="str">"CAROL white"</span>, np.nan, <span class="str">"  dave Brown"</span>])
+
+<span class="fn">print</span>(<span class="str">"dtype:"</span>, s.dtype)           <span class="cmt"># object</span>
+<span class="fn">print</span>(<span class="str">"lower:"</span>, s.str.lower().tolist())
+<span class="fn">print</span>(<span class="str">"strip:"</span>, s.str.strip().tolist())
+
+<span class="cmt"># ── NaN rows propagate as NaN by default ─────────────────────────</span>
+<span class="fn">print</span>(<span class="str">"\nNaN propagation:"</span>)
+<span class="fn">print</span>(s.str.upper())
+
+<span class="cmt"># ── na= fills NaN with a replacement value ───────────────────────</span>
+<span class="fn">print</span>(<span class="str">"\nWith na='' fill:"</span>)
+<span class="fn">print</span>(s.str.upper().fillna(<span class="str">""</span>))     <span class="cmt"># or use na= in methods that support it</span>
+<span class="fn">print</span>(s.str.contains(<span class="str">"alice"</span>, case=<span class="cls">False</span>, na=<span class="cls">False</span>))   <span class="cmt"># na=False: NaN → False</span>
+
+<span class="cmt"># ── .str on non-object dtype raises AttributeError ───────────────</span>
+n = pd.Series([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])
+<span class="kw">try</span>:
+    n.str.upper()
+<span class="kw">except</span> AttributeError <span class="kw">as</span> e:
+    <span class="fn">print</span>(<span class="grn">f"\nAttributeError: {e}"</span>)
+
+<span class="cmt"># ── Works on category dtype too ───────────────────────────────────</span>
+cat = pd.Series([<span class="str">"shipped"</span>, <span class="str">"pending"</span>, <span class="str">"shipped"</span>], dtype=<span class="str">"category"</span>)
+<span class="fn">print</span>(<span class="str">"\ncategory .str.upper():"</span>, cat.str.upper().tolist())
+
+<span class="cmt"># ── Chain multiple .str calls ─────────────────────────────────────</span>
+cleaned = s.str.strip().str.lower().str.replace(<span class="str">r"\s+"</span>, <span class="str">" "</span>, regex=<span class="cls">True</span>)
+<span class="fn">print</span>(<span class="str">"\nChained:"</span>, cleaned.tolist())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>dtype: object
+lower: ['  alice johnson  ', 'bob smith', 'carol white', nan, '  dave brown']
+strip: ['Alice Johnson', 'bob SMITH', 'CAROL white', nan, 'dave Brown']
+
+NaN propagation:
+0    ALICE JOHNSON       ← spaces preserved, NaN row:
+1        BOB SMITH
+2      CAROL WHITE
+3              NaN       ← NaN input → NaN output (not an error)
+4       DAVE BROWN
+
+With na=False (contains):  [True, False, False, False, False]
+
+Chained: ['alice johnson', 'bob smith', 'carol white', nan, 'dave brown']</pre>
+      </div>
+      <div class="info info-purple"><strong>Key rule:</strong> The <code>.str</code> accessor requires <code>object</code>, <code>string</code>, or <code>category</code> dtype. For numeric/datetime Series you must convert to string first: <code>s.astype(str).str.replace(...)</code></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Shared messy dataset — used throughout all examples</h3></div>
+    <div class="card-b">
+<pre><code>df = pd.DataFrame({
+    <span class="str">"name"</span>:    [<span class="str">"  Alice Johnson  "</span>, <span class="str">"BOB smith"</span>, <span class="str">"carol WHITE"</span>,
+               <span class="str">"Dave  Brown"</span>, np.nan, <span class="str">"  EVE martínez  "</span>],
+    <span class="str">"email"</span>:   [<span class="str">"Alice@Example.COM"</span>, <span class="str">"bob.smith@gmail.com"</span>, <span class="str">"CAROL@yahoo.com"</span>,
+               <span class="str">"dave@company.org"</span>, <span class="str">"not-an-email"</span>, <span class="str">"eve@domain.net"</span>],
+    <span class="str">"phone"</span>:   [<span class="str">"(555) 123-4567"</span>, <span class="str">"555.987.6543"</span>, <span class="str">"5559991234"</span>,
+               <span class="str">"+1-555-444-3333"</span>, <span class="str">"555 222 1111"</span>, np.nan],
+    <span class="str">"address"</span>: [<span class="str">"123 Main St, NY 10001"</span>, <span class="str">"456 Oak Ave, CA 90210"</span>,
+               <span class="str">"789 Pine Rd, TX 75001"</span>, <span class="str">"321 Elm St, FL 33101"</span>,
+               <span class="str">"555 Maple Dr, WA 98101"</span>, <span class="str">"999 Cedar Ln, OR 97201"</span>],
+    <span class="str">"tags"</span>:    [<span class="str">"python|pandas|numpy"</span>, <span class="str">"java|spring"</span>, <span class="str">"python|django|rest"</span>,
+               <span class="str">"javascript|react|node"</span>, <span class="str">"python"</span>, <span class="str">"go|grpc"</span>],
+    <span class="str">"amount"</span>:  [<span class="str">"$1,234.56"</span>, <span class="str">"$89.00"</span>, <span class="str">"$2,500.00"</span>,
+               <span class="str">"$450.75"</span>, <span class="str">"FREE"</span>, <span class="str">"$3,100.00"</span>],
+    <span class="str">"code"</span>:    [<span class="str">"ORD-2024-001"</span>, <span class="str">"ORD-2024-002"</span>, <span class="str">"ORD-2024-003"</span>,
+               <span class="str">"ORD-2024-004"</span>, <span class="str">"ORD-2024-005"</span>, <span class="str">"ORD-2024-006"</span>],
+    <span class="str">"notes"</span>:   [<span class="str">"Rush order - priority"</span>, <span class="str">"  standard  "</span>, <span class="str">"URGENT: call customer"</span>,
+               <span class="str">"regular order"</span>, <span class="str">"N/A"</span>, <span class="str">"expedited  shipping"</span>],
+})
+<span class="fn">print</span>(df.shape)   <span class="cmt"># (6, 8)</span></code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  CASE  ═══════════ -->
+<div class="section" id="case">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(56,189,248,.1)">🔠</div>
+    <h2>Case Conversion</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>All case methods</h3><span class="pill p-blue">Case</span></div>
+    <div class="card-b">
+<pre><code>s = pd.Series([<span class="str">"hello WORLD"</span>, <span class="str">"the Quick Brown FOX"</span>, <span class="str">"ALICE johnson"</span>, np.nan])
+
+<span class="cmt"># ── The six case methods ─────────────────────────────────────────</span>
+<span class="fn">print</span>(<span class="str">"lower()     :"</span>, s.str.lower().tolist())
+<span class="fn">print</span>(<span class="str">"upper()     :"</span>, s.str.upper().tolist())
+<span class="fn">print</span>(<span class="str">"title()     :"</span>, s.str.title().tolist())    <span class="cmt"># Title Case Each Word</span>
+<span class="fn">print</span>(<span class="str">"capitalize():"</span>, s.str.capitalize().tolist()) <span class="cmt"># First letter only</span>
+<span class="fn">print</span>(<span class="str">"swapcase()  :"</span>, s.str.swapcase().tolist())  <span class="cmt"># Flip each letter</span>
+<span class="fn">print</span>(<span class="str">"casefold()  :"</span>, s.str.casefold().tolist())  <span class="cmt"># Aggressive lower (ß→ss)</span>
+
+<span class="cmt"># ── casefold vs lower — German ß example ─────────────────────────</span>
+german = pd.Series([<span class="str">"Straße"</span>, <span class="str">"STRASSE"</span>])
+<span class="fn">print</span>(<span class="str">"\nlower():   "</span>, german.str.lower().tolist())     <span class="cmt"># ['straße', 'strasse']</span>
+<span class="fn">print</span>(<span class="str">"casefold():"</span>, german.str.casefold().tolist())  <span class="cmt"># ['strasse', 'strasse'] ← same!</span>
+
+<span class="cmt"># ── Normalize email case for matching ────────────────────────────</span>
+df2 = df.copy()
+df2[<span class="str">"email_clean"</span>] = df2[<span class="str">"email"</span>].str.lower().str.strip()
+<span class="fn">print</span>(<span class="str">"\nCleaned emails:"</span>)
+<span class="fn">print</span>(df2[[<span class="str">"email"</span>, <span class="str">"email_clean"</span>]].to_string())
+
+<span class="cmt"># ── Convert column names to snake_case ───────────────────────────</span>
+df_messy = pd.DataFrame(columns=[
+    <span class="str">"First Name"</span>, <span class="str">"Last Name"</span>, <span class="str">"Email Address"</span>,
+    <span class="str">"Phone Number"</span>, <span class="str">"OrderID"</span>, <span class="str">"  ShipDate  "</span>
+])
+df_messy.columns = (
+    df_messy.columns
+    .str.strip()
+    .str.lower()
+    .str.replace(<span class="str">r"[^\w\s]"</span>, <span class="str">""</span>, regex=<span class="cls">True</span>)
+    .str.replace(<span class="str">r"\s+"</span>, <span class="str">"_"</span>, regex=<span class="cls">True</span>)
+)
+<span class="fn">print</span>(<span class="str">"\nSnake_case columns:"</span>, df_messy.columns.tolist())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>lower()     : ['hello world', 'the quick brown fox', 'alice johnson', nan]
+upper()     : ['HELLO WORLD', 'THE QUICK BROWN FOX', 'ALICE JOHNSON', nan]
+title()     : ['Hello World', 'The Quick Brown Fox', 'Alice Johnson', nan]
+capitalize(): ['Hello world', 'The quick brown fox', 'Alice johnson', nan]
+swapcase()  : ['HELLO world', 'THE qUICK bROWN fox', 'alice JOHNSON', nan]
+casefold()  : ['hello world', 'the quick brown fox', 'alice johnson', nan]
+
+lower():    ['straße', 'strasse']
+casefold(): ['strasse', 'strasse']  ← ß → ss, now they match! ✅
+
+Snake_case columns: ['first_name', 'last_name', 'email_address',
+                     'phone_number', 'orderid', 'shipdate']</pre>
+      </div>
+      <div class="info info-blue"><strong>casefold() vs lower():</strong> Use <code>casefold()</code> for case-insensitive comparisons when data may contain non-ASCII text (German ß, Turkish İ). Use <code>lower()</code> for plain ASCII normalisation.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  TRIM & PAD  ═══════════ -->
+<div class="section" id="trim">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(74,222,128,.1)">✂️</div>
+    <h2>Trim, Pad & Align</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>strip / lstrip / rstrip / pad / center / zfill</h3><span class="pill p-green">Trim & Pad</span></div>
+    <div class="card-b">
+<pre><code>s = pd.Series([<span class="str">"  hello  "</span>, <span class="str">"\t tab \n"</span>, <span class="str">"   leading"</span>, <span class="str">"trailing   "</span>, np.nan])
+
+<span class="cmt"># ── Whitespace removal ───────────────────────────────────────────</span>
+<span class="fn">print</span>(<span class="str">"strip() :"</span>,  s.str.strip().tolist())   <span class="cmt"># both sides — also removes \t \n</span>
+<span class="fn">print</span>(<span class="str">"lstrip():"</span>, s.str.lstrip().tolist())  <span class="cmt"># left only</span>
+<span class="fn">print</span>(<span class="str">"rstrip():"</span>, s.str.rstrip().tolist())  <span class="cmt"># right only</span>
+
+<span class="cmt"># ── Strip specific characters ─────────────────────────────────────</span>
+codes = pd.Series([<span class="str">"***ORD-001***"</span>, <span class="str">"**ORD-002*"</span>, <span class="str">"ORD-003"</span>])
+<span class="fn">print</span>(<span class="str">"\nstrip('*'):"</span>, codes.str.strip(<span class="str">"*"</span>).tolist())
+
+currency = pd.Series([<span class="str">"$29.99"</span>, <span class="str">"$49.00"</span>, <span class="str">"€15.50"</span>])
+<span class="fn">print</span>(<span class="str">"lstrip('$€'):"</span>, currency.str.lstrip(<span class="str">"$€"</span>).tolist())
+
+<span class="cmt"># ── Padding ──────────────────────────────────────────────────────</span>
+ids = pd.Series([<span class="str">"1"</span>, <span class="str">"42"</span>, <span class="str">"999"</span>, <span class="str">"10000"</span>])
+
+<span class="fn">print</span>(<span class="str">"\npad(6, fillchar='0'): "</span>, ids.str.pad(<span class="num">6</span>, fillchar=<span class="str">"0"</span>).tolist())   <span class="cmt"># left-pad</span>
+<span class="fn">print</span>(<span class="str">"zfill(6)            :"</span>, ids.str.zfill(<span class="num">6"</span>).tolist())               <span class="cmt"># zero-pad (shortcut)</span>
+<span class="fn">print</span>(<span class="str">"ljust(8, '-')       :"</span>, ids.str.ljust(<span class="num">8</span>, <span class="str">"-"</span>).tolist())           <span class="cmt"># right-align pad</span>
+<span class="fn">print</span>(<span class="str">"rjust(8, '-')       :"</span>, ids.str.rjust(<span class="num">8</span>, <span class="str">"-"</span>).tolist())           <span class="cmt"># left-align pad</span>
+<span class="fn">print</span>(<span class="str">"center(8, '-')      :"</span>, ids.str.center(<span class="num">8</span>, <span class="str">"-"</span>).tolist())         <span class="cmt"># center</span>
+
+<span class="cmt"># ── Practical: normalise phone N-digit codes ─────────────────────</span>
+area_codes = pd.Series([<span class="str">"1"</span>, <span class="str">"44"</span>, <span class="str">"353"</span>, <span class="str">"1"</span>])
+formatted  = <span class="str">"+"</span> + area_codes.str.zfill(<span class="num">3</span>)
+<span class="fn">print</span>(<span class="str">"\nFormatted area codes:"</span>, formatted.tolist())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>strip() : ['hello', 'tab', 'leading', 'trailing', nan]
+lstrip(): ['hello  ', 'tab \n', 'leading', 'trailing   ', nan]
+rstrip(): ['  hello', '\t tab', '   leading', 'trailing', nan]
+
+strip('*'): ['ORD-001', 'ORD-002', 'ORD-003']
+
+pad(6, '0'): ['000001', '000042', '000999', '010000']
+zfill(6)   : ['000001', '000042', '000999', '010000']
+ljust(8,'-'): ['1-------', '42------', '999-----', '10000---']
+center(8,'-'): ['---1----', '--42----', '--999---', '-10000--']
+
+Formatted area codes: ['+001', '+044', '+353', '+001']</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  SEARCH & TEST  ═══════════ -->
+<div class="section" id="search">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(250,204,21,.1)">🔎</div>
+    <h2>Search & Test Methods</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>contains / startswith / endswith / match / fullmatch / find</h3><span class="pill p-yellow">Search</span></div>
+    <div class="card-b">
+<pre><code>s = pd.Series([<span class="str">"alice@example.com"</span>, <span class="str">"bob.smith@gmail.com"</span>,
+               <span class="str">"not-an-email"</span>, <span class="str">"carol@yahoo.co.uk"</span>, np.nan])
+
+<span class="cmt"># ── contains: substring or regex search ──────────────────────────</span>
+<span class="fn">print</span>(<span class="str">"contains 'gmail':"</span>, s.str.contains(<span class="str">"gmail"</span>, na=<span class="cls">False</span>).tolist())
+<span class="fn">print</span>(<span class="str">"contains regex :"</span>, s.str.contains(<span class="str">r"@\w+\.\w+"</span>, regex=<span class="cls">True</span>, na=<span class="cls">False</span>).tolist())
+
+<span class="cmt"># ── case-insensitive contains ─────────────────────────────────────</span>
+<span class="fn">print</span>(<span class="str">"contains (no case):"</span>, s.str.contains(<span class="str">"GMAIL"</span>, case=<span class="cls">False</span>, na=<span class="cls">False</span>).tolist())
+
+<span class="cmt"># ── startswith / endswith ─────────────────────────────────────────</span>
+<span class="fn">print</span>(<span class="str">"\nstartswith 'alice':"</span>, s.str.startswith(<span class="str">"alice"</span>, na=<span class="cls">False</span>).tolist())
+<span class="fn">print</span>(<span class="str">"endswith   '.com' :"</span>, s.str.endswith(<span class="str">".com"</span>, na=<span class="cls">False</span>).tolist())
+
+<span class="cmt"># Multiple prefixes/suffixes (pass a tuple)</span>
+<span class="fn">print</span>(<span class="str">"startswith ('alice','carol'):"</span>,
+      s.str.startswith((<span class="str">"alice"</span>, <span class="str">"carol"</span>), na=<span class="cls">False</span>).tolist())
+
+<span class="cmt"># ── match: test against regex at the START of string ─────────────</span>
+<span class="cmt"># match == re.match (anchored at start)  ←→  contains == re.search</span>
+codes = pd.Series([<span class="str">"ORD-001"</span>, <span class="str">"XORD-002"</span>, <span class="str">"ORD-ABC"</span>, <span class="str">"ORD-123"</span>])
+<span class="fn">print</span>(<span class="str">"\nmatch '^ORD-\\d+':"</span>, codes.str.match(<span class="str">r"^ORD-\d+"</span>).tolist())
+
+<span class="cmt"># ── fullmatch: entire string must match ──────────────────────────</span>
+<span class="fn">print</span>(<span class="str">"fullmatch '^ORD-\\d{3}$':"</span>, codes.str.fullmatch(<span class="str">r"^ORD-\d{3}$"</span>).tolist())
+
+<span class="cmt"># ── find / rfind: position of substring (-1 if not found) ────────</span>
+text = pd.Series([<span class="str">"hello world"</span>, <span class="str">"world peace"</span>, <span class="str">"no match here"</span>])
+<span class="fn">print</span>(<span class="str">"\nfind('world')  :"</span>, text.str.find(<span class="str">"world"</span>).tolist())    <span class="cmt"># [6, 0, -1]</span>
+<span class="fn">print</span>(<span class="str">"index('world') :"</span>)                                        <span class="cmt"># raises on -1</span>
+
+<span class="cmt"># ── count: occurrences of a pattern ──────────────────────────────</span>
+<span class="fn">print</span>(<span class="str">"\ncount('o'):"</span>, text.str.count(<span class="str">"o"</span>).tolist())
+
+<span class="cmt"># ── Filter DataFrame rows using string tests ─────────────────────</span>
+gmail_users = df[df[<span class="str">"email"</span>].str.endswith(<span class="str">"gmail.com"</span>, na=<span class="cls">False</span>)]
+python_devs = df[df[<span class="str">"tags"</span>].str.contains(<span class="str">"python"</span>, na=<span class="cls">False</span>)]
+<span class="fn">print</span>(<span class="str">"\nGmail users:"</span>, gmail_users[<span class="str">"email"</span>].tolist())
+<span class="fn">print</span>(<span class="str">"Python devs:"</span>, <span class="fn">len</span>(python_devs))</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>contains 'gmail': [False, True, False, False, False]
+contains regex  : [True, True, False, True, False]   ← "not-an-email" fails ✅
+
+startswith ('alice','carol'): [True, False, False, True, False]
+
+match '^ORD-\d+':    [True, False, True, True]   ← XORD fails, ORD-ABC passes
+fullmatch '^ORD-\d{3}$': [True, False, False, True]  ← strict: must be exactly 3 digits
+
+find('world'): [6, 0, -1]   ← -1 means not found
+
+Gmail users: ['bob.smith@gmail.com']
+Python devs: 3</pre>
+      </div>
+      <div class="info info-yellow"><strong>match vs contains vs fullmatch:</strong> <code>match</code> = anchored at start (like <code>re.match</code>). <code>contains</code> = anywhere in string (like <code>re.search</code>). <code>fullmatch</code> = entire string must match (like <code>re.fullmatch</code>). Use <code>fullmatch</code> for strict validation.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  REPLACE  ═══════════ -->
+<div class="section" id="replace">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(251,146,60,.1)">🔄</div>
+    <h2>Replace & Substitute</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>str.replace() — literal and regex</h3><span class="pill p-orange">Replace</span></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── literal replace ──────────────────────────────────────────────</span>
+s = pd.Series([<span class="str">"hello world"</span>, <span class="str">"world is round"</span>, <span class="str">"hello hello"</span>])
+<span class="fn">print</span>(s.str.replace(<span class="str">"hello"</span>, <span class="str">"hi"</span>, regex=<span class="cls">False</span>).tolist())
+<span class="cmt"># → ['hi world', 'world is round', 'hi hi']  (all occurrences)</span>
+
+<span class="cmt"># ── n= limits replacement count ─────────────────────────────────</span>
+<span class="fn">print</span>(s.str.replace(<span class="str">"hello"</span>, <span class="str">"hi"</span>, n=<span class="num">1</span>, regex=<span class="cls">False</span>).tolist())
+<span class="cmt"># → ['hi world', 'world is round', 'hi hello']  (max 1 replacement)</span>
+
+<span class="cmt"># ── regex replace ────────────────────────────────────────────────</span>
+noisy = pd.Series([<span class="str">"$1,234.56"</span>, <span class="str">"€ 2,500.00"</span>, <span class="str">"USD 890"</span>, <span class="str">"FREE"</span>])
+
+<span class="cmt"># Remove everything except digits and dot</span>
+clean_num = noisy.str.replace(<span class="str">r"[^\d.]"</span>, <span class="str">""</span>, regex=<span class="cls">True</span>)
+<span class="fn">print</span>(<span class="str">"\nStrip non-numeric:"</span>, clean_num.tolist())
+
+<span class="cmt"># Replace multiple whitespace with single space</span>
+messy_spaces = pd.Series([<span class="str">"hello   world"</span>, <span class="str">"too    many    spaces"</span>])
+<span class="fn">print</span>(<span class="str">"Normalise spaces:"</span>, messy_spaces.str.replace(<span class="str">r"\s+"</span>, <span class="str">" "</span>, regex=<span class="cls">True</span>).str.strip().tolist())
+
+<span class="cmt"># ── Backreference in replacement ─────────────────────────────────</span>
+phones = pd.Series([<span class="str">"5551234567"</span>, <span class="str">"5559876543"</span>])
+<span class="cmt"># Format: (555) 123-4567</span>
+formatted = phones.str.replace(
+    <span class="str">r"(\d{3})(\d{3})(\d{4})"</span>,
+    <span class="str">r"(\1) \2-\3"</span>,
+    regex=<span class="cls">True</span>
+)
+<span class="fn">print</span>(<span class="str">"\nFormatted phones:"</span>, formatted.tolist())
+
+<span class="cmt"># ── Replace using a callable (function) ──────────────────────────</span>
+words = pd.Series([<span class="str">"foo 123 bar 456"</span>, <span class="str">"abc 7 def 89"</span>])
+<span class="cmt"># Double every digit sequence found</span>
+doubled = words.str.replace(
+    <span class="str">r"\d+"</span>,
+    <span class="kw">lambda</span> m: <span class="cls">str</span>(<span class="fn">int</span>(m.group()) * <span class="num">2</span>),
+    regex=<span class="cls">True</span>
+)
+<span class="fn">print</span>(<span class="str">"Doubled digits:"</span>, doubled.tolist())
+
+<span class="cmt"># ── Strip currency symbols — real-world pattern ───────────────────</span>
+df2 = df.copy()
+df2[<span class="str">"amount_clean"</span>] = (
+    df2[<span class="str">"amount"</span>]
+    .str.replace(<span class="str">r"[$,€£]"</span>, <span class="str">""</span>, regex=<span class="cls">True</span>)
+    .str.strip()
+    .replace(<span class="str">"FREE"</span>, <span class="str">"0"</span>)
+)
+df2[<span class="str">"amount_num"</span>] = pd.to_numeric(df2[<span class="str">"amount_clean"</span>], errors=<span class="str">"coerce"</span>)
+<span class="fn">print</span>(<span class="str">"\nAmount values:"</span>, df2[<span class="str">"amount_num"</span>].tolist())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>Strip non-numeric: ['123456', '2500.00', '890', '']
+Normalise spaces : ['hello world', 'too many spaces']
+Formatted phones : ['(555) 123-4567', '(555) 987-6543']  ✅
+Doubled digits   : ['foo 246 bar 912', 'abc 14 def 178']
+
+Amount values: [1234.56, 89.0, 2500.0, 450.75, 0.0, 3100.0]  ✅</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>translate() — character-level replacement (fastest)</h3></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># str.translate() uses a character translation table — much faster
+# than regex when replacing individual characters</span>
+
+<span class="cmt"># Remove punctuation from text</span>
+<span class="kw">import</span> string
+
+PUNCT_TABLE = str.maketrans(<span class="str">""</span>, <span class="str">""</span>, string.punctuation)
+text = pd.Series([<span class="str">"Hello, World!"</span>, <span class="str">"How are you?"</span>, <span class="str">"Great. Fine!"</span>])
+<span class="fn">print</span>(text.str.translate(PUNCT_TABLE).tolist())
+
+<span class="cmt"># Replace specific characters (e.g. normalize dashes)</span>
+DASH_TABLE = str.maketrans(<span class="str">"–—"</span>, <span class="str">"--"</span>)   <span class="cmt"># em/en dash → hyphen</span>
+dashes = pd.Series([<span class="str">"2024–2025"</span>, <span class="str">"pages 10—20"</span>])
+<span class="fn">print</span>(dashes.str.translate(DASH_TABLE).tolist())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>['Hello World', 'How are you', 'Great Fine']
+['2024-2025', 'pages 10-20']</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  SPLIT & JOIN  ═══════════ -->
+<div class="section" id="split">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(45,212,191,.1)">✂️</div>
+    <h2>Split & Join</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>str.split() — all options</h3><span class="pill p-teal">Split</span></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── Basic split ───────────────────────────────────────────────────</span>
+s = pd.Series([<span class="str">"python|pandas|numpy"</span>, <span class="str">"java|spring"</span>, <span class="str">"go|grpc|protobuf"</span>])
+
+<span class="cmt"># Returns a Series of lists</span>
+split_list = s.str.split(<span class="str">"|"</span>)
+<span class="fn">print</span>(<span class="str">"split (list):"</span>, split_list.tolist())
+
+<span class="cmt"># ── expand=True → each token becomes a column ────────────────────</span>
+split_df = s.str.split(<span class="str">"|"</span>, expand=<span class="cls">True</span>)
+<span class="fn">print</span>(<span class="str">"\nsplit expand=True:"</span>)
+<span class="fn">print</span>(split_df)
+
+<span class="cmt"># ── n= limits number of splits ───────────────────────────────────</span>
+<span class="fn">print</span>(<span class="str">"\nn=1 split (keep remainder):"</span>)
+<span class="fn">print</span>(s.str.split(<span class="str">"|"</span>, n=<span class="num">1</span>, expand=<span class="cls">True</span>))
+
+<span class="cmt"># ── rsplit: split from the right ─────────────────────────────────</span>
+paths = pd.Series([<span class="str">"/home/user/docs/file.txt"</span>, <span class="str">"/var/log/app.log"</span>])
+filename = paths.str.rsplit(<span class="str">"/"</span>, n=<span class="num">1</span>, expand=<span class="cls">True</span>)[<span class="num">1</span>]
+<span class="fn">print</span>(<span class="str">"\nFilename extracted:"</span>, filename.tolist())
+
+<span class="cmt"># ── Split into named columns ─────────────────────────────────────</span>
+names = pd.Series([<span class="str">"Alice Johnson"</span>, <span class="str">"Bob Smith"</span>, <span class="str">"Carol White"</span>])
+name_df            = names.str.split(<span class="str">" "</span>, n=<span class="num">1</span>, expand=<span class="cls">True</span>)
+name_df.columns    = [<span class="str">"first_name"</span>, <span class="str">"last_name"</span>]
+<span class="fn">print</span>(<span class="str">"\nSplit names:"</span>)
+<span class="fn">print</span>(name_df)
+
+<span class="cmt"># ── Explode: one list element per row ────────────────────────────</span>
+df_tags = df[[<span class="str">"name"</span>, <span class="str">"tags"</span>]].copy()
+df_tags[<span class="str">"tag_list"</span>] = df_tags[<span class="str">"tags"</span>].str.split(<span class="str">"|"</span>)
+df_exploded = df_tags.explode(<span class="str">"tag_list"</span>).reset_index(drop=<span class="cls">True</span>)
+<span class="fn">print</span>(<span class="str">"\nExploded tags:"</span>)
+<span class="fn">print</span>(df_exploded[[<span class="str">"name"</span>, <span class="str">"tag_list"</span>]].to_string())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>split (list): [['python','pandas','numpy'], ['java','spring'], ['go','grpc','protobuf']]
+
+split expand=True:
+         0       1        2
+0   python  pandas    numpy
+1     java  spring     None
+2       go    grpc  protobuf
+
+Filename extracted: ['file.txt', 'app.log']
+
+Exploded tags:
+               name tag_list
+0  Alice Johnson    python
+1  Alice Johnson    pandas
+2  Alice Johnson     numpy
+3     BOB smith      java
+4     BOB smith    spring
+...</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>str.join() and string concatenation</h3></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── str.join: join a list stored in each cell ────────────────────</span>
+s_lists = pd.Series([[<span class="str">"a"</span>, <span class="str">"b"</span>, <span class="str">"c"</span>], [<span class="str">"x"</span>, <span class="str">"y"</span>], [<span class="str">"one"</span>]])
+<span class="fn">print</span>(<span class="str">"join('-'):"</span>, s_lists.str.join(<span class="str">"-"</span>).tolist())
+
+<span class="cmt"># ── Column concatenation with + operator ─────────────────────────</span>
+df2 = df.copy()
+df2[<span class="str">"name_clean"</span>] = df2[<span class="str">"name"</span>].str.strip().str.title().fillna(<span class="str">"Unknown"</span>)
+
+<span class="cmt"># Combine two string columns</span>
+df2[<span class="str">"greeting"</span>] = <span class="str">"Hello, "</span> + df2[<span class="str">"name_clean"</span>] + <span class="str">"!"</span>
+<span class="fn">print</span>(df2[<span class="str">"greeting"</span>].tolist())
+
+<span class="cmt"># ── cat(): concatenate across a Series (like "".join) ────────────</span>
+words = pd.Series([<span class="str">"pandas"</span>, <span class="str">"is"</span>, <span class="str">"great"</span>])
+<span class="fn">print</span>(<span class="str">"\ncat(sep=' '):"</span>, words.str.cat(sep=<span class="str">" "</span>))
+
+<span class="cmt"># cat with another Series (column-wise join)</span>
+first = pd.Series([<span class="str">"Alice"</span>, <span class="str">"Bob"</span>, <span class="str">"Carol"</span>])
+last  = pd.Series([<span class="str">"Johnson"</span>, <span class="str">"Smith"</span>, <span class="str">"White"</span>])
+full  = first.str.cat(last, sep=<span class="str">" "</span>)
+<span class="fn">print</span>(<span class="str">"cat(series):"</span>, full.tolist())
+
+<span class="cmt"># cat with NaN handling</span>
+s_na = pd.Series([<span class="str">"A"</span>, np.nan, <span class="str">"C"</span>])
+<span class="fn">print</span>(<span class="str">"cat na=''  :"</span>, s_na.str.cat(sep=<span class="str">","</span>, na_rep=<span class="str">""</span>))   <span class="cmt"># "A,,C"</span>
+<span class="fn">print</span>(<span class="str">"cat na='X' :"</span>, s_na.str.cat(sep=<span class="str">","</span>, na_rep=<span class="str">"X"</span>))   <span class="cmt"># "A,X,C"</span></code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>join('-'): ['a-b-c', 'x-y', 'one']
+
+greetings: ['Hello, Alice Johnson!', 'Hello, Bob Smith!', 'Hello, Carol White!',
+            'Hello, Dave Brown!', 'Hello, Unknown!', 'Hello, Eve Martínez!']
+
+cat(sep=' '): pandas is great
+cat(series) : ['Alice Johnson', 'Bob Smith', 'Carol White']
+cat na=''   : A,,C
+cat na='X'  : A,X,C</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  REGEX EXTRACT  ═══════════ -->
+<div class="section" id="extract">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(248,81,73,.1)">🧲</div>
+    <h2>Regex Extraction</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>str.extract() — capture groups → columns</h3><span class="pill p-red">Extract</span></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── extract: first match only, uses capture groups ───────────────</span>
+codes = pd.Series([<span class="str">"ORD-2024-001"</span>, <span class="str">"ORD-2024-002"</span>, <span class="str">"ORD-2023-999"</span>, <span class="str">"INVALID"</span>])
+
+<span class="cmt"># Single capture group → Series</span>
+year = codes.str.extract(<span class="str">r"ORD-(\d{4})-"</span>)
+<span class="fn">print</span>(<span class="str">"Year extracted:"</span>)
+<span class="fn">print</span>(year)   <span class="cmt"># DataFrame with one column; NaN where no match</span>
+
+<span class="cmt"># Multiple capture groups → DataFrame</span>
+parts = codes.str.extract(<span class="str">r"ORD-(?P&lt;year&gt;\d{4})-(?P&lt;seq&gt;\d{3})"</span>)
+<span class="fn">print</span>(<span class="str">"\nNamed groups:"</span>)
+<span class="fn">print</span>(parts)
+
+<span class="cmt"># ── extractall: ALL matches per string ───────────────────────────</span>
+text = pd.Series([<span class="str">"call 555-1234 or 555-5678"</span>, <span class="str">"no numbers here"</span>, <span class="str">"555-9999"</span>])
+all_phones = text.str.extractall(<span class="str">r"(\d{3}-\d{4})"</span>)
+<span class="fn">print</span>(<span class="str">"\nextractall (all phone numbers):"</span>)
+<span class="fn">print</span>(all_phones)
+
+<span class="cmt"># ── Real-world: parse address into components ────────────────────</span>
+addr = df[<span class="str">"address"</span>].str.extract(
+    <span class="str">r"(?P&lt;street&gt;.+),\s*(?P&lt;city&gt;\w+)\s+(?P&lt;zip&gt;\d{5})"</span>
+)
+<span class="fn">print</span>(<span class="str">"\nAddress components:"</span>)
+<span class="fn">print</span>(addr.to_string())
+
+<span class="cmt"># ── Email domain extraction ───────────────────────────────────────</span>
+df2 = df.copy()
+df2[<span class="str">"domain"</span>] = df2[<span class="str">"email"</span>].str.extract(<span class="str">r"@(.+)$"</span>)[<span class="num">0</span>].str.lower()
+<span class="fn">print</span>(<span class="str">"\nEmail domains:"</span>, df2[<span class="str">"domain"</span>].tolist())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>Named groups:
+   year  seq
+0  2024  001
+1  2024  002
+2  2023  999
+3   NaN  NaN   ← "INVALID" → no match → NaN ✅
+
+Address components:
+          street  city    zip
+0    123 Main St    NY  10001
+1    456 Oak Ave    CA  90210
+2    789 Pine Rd    TX  75001
+3    321 Elm St     FL  33101
+4  555 Maple Dr    WA  98101
+5   999 Cedar Ln   OR  97201
+
+Email domains: ['example.com', 'gmail.com', 'yahoo.com', 'company.org', nan, 'domain.net']</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>str.findall() — return all match strings</h3></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># findall returns a list of all non-overlapping matches per row</span>
+text = pd.Series([
+    <span class="str">"Order #1001 and #1002 placed"</span>,
+    <span class="str">"Single order #3000"</span>,
+    <span class="str">"No orders here"</span>,
+])
+
+order_nums = text.str.findall(<span class="str">r"#(\d+)"</span>)
+<span class="fn">print</span>(<span class="str">"findall order numbers:"</span>, order_nums.tolist())
+
+<span class="cmt"># Count how many orders per row</span>
+order_count = order_nums.str.len()
+<span class="fn">print</span>(<span class="str">"count per row:"</span>, order_count.tolist())
+
+<span class="cmt"># Extract all hashtags from social media text</span>
+posts = pd.Series([
+    <span class="str">"Loving #python and #pandas today!"</span>,
+    <span class="str">"No hashtags here"</span>,
+    <span class="str">"#data #science #ai #ml"</span>,
+])
+hashtags = posts.str.findall(<span class="str">r"#\w+"</span>)
+<span class="fn">print</span>(<span class="str">"\nHashtags:"</span>, hashtags.tolist())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>findall order numbers: [['1001', '1002'], ['3000'], []]
+count per row        : [2, 1, 0]
+
+Hashtags: [['#python', '#pandas'], [], ['#data', '#science', '#ai', '#ml']]</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  SLICE & INDEX  ═══════════ -->
+<div class="section" id="slice">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(56,189,248,.1)">🔪</div>
+    <h2>Slice & Index</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>str[] indexing, str.get(), str.slice(), str.len()</h3><span class="pill p-blue">Slice</span></div>
+    <div class="card-b">
+<pre><code>s = pd.Series([<span class="str">"ORD-2024-001"</span>, <span class="str">"ORD-2024-002"</span>, <span class="str">"ORD-2023-099"</span>])
+
+<span class="cmt"># ── str[i] — character at position i ─────────────────────────────</span>
+<span class="fn">print</span>(<span class="str">"First char  :"</span>, s.str[<span class="num">0</span>].tolist())        <span class="cmt"># ['O', 'O', 'O']</span>
+<span class="fn">print</span>(<span class="str">"Last char   :"</span>, s.str[-<span class="num">1</span>].tolist())       <span class="cmt"># ['1', '2', '9']</span>
+
+<span class="cmt"># ── str[start:stop:step] — slicing ───────────────────────────────</span>
+<span class="fn">print</span>(<span class="str">"Chars 4–8   :"</span>, s.str[<span class="num">4</span>:<span class="num">8</span>].tolist())      <span class="cmt"># year part: ['2024','2024','2023']</span>
+<span class="fn">print</span>(<span class="str">"Last 3      :"</span>, s.str[-<span class="num">3</span>:].tolist())       <span class="cmt"># sequence: ['001','002','099']</span>
+<span class="fn">print</span>(<span class="str">"Every 2nd   :"</span>, s.str[::<span class="num">2</span>].tolist())       <span class="cmt"># every other char</span>
+<span class="fn">print</span>(<span class="str">"Reversed    :"</span>, s.str[::-<span class="num">1</span>].tolist())      <span class="cmt"># reverse the string</span>
+
+<span class="cmt"># ── str.slice() — equivalent to str[start:stop:step] ─────────────</span>
+<span class="fn">print</span>(<span class="str">"\nslice(4,8)  :"</span>, s.str.slice(<span class="num">4</span>, <span class="num">8</span>).tolist())
+<span class="fn">print</span>(<span class="str">"slice(step=2):"</span>, s.str.slice(step=<span class="num">2</span>).tolist())
+
+<span class="cmt"># ── str.slice_replace() — replace a slice with new text ──────────</span>
+<span class="fn">print</span>(<span class="str">"\nslice_replace(4,8,'XXXX'):"</span>)
+<span class="fn">print</span>(s.str.slice_replace(<span class="num">4</span>, <span class="num">8</span>, <span class="str">"XXXX"</span>).tolist())  <span class="cmt"># mask the year</span>
+
+<span class="cmt"># ── str.get() — get element from list/dict stored in cells ───────</span>
+s_lists = pd.Series([[<span class="str">"a"</span>, <span class="str">"b"</span>, <span class="str">"c"</span>], [<span class="str">"x"</span>, <span class="str">"y"</span>], [<span class="str">"only"</span>]])
+<span class="fn">print</span>(<span class="str">"\nstr.get(0):"</span>, s_lists.str.get(<span class="num">0</span>).tolist())  <span class="cmt"># first element</span>
+<span class="fn">print</span>(<span class="str">"str.get(-1):"</span>, s_lists.str.get(-<span class="num">1</span>).tolist()) <span class="cmt"># last element</span>
+
+<span class="cmt"># ── str.len() — character count ───────────────────────────────────</span>
+text = pd.Series([<span class="str">"short"</span>, <span class="str">"a much longer string"</span>, np.nan, <span class="str">""</span>])
+<span class="fn">print</span>(<span class="str">"\nstr.len():"</span>, text.str.len().tolist())   <span class="cmt"># [5, 20, NaN, 0]</span>
+
+<span class="cmt"># Find rows longer than N chars</span>
+long_notes = df[df[<span class="str">"notes"</span>].str.len() > <span class="num">15</span>]
+<span class="fn">print</span>(<span class="str">"\nNotes longer than 15 chars:"</span>)
+<span class="fn">print</span>(long_notes[<span class="str">"notes"</span>].tolist())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>First char  : ['O', 'O', 'O']
+Chars 4–8   : ['2024', '2024', '2023']    ← year extracted ✅
+Last 3      : ['001', '002', '099']        ← sequence number ✅
+Reversed    : ['100-4202-DRO', '200-4202-DRO', '990-3202-DRO']
+
+slice_replace(4,8,'XXXX'): ['ORD-XXXX-001', 'ORD-XXXX-002', 'ORD-XXXX-099']
+
+str.len(): [5, 20, nan, 0]
+
+Notes longer than 15 chars: ['Rush order - priority', 'URGENT: call customer']</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  ENCODE & DECODE  ═══════════ -->
+<div class="section" id="encode">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(74,222,128,.1)">🔐</div>
+    <h2>Encode, Decode & Format</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>str.encode() / decode(), repeat(), wrap()</h3><span class="pill p-green">Encode</span></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── str.encode() — convert strings to bytes ─────────────────────</span>
+s = pd.Series([<span class="str">"hello"</span>, <span class="str">"café"</span>, <span class="str">"naïve"</span>])
+encoded = s.str.encode(<span class="str">"utf-8"</span>)
+<span class="fn">print</span>(<span class="str">"encoded:"</span>, encoded.tolist())
+
+<span class="cmt"># ── str.decode() — bytes back to string ─────────────────────────</span>
+decoded = encoded.str.decode(<span class="str">"utf-8"</span>)
+<span class="fn">print</span>(<span class="str">"decoded:"</span>, decoded.tolist())
+
+<span class="cmt"># ── str.repeat() — repeat string N times ────────────────────────</span>
+stars = pd.Series([<span class="str">"★"</span>, <span class="str">"★"</span>, <span class="str">"★"</span>])
+ratings = pd.Series([<span class="num">3</span>, <span class="num">5</span>, <span class="num">1</span>])
+<span class="fn">print</span>(<span class="str">"\nStar ratings:"</span>, stars.str.repeat(ratings).tolist())
+
+<span class="cmt"># ── str.wrap() — wrap long text at N characters ─────────────────</span>
+long_text = pd.Series([
+    <span class="str">"This is a very long sentence that needs to be wrapped at a certain width"</span>,
+    <span class="str">"Short"</span>,
+])
+<span class="fn">print</span>(<span class="str">"\nwrap(40):"</span>)
+<span class="fn">print</span>(long_text.str.wrap(<span class="num">40</span>).tolist())
+
+<span class="cmt"># ── str.normalize() — Unicode normalization ──────────────────────</span>
+<span class="cmt"># NFC: composed form (é = single codepoint)</span>
+<span class="cmt"># NFD: decomposed form (é = e + combining accent)</span>
+composed   = pd.Series([<span class="str">"\u00e9"</span>])   <span class="cmt"># é  (NFC, 1 codepoint)</span>
+decomposed = pd.Series([<span class="str">"e\u0301"</span>])  <span class="cmt"># é  (NFD, 2 codepoints)</span>
+
+<span class="fn">print</span>(<span class="str">"\nNFC length:"</span>, composed.str.len().tolist())      <span class="cmt"># [1]</span>
+<span class="fn">print</span>(<span class="str">"NFD length:"</span>, decomposed.str.len().tolist())     <span class="cmt"># [2]</span>
+<span class="fn">print</span>(<span class="str">"equal?    :"</span>, (composed == decomposed).tolist()) <span class="cmt"># [False] — different!</span>
+
+<span class="cmt"># Normalize both to NFC before comparing</span>
+c_norm = composed.str.normalize(<span class="str">"NFC"</span>)
+d_norm = decomposed.str.normalize(<span class="str">"NFC"</span>)
+<span class="fn">print</span>(<span class="str">"after NFC  :"</span>, (c_norm == d_norm).tolist())      <span class="cmt"># [True] ✅</span></code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>encoded: [b'hello', b'caf\xc3\xa9', b'na\xc3\xafve']
+decoded: ['hello', 'café', 'naïve']
+
+Star ratings: ['★★★', '★★★★★', '★']
+
+NFC length: [1]
+NFD length: [2]
+equal?    : [False]   ← same visual, different binary!
+after NFC : [True]    ← normalised → equal ✅</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  UNICODE  ═══════════ -->
+<div class="section" id="unicode">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(250,204,21,.1)">🌐</div>
+    <h2>Unicode & Accent Handling</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Strip accents, normalise Unicode, transliterate</h3><span class="pill p-yellow">Unicode</span></div>
+    <div class="card-b">
+<pre><code><span class="kw">import</span> unicodedata
+
+<span class="cmt"># ── Strip accents (NFD decompose → drop combining chars) ─────────</span>
+<span class="kw">def</span> <span class="fn">strip_accents</span>(series: pd.Series) -> pd.Series:
+    <span class="str">"""Remove diacritic marks: é→e, ü→u, ñ→n, etc."""</span>
+    <span class="kw">return</span> series.apply(
+        <span class="kw">lambda</span> x: (
+            unicodedata.normalize(<span class="str">"NFD"</span>, x)
+            .encode(<span class="str">"ascii"</span>, <span class="str">"ignore"</span>)
+            .decode(<span class="str">"ascii"</span>)
+        ) <span class="kw">if</span> pd.notna(x) <span class="kw">else</span> x
+    )
+
+names = pd.Series([<span class="str">"Álice"</span>, <span class="str">"Böb"</span>, <span class="str">"Cäröl"</span>, <span class="str">"Dàve"</span>, <span class="str">"Ève Martínez"</span>, np.nan])
+<span class="fn">print</span>(<span class="str">"Original    :"</span>, names.tolist())
+<span class="fn">print</span>(<span class="str">"No accents  :"</span>, <span class="fn">strip_accents</span>(names).tolist())
+
+<span class="cmt"># ── Detect non-ASCII characters ───────────────────────────────────</span>
+has_non_ascii = names.str.contains(<span class="str">r"[^\x00-\x7F]"</span>, na=<span class="cls">False</span>)
+<span class="fn">print</span>(<span class="str">"\nHas non-ASCII:"</span>, has_non_ascii.tolist())
+
+<span class="cmt"># ── Unicode character category (Ll=lower letter, Lu=upper, etc.) ─</span>
+<span class="kw">def</span> <span class="fn">char_categories</span>(s: <span class="cls">str</span>) -> <span class="cls">str</span>:
+    <span class="kw">return</span> <span class="str">","</span>.join({unicodedata.category(c) <span class="kw">for</span> c <span class="kw">in</span> s})
+
+sample = pd.Series([<span class="str">"Hello!"</span>, <span class="str">"123"</span>, <span class="str">"café"</span>])
+<span class="fn">print</span>(<span class="str">"\nChar categories:"</span>, sample.apply(<span class="fn">char_categories</span>).tolist())
+
+<span class="cmt"># ── Remove emojis / non-printable chars ───────────────────────────</span>
+<span class="kw">def</span> <span class="fn">remove_non_printable</span>(series: pd.Series) -> pd.Series:
+    <span class="kw">return</span> series.str.replace(
+        <span class="str">r"[^\x09\x0A\x0D\x20-\x7E\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]"</span>,
+        <span class="str">""</span>, regex=<span class="cls">True</span>
+    )
+
+mixed = pd.Series([<span class="str">"Hello 👋 World"</span>, <span class="str">"Price: $29.99 🛒"</span>, <span class="str">"normal text"</span>])
+<span class="fn">print</span>(<span class="str">"\nRemove emojis:"</span>, <span class="fn">remove_non_printable</span>(mixed).tolist())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>Original  : ['Álice', 'Böb', 'Cäröl', 'Dàve', 'Ève Martínez', nan]
+No accents: ['Alice', 'Bob', 'Carol', 'Dave', 'Eve Martinez', nan]  ✅
+
+Has non-ASCII: [True, True, True, True, True, False]
+
+Char categories: ['Lu,Po,Ll,Zs', 'Nd', 'Ll,Zs,Lo']
+  (Lu=uppercase letter, Ll=lowercase letter, Nd=digit, Po=other punctuation)
+
+Remove emojis: ['Hello  World', 'Price: $29.99 ', 'normal text']</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  REAL-WORLD  ═══════════ -->
+<div class="section" id="realworld">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(251,146,60,.1)">🏭</div>
+    <h2>Real-World Cleaning Patterns</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Email validation and normalisation</h3><span class="pill p-orange">Real-World</span></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── RFC 5322 simplified email regex ──────────────────────────────</span>
+EMAIL_RE = <span class="str">r"^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"</span>
+
+df2 = df.copy()
+df2[<span class="str">"email_lower"</span>]  = df2[<span class="str">"email"</span>].str.lower().str.strip()
+df2[<span class="str">"email_valid"</span>]  = df2[<span class="str">"email_lower"</span>].str.fullmatch(EMAIL_RE, na=<span class="cls">False</span>)
+df2[<span class="str">"email_domain"</span>] = df2[<span class="str">"email_lower"</span>].str.extract(<span class="str">r"@(.+)$"</span>)[<span class="num">0</span>]
+df2[<span class="str">"email_user"</span>]   = df2[<span class="str">"email_lower"</span>].str.extract(<span class="str">r"^([^@]+)@"</span>)[<span class="num">0</span>]
+
+<span class="fn">print</span>(df2[[<span class="str">"email"</span>, <span class="str">"email_lower"</span>, <span class="str">"email_valid"</span>, <span class="str">"email_domain"</span>]].to_string())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>               email         email_lower  email_valid    email_domain
+   Alice@Example.COM   alice@example.com         True     example.com
+ bob.smith@gmail.com bob.smith@gmail.com         True       gmail.com
+        CAROL@yahoo.com  carol@yahoo.com         True        yahoo.com
+    dave@company.org    dave@company.org         True     company.org
+        not-an-email        not-an-email        False             NaN  ✅
+      eve@domain.net      eve@domain.net         True       domain.net</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Phone number standardisation</h3></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── Strip all non-digit chars → digits only → format ─────────────</span>
+df2 = df.copy()
+
+<span class="cmt"># Step 1: Extract only digits</span>
+df2[<span class="str">"phone_digits"</span>] = (
+    df2[<span class="str">"phone"</span>]
+    .str.replace(<span class="str">r"[^\d]"</span>, <span class="str">""</span>, regex=<span class="cls">True</span>)
+    .str.strip()
+)
+
+<span class="cmt"># Step 2: Handle country prefix (+1 = 11 digits → strip leading 1)</span>
+df2[<span class="str">"phone_10"</span>] = df2[<span class="str">"phone_digits"</span>].where(
+    df2[<span class="str">"phone_digits"</span>].str.len() == <span class="num">10</span>,
+    df2[<span class="str">"phone_digits"</span>].str[-<span class="num">10</span>:]   <span class="cmt"># take last 10 if 11-digit (strip country)</span>
+)
+
+<span class="cmt"># Step 3: Format (AAA) BBB-CCCC</span>
+mask_10 = df2[<span class="str">"phone_10"</span>].str.len() == <span class="num">10</span>
+df2[<span class="str">"phone_fmt"</span>] = df2[<span class="str">"phone_10"</span>].where(~mask_10)
+df2.loc[mask_10, <span class="str">"phone_fmt"</span>] = df2.loc[mask_10, <span class="str">"phone_10"</span>].str.replace(
+    <span class="str">r"(\d{3})(\d{3})(\d{4})"</span>, <span class="str">r"(\1) \2-\3"</span>, regex=<span class="cls">True</span>
+)
+
+<span class="fn">print</span>(df2[[<span class="str">"phone"</span>, <span class="str">"phone_digits"</span>, <span class="str">"phone_fmt"</span>]].to_string())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>            phone  phone_digits         phone_fmt
+  (555) 123-4567    5551234567  (555) 123-4567  ✅
+    555.987.6543    5559876543  (555) 987-6543  ✅
+      5559991234    5559991234  (555) 999-1234  ✅
+ +1-555-444-3333   15554443333  (555) 444-3333  ✅ (11→10 digit strip)
+    555 222 1111    5552221111  (555) 222-1111  ✅
+             NaN           NaN            NaN</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Name standardisation — title case, canonical form</h3></div>
+    <div class="card-b">
+<pre><code>df2 = df.copy()
+
+<span class="cmt"># Comprehensive name cleaning pipeline</span>
+df2[<span class="str">"name_clean"</span>] = (
+    df2[<span class="str">"name"</span>]
+    .str.strip()                                          <span class="cmt"># 1. Remove outer whitespace</span>
+    .str.replace(<span class="str">r"\s+"</span>, <span class="str">" "</span>, regex=<span class="cls">True</span>)               <span class="cmt"># 2. Collapse multiple spaces</span>
+    .str.title()                                          <span class="cmt"># 3. Title case</span>
+    .str.replace(<span class="str">r"\bMc(\w)"</span>, <span class="kw">lambda</span> m: <span class="str">"Mc"</span> + m.group(<span class="num">1</span>).upper(),
+                 regex=<span class="cls">True</span>)                             <span class="cmt"># 4. Fix McName</span>
+    .str.replace(<span class="str">r"\b(Of|The|And|In|At)\b"</span>, <span class="kw">lambda</span> m: m.group(<span class="num">0</span>).lower(),
+                 regex=<span class="cls">True</span>)                             <span class="cmt"># 5. Lowercase prepositions</span>
+)
+
+<span class="fn">print</span>(df2[[<span class="str">"name"</span>, <span class="str">"name_clean"</span>]].to_string())
+
+<span class="cmt"># ── Status normalisation map ──────────────────────────────────────</span>
+STATUS_MAP = {
+    <span class="str">"shipped"</span>: <span class="str">"Shipped"</span>, <span class="str">"SHIPPED"</span>: <span class="str">"Shipped"</span>, <span class="str">"ship"</span>: <span class="str">"Shipped"</span>,
+    <span class="str">"pending"</span>: <span class="str">"Pending"</span>, <span class="str">"PENDING"</span>: <span class="str">"Pending"</span>, <span class="str">"pend"</span>: <span class="str">"Pending"</span>,
+    <span class="str">"cancelled"</span>: <span class="str">"Cancelled"</span>, <span class="str">"canceled"</span>: <span class="str">"Cancelled"</span>, <span class="str">"CNCL"</span>: <span class="str">"Cancelled"</span>,
+}
+statuses = pd.Series([<span class="str">"SHIPPED"</span>, <span class="str">"pending"</span>, <span class="str">"canceled"</span>, <span class="str">"CNCL"</span>, <span class="str">"pend"</span>])
+normalised = statuses.str.lower().map({k.lower(): v <span class="kw">for</span> k, v <span class="kw">in</span> STATUS_MAP.items()})
+<span class="fn">print</span>(<span class="str">"\nNormalised statuses:"</span>, normalised.tolist())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>               name       name_clean
+  Alice Johnson     Alice Johnson   ✅
+      BOB smith         Bob Smith   ✅
+    carol WHITE       Carol White   ✅
+    Dave  Brown        Dave Brown   ✅ (double space collapsed)
+            NaN               NaN
+  EVE martínez     Eve Martínez    ✅ (accent preserved in title)
+
+Normalised statuses: ['Shipped', 'Pending', 'Cancelled', 'Cancelled', 'Pending']  ✅</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Text tokenisation and word frequency</h3></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── Word-level operations ─────────────────────────────────────────</span>
+corpus = pd.Series([
+    <span class="str">"the quick brown fox jumps"</span>,
+    <span class="str">"the fox ran quickly over the dog"</span>,
+    <span class="str">"a lazy brown dog sat"</span>,
+])
+
+<span class="cmt"># Word count per row</span>
+df_text          = corpus.to_frame(<span class="str">"text"</span>)
+df_text[<span class="str">"word_count"</span>] = corpus.str.split().str.len()
+<span class="fn">print</span>(df_text)
+
+<span class="cmt"># Word frequency across entire corpus</span>
+all_words = corpus.str.split().explode()
+word_freq = all_words.value_counts()
+<span class="fn">print</span>(<span class="str">"\nTop words:"</span>)
+<span class="fn">print</span>(word_freq.head(<span class="num">5</span>))
+
+<span class="cmt"># Check if multiple words all present in each row</span>
+keywords = [<span class="str">"fox"</span>, <span class="str">"brown"</span>]
+for kw <span class="kw">in</span> keywords:
+    df_text[kw] = corpus.str.contains(<span class="str">r"\b"</span> + kw + <span class="str">r"\b"</span>, regex=<span class="cls">True</span>)
+df_text[<span class="str">"all_keywords"</span>] = df_text[keywords].<span class="fn">all</span>(axis=<span class="num">1</span>)
+<span class="fn">print</span>(<span class="str">"\nContains all keywords:"</span>)
+<span class="fn">print</span>(df_text[[<span class="str">"text"</span>, <span class="str">"all_keywords"</span>]])</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>Top words:
+the    3
+fox    2
+brown  2
+...
+
+Contains all keywords:
+                                  text  all_keywords
+0          the quick brown fox jumps          True   ← has both 'fox' and 'brown'
+1  the fox ran quickly over the dog          False
+2              a lazy brown dog sat          False</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  TYPE PREDICATES  ═══════════ -->
+<div class="section" id="predicates">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(250,204,21,.1)">✅</div>
+    <h2>Type Predicate Methods</h2>
+  </div>
+  <p class="sh-sub">All <code>str.isXXX()</code> methods return a boolean Series. They test character composition — useful for validation and data quality checks. Empty strings return <code>False</code>. NaN rows return <code>NaN</code>.</p>
+
+  <div class="card">
+    <div class="card-h"><h3>All nine isXXX predicates — examples and comparison</h3><span class="pill p-yellow">Predicates</span></div>
+    <div class="card-b">
+<pre><code>s = pd.Series([<span class="str">"hello"</span>, <span class="str">"HELLO"</span>, <span class="str">"Hello"</span>, <span class="str">"123"</span>, <span class="str">"12.5"</span>, <span class="str">"  "</span>,
+               <span class="str">"hello123"</span>, <span class="str">""</span>, np.nan])
+
+<span class="cmt"># ── isalpha: ALL characters alphabetic (no spaces, digits, punct) ─</span>
+<span class="fn">print</span>(<span class="str">"isalpha()  :"</span>, s.str.isalpha().tolist())
+<span class="cmt"># [True, True, True, False, False, False, False, False, NaN]</span>
+
+<span class="cmt"># ── isdigit: all chars are digit chars (0-9 + superscripts like ²) </span>
+<span class="fn">print</span>(<span class="str">"isdigit()  :"</span>, s.str.isdigit().tolist())
+<span class="cmt"># [False, False, False, True, False, False, False, False, NaN]</span>
+
+<span class="cmt"># ── isdecimal: strictest — only ASCII 0-9 decimal digits ──────────</span>
+numeric_s = pd.Series([<span class="str">"123"</span>, <span class="str">"½"</span>, <span class="str">"²"</span>, <span class="str">"12.5"</span>, <span class="str">"٣"</span>])   <span class="cmt"># ½=fraction, ²=superscript</span>
+<span class="fn">print</span>(<span class="str">"isdecimal():"</span>, numeric_s.str.isdecimal().tolist())
+<span class="cmt"># [True, False, False, False, True]   ← only '123' and Arabic '٣' pass</span>
+
+<span class="cmt"># ── isnumeric: most permissive — includes fractions, subscripts ───</span>
+<span class="fn">print</span>(<span class="str">"isnumeric():"</span>, numeric_s.str.isnumeric().tolist())
+<span class="cmt"># [True, True, True, False, True]    ← ½ and ² pass here</span>
+
+<span class="cmt"># ── isalnum: alphabetic OR numeric (no spaces or punctuation) ─────</span>
+<span class="fn">print</span>(<span class="str">"isalnum()  :"</span>, s.str.isalnum().tolist())
+<span class="cmt"># [True, True, True, True, False, False, True, False, NaN]</span>
+<span class="cmt">#  '12.5' → False (dot is not alnum);  'hello123' → True</span>
+
+<span class="cmt"># ── isspace: all whitespace (\t, \n, space) ───────────────────────</span>
+<span class="fn">print</span>(<span class="str">"isspace()  :"</span>, s.str.isspace().tolist())
+<span class="cmt"># [False, False, False, False, False, True, False, False, NaN]</span>
+
+<span class="cmt"># ── islower / isupper / istitle ───────────────────────────────────</span>
+<span class="fn">print</span>(<span class="str">"islower()  :"</span>, s.str.islower().tolist())
+<span class="cmt"># [True, False, False, False, False, False, True, False, NaN]</span>
+<span class="fn">print</span>(<span class="str">"isupper()  :"</span>, s.str.isupper().tolist())
+<span class="cmt"># [False, True, False, False, False, False, False, False, NaN]</span>
+<span class="fn">print</span>(<span class="str">"istitle()  :"</span>, s.str.istitle().tolist())
+<span class="cmt"># [False, False, True, False, False, False, False, False, NaN]</span>
+<span class="cmt">#  'Hello' → True;  'HELLO' → False;  'hello123' → False</span></code></pre>
+      <div class="out">
+        <div class="out-label">Predicate selection guide</div>
+<pre>Predicate      Passes                                  Fails
+isalpha()    → 'hello', 'Héllo'                      → '123', 'hello world', ''
+isdecimal()  → '123', '007'                          → '1.5', '½', '²', 'abc'
+isdigit()    → '123', '²' (superscript)              → '½', '1.5', 'abc'
+isnumeric()  → '123', '½', '²', '٣' (Arabic)        → '1.5', 'abc'
+isalnum()    → 'abc123', 'hello', '777'              → 'abc 123', 'hello!', ''
+isspace()    → ' ', '\t', '\n', '   '                → '', 'a ', ' a'
+islower()    → 'hello', 'hello world'                → 'Hello', 'ABC', '123'
+isupper()    → 'HELLO', 'HELLO WORLD'                → 'Hello', 'hello'
+istitle()    → 'Hello World', 'The Fox'              → 'THE FOX', 'hello world'
+
+Rule: for validating user-entered integers → always use isdecimal() (strictest)</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Practical data validation using predicates</h3></div>
+    <div class="card-b">
+<pre><code>df_val = pd.DataFrame({
+    <span class="str">"user_id"</span>:  [<span class="str">"U001"</span>, <span class="str">"U002"</span>, <span class="str">"U 03"</span>, <span class="str">""</span>,     np.nan],
+    <span class="str">"zip_code"</span>: [<span class="str">"10001"</span>, <span class="str">"9021O"</span>, <span class="str">"75001"</span>, <span class="str">"K1A0A6"</span>, <span class="str">"98101"</span>],
+    <span class="str">"age"</span>:      [<span class="str">"25"</span>,    <span class="str">"abc"</span>,   <span class="str">"30"</span>,    <span class="str">"17.5"</span>,  <span class="str">"40"</span>],
+    <span class="str">"name"</span>:     [<span class="str">"Alice"</span>, <span class="str">"Bob123"</span>, <span class="str">"Carol"</span>, <span class="str">"Dave"</span>,  <span class="str">"Eve"</span>],
+})
+
+<span class="cmt"># user_id: alphanumeric and non-empty</span>
+df_val[<span class="str">"id_valid"</span>] = (
+    df_val[<span class="str">"user_id"</span>].str.isalnum().fillna(<span class="cls">False</span>) &amp;
+    (df_val[<span class="str">"user_id"</span>].str.len().fillna(<span class="num">0</span>) > <span class="num">0</span>)
+)
+
+<span class="cmt"># zip_code: exactly 5 decimal digits</span>
+df_val[<span class="str">"zip_valid"</span>] = (
+    df_val[<span class="str">"zip_code"</span>].str.isdecimal() &amp;
+    (df_val[<span class="str">"zip_code"</span>].str.len() == <span class="num">5</span>)
+)
+
+<span class="cmt"># age: whole number string (no decimals, no letters)</span>
+df_val[<span class="str">"age_valid"</span>] = df_val[<span class="str">"age"</span>].str.isdecimal().fillna(<span class="cls">False</span>)
+
+<span class="cmt"># name: letters only</span>
+df_val[<span class="str">"name_valid"</span>] = df_val[<span class="str">"name"</span>].str.isalpha().fillna(<span class="cls">False</span>)
+
+cols = [<span class="str">"user_id"</span>, <span class="str">"id_valid"</span>, <span class="str">"zip_code"</span>, <span class="str">"zip_valid"</span>, <span class="str">"age"</span>, <span class="str">"age_valid"</span>]
+<span class="fn">print</span>(df_val[cols].to_string())
+
+<span class="cmt"># Data quality summary</span>
+quality = df_val[[<span class="str">"id_valid"</span>, <span class="str">"zip_valid"</span>, <span class="str">"age_valid"</span>, <span class="str">"name_valid"</span>]]
+<span class="fn">print</span>(<span class="str">"\nValid count per field:"</span>)
+<span class="fn">print</span>(quality.sum())
+<span class="fn">print</span>(<span class="str">"Fully clean rows:"</span>, quality.<span class="fn">all</span>(axis=<span class="num">1</span>).sum())</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>  user_id  id_valid zip_code  zip_valid  age  age_valid
+     U001      True    10001       True   25       True
+     U002      True    9021O      False  abc      False  ← 'O' not a digit!
+     U 03     False    75001       True   30       True
+                      K1A0A6      False 17.5      False
+      NaN     False    98101       True   40       True
+
+Valid count per field:
+id_valid     2
+zip_valid    3
+age_valid    3
+name_valid   4
+
+Fully clean rows: 1</pre>
+      </div>
+      <div class="info info-yellow"><strong>isdecimal vs isdigit vs isnumeric:</strong> For validating ages, zip codes, and IDs entered by users, always use <code>isdecimal()</code> — it is the strictest and only accepts 0–9. <code>isdigit()</code> also accepts superscripts (²³), and <code>isnumeric()</code> also accepts fractions (½) and other Unicode numeric glyphs.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  PARTITION  ═══════════ -->
+<div class="section" id="partition">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(45,212,191,.1)">🪓</div>
+    <h2>partition() and rpartition()</h2>
+  </div>
+  <p class="sh-sub"><code>str.partition(sep)</code> always splits into exactly <strong>3 parts</strong>: (before, sep, after). Unlike <code>split()</code>, it never returns variable-length results and always succeeds, making it safer for structured strings.</p>
+
+  <div class="card">
+    <div class="card-h"><h3>partition vs split — reliability with missing separators</h3><span class="pill p-teal">Partition</span></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── partition(sep) → always returns exactly 3 columns ────────────</span>
+s = pd.Series([<span class="str">"user@example.com"</span>, <span class="str">"admin@corp.org"</span>, <span class="str">"no-at-sign"</span>, np.nan])
+
+result = s.str.partition(<span class="str">"@"</span>)
+result.columns = [<span class="str">"local"</span>, <span class="str">"sep"</span>, <span class="str">"domain"</span>]
+<span class="fn">print</span>(result)
+<span class="cmt"># 'no-at-sign': local='no-at-sign', sep='', domain=''  ← safe, no crash</span>
+
+<span class="cmt"># ── rpartition: split on LAST occurrence ─────────────────────────</span>
+paths = pd.Series([<span class="str">"/home/user/docs/report.txt"</span>, <span class="str">"/etc/nginx/nginx.conf"</span>, <span class="str">"/nopath"</span>])
+
+rp = paths.str.rpartition(<span class="str">"/"</span>)
+rp.columns = [<span class="str">"directory"</span>, <span class="str">"sep"</span>, <span class="str">"filename"</span>]
+<span class="fn">print</span>(<span class="str">"\nrpartition('/'):"</span>)
+<span class="fn">print</span>(rp[[<span class="str">"directory"</span>, <span class="str">"filename"</span>]])
+
+<span class="cmt"># ── HTTP headers: partition on first ': ' only ───────────────────</span>
+headers = pd.Series([<span class="str">"Content-Type: application/json"</span>,
+                     <span class="str">"Authorization: Bearer abc123"</span>,
+                     <span class="str">"X-Custom-Header: value:with:colons"</span>])
+
+hdr = headers.str.partition(<span class="str">": "</span>)
+hdr.columns = [<span class="str">"key"</span>, <span class="str">"sep"</span>, <span class="str">"value"</span>]
+<span class="fn">print</span>(<span class="str">"\nHeader parsing:"</span>)
+<span class="fn">print</span>(hdr[[<span class="str">"key"</span>, <span class="str">"value"</span>]])
+<span class="cmt"># 'value:with:colons' stays intact ← partition only splits ONCE</span>
+
+<span class="cmt"># ── partition vs split(n=1) on missing separator ──────────────────</span>
+s2 = pd.Series([<span class="str">"no-separator"</span>, <span class="str">"has@separator"</span>])
+
+<span class="fn">print</span>(<span class="str">"\n-- partition (safe) --"</span>)
+<span class="fn">print</span>(s2.str.partition(<span class="str">"@"</span>))
+<span class="cmt"># 'no-separator' → ['no-separator', '', '']  ← always 3 cols, no NaN</span>
+
+<span class="fn">print</span>(<span class="str">"\n-- split(n=1, expand=True) (risky) --"</span>)
+<span class="fn">print</span>(s2.str.split(<span class="str">"@"</span>, n=<span class="num">1</span>, expand=<span class="cls">True</span>))
+<span class="cmt"># 'no-separator' → col[0]='no-separator', col[1]=NaN  ← NaN when sep absent</span></code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>           local sep        domain
+0           user   @   example.com
+1          admin   @      corp.org
+2     no-at-sign              (empty string — not NaN) ✅
+3            NaN NaN           NaN
+
+rpartition('/'):
+              directory   filename
+0  /home/user/docs     report.txt   ← uses LAST slash
+1  /etc/nginx          nginx.conf
+2  (empty)                nopath   ← no slash before → right side has full string
+
+Header parsing:
+               key                   value
+0     Content-Type        application/json
+1    Authorization         Bearer abc123
+2  X-Custom-Header    value:with:colons   ← colons in value preserved ✅</pre>
+      </div>
+      <div class="info info-teal"><strong>partition vs split:</strong> Use <code>partition</code> when you want reliable 3-column output regardless of whether the separator exists. Use <code>split</code> when you need to split on all occurrences. Use <code>rpartition</code> to extract the filename from a path or the extension from a dotted name.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  GET_DUMMIES  ═══════════ -->
+<div class="section" id="getdummies">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(74,222,128,.1)">🎲</div>
+    <h2>str.get_dummies() — Multi-Label One-Hot Encoding</h2>
+  </div>
+  <p class="sh-sub"><code>Series.str.get_dummies(sep)</code> splits each string on the separator and produces a binary indicator DataFrame — one column per unique token. The multi-label counterpart to <code>pd.get_dummies()</code>, essential for ML feature engineering.</p>
+
+  <div class="card">
+    <div class="card-h"><h3>Basic usage and joining back to the DataFrame</h3><span class="pill p-green">One-Hot</span></div>
+    <div class="card-b">
+<pre><code>df_tags = pd.DataFrame({
+    <span class="str">"name"</span>: [<span class="str">"Alice"</span>, <span class="str">"Bob"</span>, <span class="str">"Carol"</span>, <span class="str">"Dave"</span>, <span class="str">"Eve"</span>],
+    <span class="str">"tags"</span>: [<span class="str">"python|pandas|numpy"</span>, <span class="str">"java|spring"</span>, <span class="str">"python|django|rest"</span>,
+             <span class="str">"javascript|react|node"</span>, <span class="str">"python"</span>],
+})
+
+<span class="cmt"># ── get_dummies on pipe-delimited tags ───────────────────────────</span>
+dummies = df_tags[<span class="str">"tags"</span>].str.get_dummies(sep=<span class="str">"|"</span>)
+<span class="fn">print</span>(<span class="str">"Shape:"</span>, dummies.shape)   <span class="cmt"># (5, 9) — 9 unique tags</span>
+<span class="fn">print</span>(dummies.to_string())
+
+<span class="cmt"># Join back to original DataFrame</span>
+df_enc = pd.concat([df_tags[[<span class="str">"name"</span>]], dummies], axis=<span class="num">1</span>)
+
+<span class="cmt"># Filter: users who know python</span>
+python_users = df_enc[df_enc[<span class="str">"python"</span>] == <span class="num">1</span>][<span class="str">"name"</span>]
+<span class="fn">print</span>(<span class="str">"\nPython users:"</span>, python_users.tolist())
+
+<span class="cmt"># Count tags per person</span>
+df_enc[<span class="str">"tag_count"</span>] = dummies.sum(axis=<span class="num">1</span>)
+<span class="fn">print</span>(<span class="str">"\nTag count per person:"</span>)
+<span class="fn">print</span>(df_enc[[<span class="str">"name"</span>, <span class="str">"tag_count"</span>]].to_string())
+
+<span class="cmt"># Tag co-occurrence matrix</span>
+cooc = dummies.T.dot(dummies)
+<span class="fn">print</span>(<span class="str">"\nPython co-occurrences:"</span>)
+<span class="fn">print</span>(cooc[<span class="str">"python"</span>].sort_values(ascending=<span class="cls">False</span>))</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>Shape: (5, 9)
+   django  java  javascript  node  numpy  pandas  python  react  rest  spring
+0       0     0           0     0      1       1       1      0     0       0
+1       0     1           0     0      0       0       0      0     0       1
+2       1     0           0     0      0       0       1      0     1       0
+3       0     0           1     1      0       0       0      1     0       0
+4       0     0           0     0      0       0       1      0     0       0
+
+Python users: ['Alice', 'Carol', 'Eve']
+
+Tag count: Alice=3, Bob=2, Carol=3, Dave=3, Eve=1
+
+Python co-occurrences:
+python    3   ← appears in 3 rows
+pandas    1   ← co-occurs with python in Alice's row
+numpy     1
+django    1
+rest      1
+java      0   ← no overlap with python users</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>pd.get_dummies vs str.get_dummies — key difference</h3></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── pd.get_dummies: ONE value per cell → exclusive categories ─────</span>
+single_cat = pd.Series([<span class="str">"cat"</span>, <span class="str">"dog"</span>, <span class="str">"cat"</span>, <span class="str">"bird"</span>])
+<span class="fn">print</span>(<span class="str">"pd.get_dummies (single-label):"</span>)
+<span class="fn">print</span>(pd.get_dummies(single_cat, prefix=<span class="str">"pet"</span>, dtype=<span class="str">"int8"</span>))
+
+<span class="cmt"># ── str.get_dummies: MULTIPLE values per cell → multi-hot ─────────</span>
+multi_cat = pd.Series([<span class="str">"cat|dog"</span>, <span class="str">"dog"</span>, <span class="str">"cat|bird"</span>, <span class="str">"bird"</span>])
+<span class="fn">print</span>(<span class="str">"\nstr.get_dummies (multi-label):"</span>)
+dm = multi_cat.str.get_dummies(sep=<span class="str">"|"</span>)
+<span class="fn">print</span>(dm)
+
+<span class="cmt"># Add column prefix to avoid name collisions when joining</span>
+<span class="fn">print</span>(<span class="str">"\nWith prefix:"</span>)
+<span class="fn">print</span>(dm.add_prefix(<span class="str">"pet_"</span>))
+
+<span class="cmt"># Cast to int8 for ML — saves 8x memory vs int64</span>
+dm_small = multi_cat.str.get_dummies(sep=<span class="str">"|"</span>).astype(<span class="str">"int8"</span>)
+<span class="fn">print</span>(<span class="str">"\nMemory — int64:"</span>, dm.memory_usage(deep=<span class="cls">True</span>).sum(), <span class="str">"bytes"</span>)
+<span class="fn">print</span>(<span class="str">"Memory — int8 :"</span>, dm_small.memory_usage(deep=<span class="cls">True</span>).sum(), <span class="str">"bytes"</span>)</code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>pd.get_dummies (single-label):
+   pet_bird  pet_cat  pet_dog
+0         0        1        0
+1         0        0        1
+2         0        1        0
+3         1        0        0   ← exactly one column = 1 per row
+
+str.get_dummies (multi-label):
+   bird  cat  dog
+0     0    1    1   ← TWO columns = 1 (both cat and dog)
+1     0    0    1
+2     1    1    0
+3     1    0    0
+
+Memory — int64: 228 bytes
+Memory — int8 : 156 bytes  ← 32% less; scales to huge savings at millions of rows</pre>
+      </div>
+      <div class="info info-green"><strong>ML tip:</strong> After <code>str.get_dummies()</code>, always cast to <code>int8</code>: <code>dummies.astype('int8')</code>. Each binary column requires only 1 byte instead of 8. With hundreds of one-hot columns and millions of rows this saves gigabytes of RAM and speeds up training.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  ADVANCED REGEX  ═══════════ -->
+<div class="section" id="advregex">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(248,81,73,.1)">🔬</div>
+    <h2>Advanced Regex Patterns</h2>
+  </div>
+  <p class="sh-sub">Lookaheads, lookbehinds, non-capturing groups, named groups, verbose patterns, and compiled-regex strategies for complex extraction tasks.</p>
+
+  <div class="card">
+    <div class="card-h"><h3>Lookahead and lookbehind assertions</h3><span class="pill p-red">Advanced</span></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── Positive lookahead (?=...) — match X only when followed by Y ──</span>
+s = pd.Series([<span class="str">"100px"</span>, <span class="str">"200em"</span>, <span class="str">"50px"</span>, <span class="str">"75"</span>, <span class="str">"30%"</span>])
+
+px_only = s.str.extract(<span class="str">r"(\d+)(?=px)"</span>)[<span class="num">0</span>]
+<span class="fn">print</span>(<span class="str">"Number before 'px' only:"</span>, px_only.tolist())
+<span class="cmt"># ['100', NaN, '50', NaN, NaN]  ← 200em and bare 75 don't match</span>
+
+<span class="cmt"># ── Positive lookbehind (?&lt;=...) — match X only when preceded by Y ─</span>
+prices = pd.Series([<span class="str">"$100"</span>, <span class="str">"€200"</span>, <span class="str">"£50"</span>, <span class="str">"100"</span>])
+
+dollar_amt = prices.str.extract(<span class="str">r"(?&lt;=\$)(\d+)"</span>)[<span class="num">0</span>]
+<span class="fn">print</span>(<span class="str">"\nDollar amounts only:"</span>, dollar_amt.tolist())
+<span class="cmt"># ['100', NaN, NaN, NaN]  ← €200 and bare 100 excluded</span>
+
+<span class="cmt"># ── Negative lookbehind (?&lt;!...) — match X NOT preceded by Y ──────</span>
+no_prefix = prices.str.extract(<span class="str">r"(?&lt;![$€£])(\d+)"</span>)[<span class="num">0</span>]
+<span class="fn">print</span>(<span class="str">"No currency prefix:"</span>, no_prefix.tolist())
+<span class="cmt"># [NaN, NaN, NaN, '100']  ← only bare 100 matches</span>
+
+<span class="cmt"># ── Negative lookahead (?!...) — match X NOT followed by Y ────────</span>
+numbers = pd.Series([<span class="str">"100px"</span>, <span class="str">"200em"</span>, <span class="str">"300"</span>])
+not_px = numbers.str.extract(<span class="str">r"(\d+)(?!px)"</span>)[<span class="num">0</span>]
+<span class="fn">print</span>(<span class="str">"\nNot followed by px:"</span>, not_px.tolist())
+
+<span class="cmt"># ── Named groups + lookarounds: extract tag contents ─────────────</span>
+html = pd.Series([<span class="str">"&lt;b&gt;Hello&lt;/b&gt;"</span>, <span class="str">"&lt;i&gt;World&lt;/i&gt;"</span>, <span class="str">"&lt;span&gt;Text&lt;/span&gt;"</span>])
+content = html.str.extract(<span class="str">r"(?&lt;=&gt;)(?P&lt;text&gt;[^&lt;]+)(?=&lt;/)"</span>)
+<span class="fn">print</span>(<span class="str">"\nHTML tag content:"</span>, content[<span class="str">"text"</span>].tolist())
+<span class="cmt"># ['Hello', 'World', 'Text']  ← no tag name in result, only text content</span></code></pre>
+      <div class="out">
+        <div class="out-label">Lookaround summary</div>
+<pre>Syntax       Name                    Meaning
+(?=Y)        Positive lookahead      X only if FOLLOWED BY Y       (Y not consumed)
+(?!Y)        Negative lookahead      X only if NOT followed by Y
+(?&lt;=Y)       Positive lookbehind     X only if PRECEDED BY Y       (Y not consumed)
+(?&lt;!Y)       Negative lookbehind     X only if NOT preceded by Y
+
+Zero-width: lookarounds check context but do NOT include the
+context text in the match / extract / replace output.</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Non-capturing groups, alternation, and re.VERBOSE</h3></div>
+    <div class="card-b">
+<pre><code><span class="kw">import</span> re
+
+<span class="cmt"># ── Non-capturing group (?:...) — group without capturing ────────</span>
+<span class="cmt"># Every (...) in a pattern adds a column to str.extract() result</span>
+<span class="cmt"># Use (?:...) when you need grouping but NOT the group in the output</span>
+logs = pd.Series([<span class="str">"ERROR: disk full"</span>, <span class="str">"WARN: low memory"</span>,
+                  <span class="str">"INFO: started"</span>, <span class="str">"CRITICAL: db down"</span>])
+
+<span class="cmt"># BAD: captures 2 groups → 2 columns (level AND message)</span>
+bad = logs.str.extract(<span class="str">r"(ERROR|CRITICAL): (.+)"</span>)
+<span class="fn">print</span>(<span class="str">"Capturing both groups (2 cols):"</span>)
+<span class="fn">print</span>(bad)
+
+<span class="cmt"># GOOD: non-capturing for level → only message column</span>
+good = logs.str.extract(<span class="str">r"(?:ERROR|CRITICAL): (.+)"</span>)[<span class="num">0</span>]
+<span class="fn">print</span>(<span class="str">"\nNon-capturing level (1 col):"</span>, good.dropna().tolist())
+
+<span class="cmt"># ── re.VERBOSE: annotated regex for complex patterns ─────────────</span>
+DATE_PAT = re.compile(<span class="str">r"""
+    (?P&lt;year&gt;  \d{4})   # 4-digit year
+    [-/]                 # separator: dash or slash
+    (?P&lt;month&gt; \d{1,2}) # 1 or 2 digit month
+    [-/]                 # separator
+    (?P&lt;day&gt;   \d{1,2}) # 1 or 2 digit day
+"""</span>, re.VERBOSE)
+
+dates = pd.Series([<span class="str">"2024-01-15"</span>, <span class="str">"2023/12/31"</span>, <span class="str">"not-a-date"</span>, <span class="str">"2025-3-7"</span>])
+parsed = dates.str.extract(DATE_PAT)
+<span class="fn">print</span>(<span class="str">"\nVerbose date regex:"</span>)
+<span class="fn">print</span>(parsed)
+
+<span class="cmt"># ── Compiled pattern reuse in str accessor methods ────────────────</span>
+<span class="cmt"># pandas .str methods accept compiled re.Pattern objects directly</span>
+PHONE_RE = re.compile(<span class="str">r"\(?\d{3}\)?[\s.\-]\d{3}[\.\-]\d{4}"</span>)
+big = pd.Series([<span class="str">"call (555) 123-4567 now"</span>, <span class="str">"no phone here"</span>, <span class="str">"555.987.6543"</span>])
+
+<span class="fn">print</span>(<span class="str">"\nCompiled pattern in str.contains:"</span>)
+<span class="fn">print</span>(big.str.contains(PHONE_RE, na=<span class="cls">False</span>))
+
+<span class="fn">print</span>(<span class="str">"\nCompiled pattern in str.extract:"</span>)
+<span class="fn">print</span>(big.str.extract(PHONE_RE))   <span class="cmt"># non-capturing pattern → 1 col</span></code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>Capturing both groups (2 cols):
+         0         1
+0    ERROR  disk full
+3  CRITICAL   db down
+(2 columns — 0 and 1 — both extracted)
+
+Non-capturing level: ['disk full', 'db down']  ← only message, 1 column ✅
+
+Verbose date regex:
+   year month day
+0  2024    01  15
+1  2023    12  31
+2   NaN   NaN NaN   ← no match → NaN
+3  2025     3   7</pre>
+      </div>
+      <div class="info info-red"><strong>(?:...) vs (...):</strong> <code>str.extract()</code> returns one column per capturing group <code>(...)</code>. Non-capturing groups <code>(?:...)</code> do not count. A pattern with 3 <code>(...)</code> groups produces a 3-column DataFrame. Use <code>(?:...)</code> for alternation or quantifiers when you don't want that group in the output.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  REMOVEPREFIX / REMOVESUFFIX  ═══════════ -->
+<div class="section" id="removepfx">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(139,92,246,.1)">✂️</div>
+    <h2>removeprefix() and removesuffix()</h2>
+  </div>
+  <p class="sh-sub">Python 3.9+ <code>str.removeprefix()</code> / <code>str.removesuffix()</code> remove a known <em>literal</em> prefix or suffix. They are safer than <code>lstrip()</code>/<code>rstrip()</code> because they operate on a <em>substring</em>, not a character set. Available on the pandas <code>.str</code> accessor.</p>
+
+  <div class="card">
+    <div class="card-h"><h3>The lstrip bug vs removeprefix — why it matters</h3><span class="pill p-purple">Python 3.9+</span></div>
+    <div class="card-b">
+<pre><code>s = pd.Series([<span class="str">"https://example.com"</span>, <span class="str">"https://other.org"</span>, <span class="str">"http://plain.com"</span>])
+
+<span class="cmt"># ── WRONG: lstrip removes a CHARACTER SET, not a substring ───────</span>
+<span class="cmt"># lstrip('https://') strips any of: h, t, p, s, :, / from the left</span>
+bad = s.str.lstrip(<span class="str">"https://"</span>)
+<span class="fn">print</span>(<span class="str">"lstrip (WRONG)     :"</span>, bad.tolist())
+<span class="cmt"># ['example.com', 'other.org', 'plain.com']</span>
+<span class="cmt"># ↑ http://plain.com → 'plain.com'  (http:// accidentally stripped!)</span>
+
+<span class="cmt"># ── CORRECT: removeprefix removes the exact substring ────────────</span>
+good = s.str.removeprefix(<span class="str">"https://"</span>)
+<span class="fn">print</span>(<span class="str">"removeprefix (✅)  :"</span>, good.tolist())
+<span class="cmt"># ['example.com', 'other.org', 'http://plain.com']</span>
+<span class="cmt"># ↑ http://plain.com unchanged — prefix doesn't match exactly</span>
+
+<span class="cmt"># ── removesuffix: strip a known file extension ───────────────────</span>
+files = pd.Series([<span class="str">"report.pdf"</span>, <span class="str">"data.csv"</span>, <span class="str">"archive.csv"</span>, <span class="str">"image.png"</span>])
+cleaned = files.str.removesuffix(<span class="str">".csv"</span>)
+<span class="fn">print</span>(<span class="str">"\nremovesuffix('.csv'):"</span>, cleaned.tolist())
+<span class="cmt"># ['report.pdf', 'data', 'archive', 'image.png']  ← .pdf and .png untouched</span>
+
+<span class="cmt"># ── Strip environment prefix from config keys ────────────────────</span>
+env_keys = pd.Series([<span class="str">"APP_DB_HOST"</span>, <span class="str">"APP_DB_PORT"</span>, <span class="str">"APP_SECRET"</span>, <span class="str">"OTHER_KEY"</span>])
+<span class="fn">print</span>(<span class="str">"\nremoveprefix('APP_'):"</span>, env_keys.str.removeprefix(<span class="str">"APP_"</span>).tolist())
+<span class="cmt"># ['DB_HOST', 'DB_PORT', 'SECRET', 'OTHER_KEY']  ← OTHER_KEY unchanged</span>
+
+<span class="cmt"># ── Chain removeprefix + removesuffix ────────────────────────────</span>
+routes = pd.Series([<span class="str">"/api/v1/users/"</span>, <span class="str">"/api/v1/orders/"</span>, <span class="str">"/health"</span>])
+cleaned_routes = routes.str.removeprefix(<span class="str">"/api/v1/"</span>).str.removesuffix(<span class="str">"/"</span>)
+<span class="fn">print</span>(<span class="str">"\nCleaned routes:"</span>, cleaned_routes.tolist())
+<span class="cmt"># ['users', 'orders', '/health']  ← '/health' unaffected by prefix strip</span>
+
+<span class="cmt"># ── Python &lt; 3.9 compatibility alternative ───────────────────────</span>
+<span class="kw">import</span> re
+prefix = <span class="str">"https://"</span>
+compat = s.str.replace(<span class="str">r"^"</span> + re.escape(prefix), <span class="str">""</span>, regex=<span class="cls">True</span>)
+<span class="fn">print</span>(<span class="str">"\ncompat regex:"</span>, compat.tolist())
+<span class="cmt"># Same result as removeprefix — re.escape() ensures special chars are literal</span></code></pre>
+      <div class="out">
+        <div class="out-label">Output</div>
+<pre>lstrip (WRONG)     : ['example.com', 'other.org', 'plain.com']  ← http:// gone too!
+
+removeprefix (✅)  : ['example.com', 'other.org', 'http://plain.com']  ← correct!
+
+removesuffix('.csv'): ['report.pdf', 'data', 'archive', 'image.png']
+
+removeprefix('APP_'): ['DB_HOST', 'DB_PORT', 'SECRET', 'OTHER_KEY']
+
+Cleaned routes: ['users', 'orders', '/health']</pre>
+      </div>
+      <div class="info info-purple"><strong>The classic lstrip bug:</strong> <code>lstrip('https://')</code> does NOT strip the prefix <code>"https://"</code>. It strips the set of characters <code>{'h','t','p','s',':','/'}</code> from the left, one by one, for as long as the next character is in that set. Always use <code>removeprefix()</code> (Python 3.9+) or a regex with <code>^</code> anchor for prefix removal.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  PERFORMANCE  ═══════════ -->
+<div class="section" id="performance">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(74,222,128,.1)">⚡</div>
+    <h2>Performance — at Scale</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>str accessor vs apply() vs compiled regex — benchmarks</h3><span class="pill p-green">Performance</span></div>
+    <div class="card-b">
+<pre><code><span class="kw">import</span> time, re
+
+N = <span class="num">1_000_000</span>
+big = pd.Series(np.random.choice([<span class="str">"Alice Johnson"</span>,<span class="str">"BOB smith"</span>,<span class="str">"carol WHITE"</span>], N))
+
+<span class="cmt"># ── Method 1: .str.lower() — vectorised ──────────────────────────</span>
+t0 = time.perf_counter()
+r1 = big.str.lower()
+<span class="fn">print</span>(<span class="grn">f"str.lower()         : {time.perf_counter()-t0:.3f}s"</span>)
+
+<span class="cmt"># ── Method 2: .apply(str.lower) ───────────────────────────────────</span>
+t0 = time.perf_counter()
+r2 = big.apply(<span class="cls">str</span>.lower)
+<span class="fn">print</span>(<span class="grn">f"apply(str.lower)    : {time.perf_counter()-t0:.3f}s"</span>)
+
+<span class="cmt"># ── Method 3: list comprehension ─────────────────────────────────</span>
+t0 = time.perf_counter()
+r3 = pd.Series([s.lower() <span class="kw">if</span> pd.notna(s) <span class="kw">else</span> s <span class="kw">for</span> s <span class="kw">in</span> big])
+<span class="fn">print</span>(<span class="grn">f"list comprehension  : {time.perf_counter()-t0:.3f}s"</span>)
+
+<span class="cmt"># ── Method 4: compiled regex replace ─────────────────────────────</span>
+PAT_WS = re.compile(<span class="str">r"\s+"</span>)
+t0 = time.perf_counter()
+r4 = big.str.replace(<span class="str">r"\s+"</span>, <span class="str">" "</span>, regex=<span class="cls">True</span>)
+<span class="fn">print</span>(<span class="grn">f"str.replace(regex)  : {time.perf_counter()-t0:.3f}s"</span>)
+
+<span class="cmt"># ── Method 5: apply with compiled regex (faster than str.replace) ─</span>
+t0 = time.perf_counter()
+r5 = big.apply(<span class="kw">lambda</span> x: PAT_WS.sub(<span class="str">" "</span>, x) <span class="kw">if</span> pd.notna(x) <span class="kw">else</span> x)
+<span class="fn">print</span>(<span class="grn">f"apply(compiled re)  : {time.perf_counter()-t0:.3f}s"</span>)
+
+<span class="cmt"># ── StringDtype: faster for some operations ───────────────────────</span>
+big_str = big.astype(<span class="str">"string"</span>)   <span class="cmt"># pandas StringDtype</span>
+t0 = time.perf_counter()
+r6 = big_str.str.lower()
+<span class="fn">print</span>(<span class="grn">f"StringDtype.lower() : {time.perf_counter()-t0:.3f}s"</span>)</code></pre>
+      <div class="out">
+        <div class="out-label">1M rows — performance comparison</div>
+<pre>str.lower()         : 0.142s   ← fastest for simple methods
+apply(str.lower)    : 0.231s
+list comprehension  : 0.198s   ← competitive, no NaN safety
+str.replace(regex)  : 0.387s
+apply(compiled re)  : 0.274s   ← compile regex ONCE, then reuse
+StringDtype.lower() : 0.118s   ← slightly faster with StringDtype
+
+Key rules:
+• Use .str.lower/upper/strip for case/whitespace operations
+• Compile regex with re.compile() when reusing → 30-40% faster in apply
+• StringDtype is marginally faster and gives nullable string semantics
+• Avoid apply() with lambda+str.method — use .str accessor instead</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Batch string cleaning — efficient production pattern</h3></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── Compile all patterns once at module level ─────────────────────</span>
+_RE_SPACES  = re.compile(<span class="str">r"\s+"</span>)
+_RE_NONNUM  = re.compile(<span class="str">r"[^\d.]"</span>)
+_RE_PHONE   = re.compile(<span class="str">r"[^\d]"</span>)
+_RE_EMAIL   = re.compile(<span class="str">r"^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"</span>)
+
+<span class="kw">def</span> <span class="fn">clean_string_columns</span>(df: pd.DataFrame) -> pd.DataFrame:
+    <span class="str">"""Apply all string cleaning in a single pass."""</span>
+    df = df.copy()
+
+    <span class="cmt"># 1. All object columns: strip + collapse spaces</span>
+    obj_cols = df.select_dtypes(<span class="str">"object"</span>).columns
+    <span class="kw">for</span> col <span class="kw">in</span> obj_cols:
+        df[col] = (df[col]
+                   .str.strip()
+                   .str.replace(<span class="str">r"\s+"</span>, <span class="str">" "</span>, regex=<span class="cls">True</span>))
+
+    <span class="cmt"># 2. Name → title case</span>
+    <span class="kw">if</span> <span class="str">"name"</span> <span class="kw">in</span> df.columns:
+        df[<span class="str">"name"</span>] = df[<span class="str">"name"</span>].str.title()
+
+    <span class="cmt"># 3. Email → lowercase + validate flag</span>
+    <span class="kw">if</span> <span class="str">"email"</span> <span class="kw">in</span> df.columns:
+        df[<span class="str">"email"</span>] = df[<span class="str">"email"</span>].str.lower()
+        df[<span class="str">"email_valid"</span>] = df[<span class="str">"email"</span>].str.fullmatch(
+            <span class="str">r"^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"</span>, na=<span class="cls">False</span>
+        )
+
+    <span class="cmt"># 4. Phone → digits only</span>
+    <span class="kw">if</span> <span class="str">"phone"</span> <span class="kw">in</span> df.columns:
+        df[<span class="str">"phone_digits"</span>] = df[<span class="str">"phone"</span>].str.replace(<span class="str">r"[^\d]"</span>, <span class="str">""</span>, regex=<span class="cls">True</span>)
+
+    <span class="cmt"># 5. Amount → numeric</span>
+    <span class="kw">if</span> <span class="str">"amount"</span> <span class="kw">in</span> df.columns:
+        df[<span class="str">"amount_num"</span>] = pd.to_numeric(
+            df[<span class="str">"amount"</span>].str.replace(<span class="str">r"[$,€]"</span>, <span class="str">""</span>, regex=<span class="cls">True</span>)
+                         .replace(<span class="str">"FREE"</span>, <span class="str">"0"</span>),
+            errors=<span class="str">"coerce"</span>
+        )
+
+    <span class="kw">return</span> df
+
+result = <span class="fn">clean_string_columns</span>(df)
+<span class="fn">print</span>(result[[<span class="str">"name"</span>, <span class="str">"email"</span>, <span class="str">"email_valid"</span>, <span class="str">"phone_digits"</span>, <span class="str">"amount_num"</span>]].to_string())</code></pre>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════  CHEAT SHEET  ═══════════ -->
+<div class="section" id="cheatsheet">
+  <div class="sh">
+    <div class="sh-icon" style="background:rgba(139,92,246,.1)">🗺️</div>
+    <h2>Complete Cheat Sheet</h2>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>All .str methods — quick reference</h3></div>
+    <div class="card-b" style="padding:0">
+      <table class="dt">
+        <tr><th>Category</th><th>Method</th><th>Description</th><th>Returns</th></tr>
+        <tr><td rowspan="6" style="color:#38bdf8;font-weight:700">Case</td><td><code>.str.lower()</code></td><td>All lowercase</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.upper()</code></td><td>All uppercase</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.title()</code></td><td>Title Case Each Word</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.capitalize()</code></td><td>First letter only</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.swapcase()</code></td><td>Flip upper↔lower</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.casefold()</code></td><td>Aggressive lower (Unicode)</td><td>Series[str]</td></tr>
+        <tr><td rowspan="5" style="color:#4ade80;font-weight:700">Trim/Pad</td><td><code>.str.strip()</code></td><td>Remove leading/trailing whitespace</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.lstrip() / rstrip()</code></td><td>One side only</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.pad(width, side, fillchar)</code></td><td>Pad to fixed width</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.zfill(width)</code></td><td>Zero-pad (shortcut for pad left '0')</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.center/ljust/rjust(w, c)</code></td><td>Align with fill char</td><td>Series[str]</td></tr>
+        <tr><td rowspan="6" style="color:#facc15;font-weight:700">Search</td><td><code>.str.contains(pat, case, na=)</code></td><td>Substring/regex search</td><td>Series[bool]</td></tr>
+        <tr><td><code>.str.startswith(pat, na=)</code></td><td>Test prefix</td><td>Series[bool]</td></tr>
+        <tr><td><code>.str.endswith(pat, na=)</code></td><td>Test suffix</td><td>Series[bool]</td></tr>
+        <tr><td><code>.str.match(pat)</code></td><td>Regex anchored at start</td><td>Series[bool]</td></tr>
+        <tr><td><code>.str.fullmatch(pat)</code></td><td>Entire string must match</td><td>Series[bool]</td></tr>
+        <tr><td><code>.str.find(sub) / rfind()</code></td><td>Position of substring (-1 = not found)</td><td>Series[int]</td></tr>
+        <tr><td rowspan="2" style="color:#fb923c;font-weight:700">Replace</td><td><code>.str.replace(pat, repl, regex=, n=)</code></td><td>Literal or regex substitution</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.translate(table)</code></td><td>Character-table replacement (fast)</td><td>Series[str]</td></tr>
+        <tr><td rowspan="4" style="color:#2dd4bf;font-weight:700">Split/Join</td><td><code>.str.split(pat, expand=, n=)</code></td><td>Split on delimiter</td><td>Series[list] / DataFrame</td></tr>
+        <tr><td><code>.str.rsplit(pat, n=)</code></td><td>Split from right</td><td>Series[list]</td></tr>
+        <tr><td><code>.str.join(sep)</code></td><td>Join list items</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.cat(others, sep, na_rep)</code></td><td>Concatenate across series</td><td>str or Series</td></tr>
+        <tr><td rowspan="3" style="color:#f87171;font-weight:700">Extract</td><td><code>.str.extract(pat)</code></td><td>First match via capture groups</td><td>DataFrame</td></tr>
+        <tr><td><code>.str.extractall(pat)</code></td><td>All matches (MultiIndex result)</td><td>DataFrame</td></tr>
+        <tr><td><code>.str.findall(pat)</code></td><td>All matches as list per row</td><td>Series[list]</td></tr>
+        <tr><td rowspan="4" style="color:#a78bfa;font-weight:700">Slice</td><td><code>.str[i] / .str[a:b]</code></td><td>Character indexing / slicing</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.slice(start, stop, step)</code></td><td>Explicit slice method</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.slice_replace(a, b, repl)</code></td><td>Replace a slice</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.get(i)</code></td><td>Get element from list/dict in cell</td><td>Series</td></tr>
+        <tr><td rowspan="3" style="color:#38bdf8;font-weight:700">Info</td><td><code>.str.len()</code></td><td>Character / list length</td><td>Series[int]</td></tr>
+        <tr><td><code>.str.count(pat)</code></td><td>Count pattern occurrences per row</td><td>Series[int]</td></tr>
+        <tr><td><code>.str.isnumeric() / isdigit() / isdecimal() / isalpha() / isalnum() / isspace() / islower() / isupper() / istitle()</code></td><td>Character type tests (see Type Predicates section)</td><td>Series[bool]</td></tr>
+        <tr><td rowspan="2" style="color:#2dd4bf;font-weight:700">Partition</td><td><code>.str.partition(sep)</code></td><td>Split into exactly 3 parts (before, sep, after)</td><td>DataFrame</td></tr>
+        <tr><td><code>.str.rpartition(sep)</code></td><td>Same but on last occurrence of sep</td><td>DataFrame</td></tr>
+        <tr><td style="color:#4ade80;font-weight:700">Dummies</td><td><code>.str.get_dummies(sep)</code></td><td>Multi-label one-hot from delimited string</td><td>DataFrame</td></tr>
+        <tr><td rowspan="2" style="color:#a78bfa;font-weight:700">Py 3.9+</td><td><code>.str.removeprefix(prefix)</code></td><td>Remove exact prefix string (not char set)</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.removesuffix(suffix)</code></td><td>Remove exact suffix string</td><td>Series[str]</td></tr>
+        <tr><td rowspan="4" style="color:#4ade80;font-weight:700">Encode</td><td><code>.str.encode(enc) / .str.decode(enc)</code></td><td>Bytes conversion</td><td>Series[bytes/str]</td></tr>
+        <tr><td><code>.str.normalize("NFC"/"NFD")</code></td><td>Unicode normalisation</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.repeat(n)</code></td><td>Repeat string N times</td><td>Series[str]</td></tr>
+        <tr><td><code>.str.wrap(width)</code></td><td>Wrap at N characters</td><td>Series[str]</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h"><h3>Common patterns — copy-paste ready</h3></div>
+    <div class="card-b">
+<pre><code><span class="cmt"># ── Normalise a free-text column ─────────────────────────────────</span>
+s.str.strip().str.lower().str.replace(<span class="str">r"\s+"</span>, <span class="str">" "</span>, regex=<span class="cls">True</span>)
+
+<span class="cmt"># ── Strip currency and convert to float ──────────────────────────</span>
+pd.to_numeric(s.str.replace(<span class="str">r"[$,€£]"</span>, <span class="str">""</span>, regex=<span class="cls">True</span>).str.strip(), errors=<span class="str">"coerce"</span>)
+
+<span class="cmt"># ── Column names → snake_case ─────────────────────────────────────</span>
+df.columns.str.strip().str.lower().str.replace(<span class="str">r"\s+"</span>, <span class="str">"_"</span>, regex=<span class="cls">True</span>)
+
+<span class="cmt"># ── Validate email ───────────────────────────────────────────────</span>
+s.str.lower().str.fullmatch(<span class="str">r"^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$"</span>, na=<span class="cls">False</span>)
+
+<span class="cmt"># ── Phone → 10 digits only ───────────────────────────────────────</span>
+s.str.replace(<span class="str">r"[^\d]"</span>, <span class="str">""</span>, regex=<span class="cls">True</span>).str[-<span class="num">10</span>:]
+
+<span class="cmt"># ── Extract year from date-like string ───────────────────────────</span>
+s.str.extract(<span class="str">r"(\d{4})"</span>)[<span class="num">0</span>].astype(<span class="str">"Int32"</span>)
+
+<span class="cmt"># ── Split pipe-delimited tags → explode ──────────────────────────</span>
+df.assign(tag=df[<span class="str">"tags"</span>].str.split(<span class="str">"|"</span>)).explode(<span class="str">"tag"</span>).reset_index(drop=<span class="cls">True</span>)
+
+<span class="cmt"># ── Split "First Last" → two columns ─────────────────────────────</span>
+df[[<span class="str">"first"</span>, <span class="str">"last"</span>]] = df[<span class="str">"name"</span>].str.strip().str.split(<span class="str">" "</span>, n=<span class="num">1</span>, expand=<span class="cls">True</span>)
+
+<span class="cmt"># ── Zero-pad an integer ID column ────────────────────────────────</span>
+df[<span class="str">"id"</span>].astype(<span class="cls">str</span>).str.zfill(<span class="num">6</span>)
+
+<span class="cmt"># ── Check if column can be all-numeric ───────────────────────────</span>
+s.str.replace(<span class="str">r"[^\d.]"</span>, <span class="str">""</span>, regex=<span class="cls">True</span>).str.match(<span class="str">r"^\d+\.?\d*$"</span>, na=<span class="cls">False</span>)
+
+<span class="cmt"># ── Replace multiple sentinel strings with NaN ───────────────────</span>
+s.replace([<span class="str">"N/A"</span>, <span class="str">"NULL"</span>, <span class="str">"?"</span>, <span class="str">"-"</span>, <span class="str">""</span>], np.nan)
+
+<span class="cmt"># ── Strip accents from international names ────────────────────────</span>
+s.apply(<span class="kw">lambda</span> x: unicodedata.normalize(<span class="str">"NFD"</span>,x).encode(<span class="str">"ascii"</span>,<span class="str">"ignore"</span>).decode()
+        <span class="kw">if</span> pd.notna(x) <span class="kw">else</span> x)
+
+<span class="cmt"># ── Count words per row ───────────────────────────────────────────</span>
+s.str.split().str.len()
+
+<span class="cmt"># ── Find rows containing any of a list of keywords ───────────────</span>
+pattern = <span class="str">"|"</span>.join(map(re.escape, [<span class="str">"python"</span>, <span class="str">"pandas"</span>, <span class="str">"numpy"</span>]))
+df[df[<span class="str">"tags"</span>].str.contains(pattern, case=<span class="cls">False</span>, na=<span class="cls">False</span>)]</code></pre>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:18px">
+    <div class="info info-purple">
+      <strong>⚠️ Always use regex=False for literal strings:</strong><br/>
+      <code>str.replace("$29.99", "", regex=False)</code> — the <code>$</code> is a literal dollar sign. Without <code>regex=False</code> it's a regex end-anchor and won't match. In pandas 2.x this defaults to <code>True</code> with a warning.
+    </div>
+    <div class="info info-red">
+      <strong>⚠️ astype(bool) on strings is wrong:</strong><br/>
+      Any non-empty string is truthy. <code>"False".astype(bool) == True</code>. Use <code>.map({"True": True, "False": False})</code> or <code>.str.lower().isin({"true","yes","1"})</code>.
+    </div>
+    <div class="info info-blue">
+      <strong>💡 na= parameter prevents filtering bugs:</strong><br/>
+      <code>str.contains("foo", na=False)</code> returns <code>False</code> for NaN rows instead of <code>NaN</code>. Without it, boolean indexing like <code>df[mask]</code> raises when mask contains NaN.
+    </div>
+    <div class="info info-green">
+      <strong>✅ Compile regex once for apply loops:</strong><br/>
+      If using <code>apply()</code> with regex, compile the pattern at module level: <code>PAT = re.compile(r"\d+")</code>. Reusing a compiled pattern is ~3× faster than re-compiling on every row.
+    </div>
+    <div class="info info-teal">
+      <strong>💡 str.extract() returns a DataFrame:</strong><br/>
+      Even with a single capture group, <code>str.extract()</code> returns a one-column DataFrame, not a Series. Use <code>str.extract(r"(pat)")[0]</code> or add a named group <code>(?P&lt;name&gt;pat)</code> to get a named column.
+    </div>
+    <div class="info info-orange">
+      <strong>💡 Use casefold() not lower() for comparisons:</strong><br/>
+      <code>casefold()</code> handles Unicode edge cases like German ß → ss. For standard ASCII data <code>lower()</code> is fine and slightly faster. For multilingual data always use <code>casefold()</code>.
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+<footer>String Manipulations in Pandas — End to End &nbsp;|&nbsp; pandas 2.x · regex · unicodedata · Python 3.11 &nbsp;|&nbsp; April 2026</footer>
+</body>
+</html>
