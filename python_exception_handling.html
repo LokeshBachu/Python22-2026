@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Python Exception Handling — End to End</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3250;
+      --accent: #7c6af7;
+      --accent2: #56cfe1;
+      --green: #57cc99;
+      --red: #ff6b6b;
+      --yellow: #ffd166;
+      --orange: #f4a261;
+      --text: #e2e8f0;
+      --muted: #8892b0;
+      --code-bg: #141721;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 2rem 1rem;
+    }
+    .container { max-width: 960px; margin: 0 auto; }
+
+    /* Header */
+    header {
+      text-align: center;
+      padding: 3rem 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 3rem;
+    }
+    header .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+    }
+    header h1 {
+      font-size: 2.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    header p {
+      color: var(--muted);
+      margin-top: 0.75rem;
+      font-size: 1.05rem;
+    }
+
+    /* TOC */
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      margin-bottom: 3rem;
+    }
+    .toc h2 { font-size: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
+    .toc ol { padding-left: 1.2rem; }
+    .toc li { margin: 0.3rem 0; }
+    .toc a { color: var(--accent2); text-decoration: none; font-size: 0.95rem; }
+    .toc a:hover { text-decoration: underline; }
+
+    /* Sections */
+    section { margin-bottom: 3.5rem; }
+    section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent2);
+      border-left: 4px solid var(--accent);
+      padding-left: 0.85rem;
+      margin-bottom: 1.25rem;
+    }
+    section h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--yellow);
+      margin: 1.5rem 0 0.75rem;
+    }
+    section p { color: var(--muted); margin-bottom: 1rem; }
+
+    /* Code blocks */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      overflow-x: auto;
+      margin-bottom: 1.25rem;
+      position: relative;
+    }
+    pre .lang-label {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.75rem;
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    code {
+      font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+      font-size: 0.9rem;
+      line-height: 1.8;
+    }
+    /* Syntax highlighting */
+    .kw  { color: #c678dd; }   /* keyword */
+    .fn  { color: #61afef; }   /* function/class */
+    .st  { color: #98c379; }   /* string */
+    .cm  { color: #5c6370; font-style: italic; } /* comment */
+    .nb  { color: #e5c07b; }   /* built-in */
+    .nu  { color: #d19a66; }   /* number */
+    .op  { color: #56b6c2; }   /* operator */
+    .ex  { color: #e06c75; }   /* exception name */
+    .df  { color: #61afef; }   /* def name */
+
+    /* Callout boxes */
+    .callout {
+      border-radius: 10px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      border-left: 4px solid;
+      font-size: 0.93rem;
+    }
+    .callout.tip    { background: #1a2e22; border-color: var(--green); color: #a8f0c6; }
+    .callout.warn   { background: #2e2010; border-color: var(--orange); color: #fac898; }
+    .callout.info   { background: #12243a; border-color: var(--accent2); color: #a0dde6; }
+    .callout.danger { background: #2e1212; border-color: var(--red); color: #ffb3b3; }
+    .callout strong { font-weight: 700; }
+
+    /* Tables */
+    .table-wrap { overflow-x: auto; margin-bottom: 1.25rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th {
+      background: var(--surface2);
+      color: var(--accent2);
+      text-align: left;
+      padding: 0.65rem 1rem;
+      border-bottom: 2px solid var(--border);
+      font-weight: 600;
+    }
+    td {
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: top;
+    }
+    tr:hover td { background: var(--surface); }
+    td code, th code { background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; }
+
+    /* Hierarchy tree */
+    .tree {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      font-family: 'Cascadia Code', monospace;
+      font-size: 0.88rem;
+      line-height: 2;
+      margin-bottom: 1.25rem;
+    }
+    .tree .root  { color: var(--red); font-weight: bold; }
+    .tree .base  { color: var(--orange); font-weight: bold; }
+    .tree .group { color: var(--yellow); }
+    .tree .leaf  { color: var(--green); }
+    .tree .branch{ color: var(--muted); }
+
+    /* Grid layout */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem; }
+    @media(max-width:640px){ .grid2 { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+    .card h4 { color: var(--accent); font-size: 0.95rem; margin-bottom: 0.75rem; }
+
+    /* Tag pills */
+    .pill {
+      display: inline-block;
+      background: var(--surface2);
+      color: var(--accent2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.78rem;
+      padding: 2px 10px;
+      margin: 2px;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      padding: 2rem 0;
+      border-top: 1px solid var(--border);
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="badge">Reference Guide</div>
+    <h1>Python Exception Handling</h1>
+    <p>End-to-end guide covering syntax, hierarchy, patterns, and best practices</p>
+    <div style="margin-top:1rem;">
+      <span class="pill">Python 3.x</span>
+      <span class="pill">try / except</span>
+      <span class="pill">Custom Exceptions</span>
+      <span class="pill">Context Managers</span>
+      <span class="pill">Python 3.11+ ExceptionGroup</span>
+    </div>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <h2>Table of Contents</h2>
+    <ol>
+      <li><a href="#basics">Basic try / except / else / finally</a></li>
+      <li><a href="#hierarchy">Exception Hierarchy</a></li>
+      <li><a href="#multiple">Catching Multiple Exceptions</a></li>
+      <li><a href="#raising">Raising Exceptions</a></li>
+      <li><a href="#chaining">Exception Chaining</a></li>
+      <li><a href="#custom">Custom Exceptions</a></li>
+      <li><a href="#context">Context Managers</a></li>
+      <li><a href="#contextlib">contextlib Utilities</a></li>
+      <li><a href="#groups">Exception Groups (Python 3.11+)</a></li>
+      <li><a href="#logging">Logging &amp; Traceback</a></li>
+      <li><a href="#patterns">Common Patterns</a></li>
+      <li><a href="#best">Best Practices &amp; Anti-patterns</a></li>
+      <li><a href="#builtins">Built-in Exception Reference</a></li>
+      <li><a href="#programs">Complete Programs</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1. BASICS -->
+  <section id="basics">
+    <h2>1. Basic try / except / else / finally</h2>
+    <p>The fundamental building block. Each clause has a distinct role:</p>
+    <pre><span class="lang-label">python</span><code><span class="kw">try</span>:
+    result <span class="op">=</span> <span class="nu">10</span> <span class="op">/</span> <span class="nu">0</span>           <span class="cm"># code that may raise</span>
+
+<span class="kw">except</span> <span class="ex">ZeroDivisionError</span> <span class="kw">as</span> e:
+    <span class="nb">print</span>(<span class="st">f"Caught: </span><span class="op">{</span>e<span class="op">}</span><span class="st">"</span>)      <span class="cm"># handle the specific error</span>
+
+<span class="kw">else</span>:
+    <span class="nb">print</span>(<span class="st">f"Result: </span><span class="op">{</span>result<span class="op">}</span><span class="st">"</span>)   <span class="cm"># runs ONLY when no exception occurred</span>
+
+<span class="kw">finally</span>:
+    <span class="nb">print</span>(<span class="st">"Always executes"</span>)    <span class="cm"># cleanup — runs regardless</span></code></pre>
+
+    <div class="grid2">
+      <div class="card">
+        <h4>try</h4>
+        The block of code to monitor for exceptions. Execution stops at the first raised exception.
+      </div>
+      <div class="card">
+        <h4>except</h4>
+        Handles a specific exception type. Multiple <code>except</code> clauses are evaluated top-to-bottom.
+      </div>
+      <div class="card">
+        <h4>else</h4>
+        Runs only when the <code>try</code> block completed without raising. Useful to keep "success" logic separate.
+      </div>
+      <div class="card">
+        <h4>finally</h4>
+        Always executes — even if the handler re-raises or a <code>return</code> is hit. Use for resource cleanup.
+      </div>
+    </div>
+
+    <div class="callout info">
+      <strong>Note:</strong> <code>else</code> and <code>finally</code> are optional. A bare <code>try/except</code> with no <code>else</code> or <code>finally</code> is perfectly valid.
+    </div>
+  </section>
+
+  <!-- 2. HIERARCHY -->
+  <section id="hierarchy">
+    <h2>2. Exception Hierarchy</h2>
+    <p>All exceptions derive from <code>BaseException</code>. Catching a parent class also catches all its children.</p>
+    <div class="tree">
+<span class="root">BaseException</span>
+<span class="branch"> ├──</span> <span class="group">SystemExit</span>              <span class="cm"># raised by sys.exit()</span>
+<span class="branch"> ├──</span> <span class="group">KeyboardInterrupt</span>       <span class="cm"># Ctrl+C</span>
+<span class="branch"> ├──</span> <span class="group">GeneratorExit</span>           <span class="cm"># generator.close()</span>
+<span class="branch"> └──</span> <span class="base">Exception</span>               <span class="cm"># base of all normal errors</span>
+<span class="branch">      ├──</span> <span class="group">ArithmeticError</span>
+<span class="branch">      │    ├──</span> <span class="leaf">ZeroDivisionError</span>
+<span class="branch">      │    ├──</span> <span class="leaf">OverflowError</span>
+<span class="branch">      │    └──</span> <span class="leaf">FloatingPointError</span>
+<span class="branch">      ├──</span> <span class="group">LookupError</span>
+<span class="branch">      │    ├──</span> <span class="leaf">IndexError</span>
+<span class="branch">      │    └──</span> <span class="leaf">KeyError</span>
+<span class="branch">      ├──</span> <span class="group">OSError  (IOError, EnvironmentError)</span>
+<span class="branch">      │    ├──</span> <span class="leaf">FileNotFoundError</span>
+<span class="branch">      │    ├──</span> <span class="leaf">PermissionError</span>
+<span class="branch">      │    ├──</span> <span class="leaf">TimeoutError</span>
+<span class="branch">      │    └──</span> <span class="leaf">ConnectionError → BrokenPipeError, ConnectionResetError …</span>
+<span class="branch">      ├──</span> <span class="leaf">AttributeError</span>
+<span class="branch">      ├──</span> <span class="leaf">ImportError → ModuleNotFoundError</span>
+<span class="branch">      ├──</span> <span class="leaf">NameError → UnboundLocalError</span>
+<span class="branch">      ├──</span> <span class="leaf">TypeError</span>
+<span class="branch">      ├──</span> <span class="leaf">ValueError → UnicodeError</span>
+<span class="branch">      ├──</span> <span class="leaf">RuntimeError → RecursionError, NotImplementedError</span>
+<span class="branch">      ├──</span> <span class="leaf">StopIteration</span>
+<span class="branch">      ├──</span> <span class="leaf">MemoryError</span>
+<span class="branch">      └──</span> <span class="leaf">Warning → DeprecationWarning, UserWarning …</span>
+    </div>
+    <div class="callout warn">
+      <strong>Caution:</strong> Catching <code>Exception</code> will NOT catch <code>SystemExit</code>, <code>KeyboardInterrupt</code>, or <code>GeneratorExit</code> — you need <code>BaseException</code> for those. In practice, almost never catch <code>BaseException</code> directly.
+    </div>
+  </section>
+
+  <!-- 3. MULTIPLE -->
+  <section id="multiple">
+    <h2>3. Catching Multiple Exceptions</h2>
+
+    <h3>Separate handlers</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">try</span>:
+    data <span class="op">=</span> process(value)
+<span class="kw">except</span> <span class="ex">ValueError</span>:
+    <span class="nb">print</span>(<span class="st">"Bad value"</span>)
+<span class="kw">except</span> <span class="ex">TypeError</span>:
+    <span class="nb">print</span>(<span class="st">"Wrong type"</span>)
+<span class="kw">except</span> <span class="ex">Exception</span> <span class="kw">as</span> e:
+    <span class="nb">print</span>(<span class="st">f"Unexpected: </span><span class="op">{</span>e<span class="op">}</span><span class="st">"</span>)   <span class="cm"># catch-all fallback</span></code></pre>
+
+    <h3>Grouped exceptions in a single handler</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">except</span> (<span class="ex">ValueError</span>, <span class="ex">TypeError</span>, <span class="ex">KeyError</span>) <span class="kw">as</span> e:
+    <span class="nb">print</span>(<span class="st">f"Input error: </span><span class="op">{</span>e<span class="op">}</span><span class="st">"</span>)</code></pre>
+
+    <h3>Re-raising inside a handler</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">except</span> <span class="ex">Exception</span>:
+    log_error()
+    <span class="kw">raise</span>           <span class="cm"># bare raise — re-raises the original exception unchanged</span></code></pre>
+
+    <div class="callout info">
+      <strong>Order matters:</strong> Handlers are tried top-to-bottom. Put specific exceptions before general ones, otherwise the general handler will shadow them.
+    </div>
+  </section>
+
+  <!-- 4. RAISING -->
+  <section id="raising">
+    <h2>4. Raising Exceptions</h2>
+    <pre><span class="lang-label">python</span><code><span class="cm"># Raise with a message</span>
+<span class="kw">raise</span> <span class="ex">ValueError</span>(<span class="st">"value must be positive"</span>)
+
+<span class="cm"># Raise without instantiating (equivalent — Python calls the constructor)</span>
+<span class="kw">raise</span> <span class="ex">ValueError</span>
+
+<span class="cm"># Re-raise the current exception (inside an except block)</span>
+<span class="kw">raise</span>
+
+<span class="cm"># Raise chained — preserves original cause</span>
+<span class="kw">raise</span> <span class="ex">RuntimeError</span>(<span class="st">"wrapper message"</span>) <span class="kw">from</span> original_exception
+
+<span class="cm"># Raise suppressing original context</span>
+<span class="kw">raise</span> <span class="ex">RuntimeError</span>(<span class="st">"clean message"</span>) <span class="kw">from</span> <span class="kw">None</span></code></pre>
+
+    <h3>Conditional raising</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">def</span> <span class="df">set_age</span>(age: <span class="nb">int</span>) <span class="op">-></span> <span class="kw">None</span>:
+    <span class="kw">if not</span> <span class="nb">isinstance</span>(age, <span class="nb">int</span>):
+        <span class="kw">raise</span> <span class="ex">TypeError</span>(<span class="st">f"age must be int, got </span><span class="op">{</span><span class="nb">type</span>(age).__name__<span class="op">}</span><span class="st">"</span>)
+    <span class="kw">if</span> age <span class="op">&lt;</span> <span class="nu">0</span>:
+        <span class="kw">raise</span> <span class="ex">ValueError</span>(<span class="st">f"age cannot be negative: </span><span class="op">{</span>age<span class="op">}</span><span class="st">"</span>)</code></pre>
+  </section>
+
+  <!-- 5. CHAINING -->
+  <section id="chaining">
+    <h2>5. Exception Chaining</h2>
+    <p>Python automatically records context. Explicit chaining with <code>from</code> makes the relationship clear.</p>
+
+    <h3>Implicit chaining (<code>__context__</code>)</h3>
+    <pre><span class="lang-label">python</span><code><span class="cm"># When an exception occurs while handling another, Python links them automatically</span>
+<span class="kw">try</span>:
+    load_config()
+<span class="kw">except</span> <span class="ex">FileNotFoundError</span>:
+    process_default()   <span class="cm"># if THIS raises, traceback shows both errors</span></code></pre>
+
+    <h3>Explicit chaining (<code>__cause__</code>)</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">try</span>:
+    <span class="nb">open</span>(<span class="st">"config.yaml"</span>)
+<span class="kw">except</span> <span class="ex">FileNotFoundError</span> <span class="kw">as</span> e:
+    <span class="kw">raise</span> <span class="ex">RuntimeError</span>(<span class="st">"Configuration load failed"</span>) <span class="kw">from</span> e
+    <span class="cm"># Traceback shows: "The above exception was the direct cause of..."</span></code></pre>
+
+    <h3>Suppress original context</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">try</span>:
+    internal_call()
+<span class="kw">except</span> <span class="ex">InternalError</span> <span class="kw">as</span> e:
+    <span class="kw">raise</span> <span class="ex">PublicAPIError</span>(<span class="st">"Operation failed"</span>) <span class="kw">from</span> <span class="kw">None</span>
+    <span class="cm"># Hides implementation details from callers</span></code></pre>
+
+    <div class="table-wrap">
+      <table>
+        <tr><th>Attribute</th><th>Set by</th><th>Shown in traceback as</th></tr>
+        <tr><td><code>__cause__</code></td><td><code>raise X from Y</code></td><td>"The above exception was the direct cause of…"</td></tr>
+        <tr><td><code>__context__</code></td><td>implicit (Python runtime)</td><td>"During handling of the above exception, another exception occurred…"</td></tr>
+        <tr><td><code>__suppress_context__</code></td><td><code>raise X from None</code></td><td>Suppresses the chained traceback</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 6. CUSTOM -->
+  <section id="custom">
+    <h2>6. Custom Exceptions</h2>
+
+    <h3>Basic custom exception</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">class</span> <span class="fn">AppError</span>(<span class="ex">Exception</span>):
+    <span class="st">"""Base class for all application errors."""</span></code></pre>
+
+    <h3>Hierarchy with extra context</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">class</span> <span class="fn">AppError</span>(<span class="ex">Exception</span>):
+    <span class="st">"""Base application error."""</span>
+
+<span class="kw">class</span> <span class="fn">ValidationError</span>(<span class="fn">AppError</span>):
+    <span class="kw">def</span> <span class="df">__init__</span>(<span class="kw">self</span>, field: <span class="nb">str</span>, message: <span class="nb">str</span>) <span class="op">-></span> <span class="kw">None</span>:
+        <span class="kw">self</span>.field <span class="op">=</span> field
+        <span class="nb">super</span>().<span class="df">__init__</span>(<span class="st">f"</span><span class="op">{</span>field<span class="op">}</span><span class="st">: </span><span class="op">{</span>message<span class="op">}</span><span class="st">"</span>)
+
+<span class="kw">class</span> <span class="fn">NotFoundError</span>(<span class="fn">AppError</span>):
+    <span class="kw">def</span> <span class="df">__init__</span>(<span class="kw">self</span>, resource: <span class="nb">str</span>, id_: <span class="nb">int</span>) <span class="op">-></span> <span class="kw">None</span>:
+        <span class="kw">self</span>.resource <span class="op">=</span> resource
+        <span class="kw">self</span>.id_ <span class="op">=</span> id_
+        <span class="nb">super</span>().<span class="df">__init__</span>(<span class="st">f"</span><span class="op">{</span>resource<span class="op">}</span><span class="st"> with id=</span><span class="op">{</span>id_<span class="op">}</span><span class="st"> not found"</span>)
+
+<span class="kw">class</span> <span class="fn">DatabaseError</span>(<span class="fn">AppError</span>):
+    <span class="kw">def</span> <span class="df">__init__</span>(<span class="kw">self</span>, message: <span class="nb">str</span>, query: <span class="nb">str</span> <span class="op">=</span> <span class="st">""</span>) <span class="op">-></span> <span class="kw">None</span>:
+        <span class="kw">self</span>.query <span class="op">=</span> query
+        <span class="nb">super</span>().<span class="df">__init__</span>(message)</code></pre>
+
+    <h3>Usage</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">try</span>:
+    <span class="kw">raise</span> <span class="fn">ValidationError</span>(<span class="st">"email"</span>, <span class="st">"invalid format"</span>)
+<span class="kw">except</span> <span class="fn">ValidationError</span> <span class="kw">as</span> e:
+    <span class="nb">print</span>(e.field)    <span class="cm"># "email"</span>
+    <span class="nb">print</span>(<span class="nb">str</span>(e))     <span class="cm"># "email: invalid format"</span>
+<span class="kw">except</span> <span class="fn">AppError</span> <span class="kw">as</span> e:
+    <span class="nb">print</span>(<span class="st">"General app error"</span>)</code></pre>
+
+    <div class="callout tip">
+      <strong>Pattern:</strong> Always create a base <code>AppError(Exception)</code> for your package. Users can then catch all your exceptions with a single type, or specific ones as needed.
+    </div>
+  </section>
+
+  <!-- 7. CONTEXT MANAGERS -->
+  <section id="context">
+    <h2>7. Context Managers</h2>
+    <p><code>with</code> statements guarantee cleanup whether or not an exception occurs — the idiomatic replacement for <code>try/finally</code>.</p>
+
+    <h3>Using built-in context managers</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">with</span> <span class="nb">open</span>(<span class="st">"data.txt"</span>, <span class="st">"r"</span>) <span class="kw">as</span> f:
+    content <span class="op">=</span> f.read()   <span class="cm"># file is closed even if read() raises</span>
+
+<span class="cm"># Multiple resources in one statement (Python 3.10+ parenthesised form)</span>
+<span class="kw">with</span> (
+    <span class="nb">open</span>(<span class="st">"input.txt"</span>) <span class="kw">as</span> src,
+    <span class="nb">open</span>(<span class="st">"output.txt"</span>, <span class="st">"w"</span>) <span class="kw">as</span> dst,
+):
+    dst.write(src.read())</code></pre>
+
+    <h3>Class-based context manager</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">class</span> <span class="fn">DatabaseConnection</span>:
+    <span class="kw">def</span> <span class="df">__enter__</span>(<span class="kw">self</span>):
+        <span class="kw">self</span>.conn <span class="op">=</span> connect_db()
+        <span class="kw">return</span> <span class="kw">self</span>.conn       <span class="cm"># value bound to 'as' variable</span>
+
+    <span class="kw">def</span> <span class="df">__exit__</span>(<span class="kw">self</span>, exc_type, exc_val, exc_tb):
+        <span class="kw">self</span>.conn.close()
+        <span class="cm"># Return True  → suppress the exception</span>
+        <span class="cm"># Return False → propagate the exception (default)</span>
+        <span class="kw">return</span> <span class="kw">False</span>
+
+<span class="kw">with</span> <span class="fn">DatabaseConnection</span>() <span class="kw">as</span> conn:
+    conn.execute(<span class="st">"SELECT 1"</span>)</code></pre>
+
+    <h3><code>__exit__</code> parameters</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Parameter</th><th>Value when no exception</th><th>Value when exception raised</th></tr>
+        <tr><td><code>exc_type</code></td><td><code>None</code></td><td>Exception class (e.g. <code>ValueError</code>)</td></tr>
+        <tr><td><code>exc_val</code></td><td><code>None</code></td><td>Exception instance</td></tr>
+        <tr><td><code>exc_tb</code></td><td><code>None</code></td><td>Traceback object</td></tr>
+        <tr><td>return value</td><td>ignored</td><td><code>True</code> suppresses, <code>False</code>/<code>None</code> propagates</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 8. CONTEXTLIB -->
+  <section id="contextlib">
+    <h2>8. contextlib Utilities</h2>
+
+    <h3>@contextmanager — generator-based</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">from</span> contextlib <span class="kw">import</span> contextmanager
+
+<span class="op">@</span>contextmanager
+<span class="kw">def</span> <span class="df">managed_transaction</span>(conn):
+    <span class="kw">try</span>:
+        <span class="kw">yield</span> conn          <span class="cm"># code inside 'with' block runs here</span>
+        conn.commit()
+    <span class="kw">except</span> <span class="ex">Exception</span>:
+        conn.rollback()
+        <span class="kw">raise</span>
+    <span class="kw">finally</span>:
+        conn.close()
+
+<span class="kw">with</span> <span class="df">managed_transaction</span>(get_conn()) <span class="kw">as</span> conn:
+    conn.execute(<span class="st">"INSERT ..."</span>)</code></pre>
+
+    <h3>suppress — silently ignore specific exceptions</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">from</span> contextlib <span class="kw">import</span> suppress
+<span class="kw">import</span> os
+
+<span class="kw">with</span> suppress(<span class="ex">FileNotFoundError</span>):
+    os.remove(<span class="st">"tmp_file.txt"</span>)   <span class="cm"># no error if file doesn't exist</span></code></pre>
+
+    <h3>ExitStack — dynamic resource management</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">from</span> contextlib <span class="kw">import</span> ExitStack
+
+<span class="kw">with</span> ExitStack() <span class="kw">as</span> stack:
+    files <span class="op">=</span> [stack.enter_context(<span class="nb">open</span>(f)) <span class="kw">for</span> f <span class="kw">in</span> filenames]
+    <span class="cm"># all files are closed when the block exits, even if one open() fails</span></code></pre>
+
+    <h3>asynccontextmanager (async/await)</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">from</span> contextlib <span class="kw">import</span> asynccontextmanager
+
+<span class="op">@</span>asynccontextmanager
+<span class="kw">async def</span> <span class="df">async_resource</span>():
+    resource <span class="op">=</span> <span class="kw">await</span> acquire()
+    <span class="kw">try</span>:
+        <span class="kw">yield</span> resource
+    <span class="kw">finally</span>:
+        <span class="kw">await</span> resource.release()
+
+<span class="kw">async with</span> <span class="df">async_resource</span>() <span class="kw">as</span> r:
+    <span class="kw">await</span> r.do_work()</code></pre>
+  </section>
+
+  <!-- 9. EXCEPTION GROUPS -->
+  <section id="groups">
+    <h2>9. Exception Groups (Python 3.11+)</h2>
+    <p>Handle multiple simultaneous exceptions — primarily from concurrent code (e.g. <code>asyncio.TaskGroup</code>).</p>
+
+    <h3>Raising an ExceptionGroup</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">raise</span> ExceptionGroup(
+    <span class="st">"multiple errors"</span>,
+    [<span class="ex">ValueError</span>(<span class="st">"bad val"</span>), <span class="ex">TypeError</span>(<span class="st">"bad type"</span>), <span class="ex">KeyError</span>(<span class="st">"missing"</span>)]
+)</code></pre>
+
+    <h3>Handling with <code>except*</code></h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">try</span>:
+    <span class="kw">async with</span> asyncio.TaskGroup() <span class="kw">as</span> tg:
+        tg.create_task(task_a())
+        tg.create_task(task_b())
+<span class="kw">except*</span> <span class="ex">ValueError</span> <span class="kw">as</span> eg:
+    <span class="kw">for</span> exc <span class="kw">in</span> eg.exceptions:
+        <span class="nb">print</span>(<span class="st">f"ValueError: </span><span class="op">{</span>exc<span class="op">}</span><span class="st">"</span>)
+<span class="kw">except*</span> <span class="ex">TypeError</span> <span class="kw">as</span> eg:
+    <span class="nb">print</span>(<span class="st">f"</span><span class="op">{</span><span class="nb">len</span>(eg.exceptions)<span class="op">}</span><span class="st"> TypeErrors occurred"</span>)</code></pre>
+
+    <div class="callout info">
+      <strong>Note:</strong> <code>except*</code> and <code>except</code> cannot be mixed in the same <code>try</code> block. <code>except*</code> always receives an <code>ExceptionGroup</code> even if only one matching exception exists.
+    </div>
+  </section>
+
+  <!-- 10. LOGGING -->
+  <section id="logging">
+    <h2>10. Logging &amp; Traceback</h2>
+
+    <h3>logging.exception — full traceback automatically</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">import</span> logging
+
+logging.basicConfig(level<span class="op">=</span>logging.DEBUG)
+logger <span class="op">=</span> logging.getLogger(__name__)
+
+<span class="kw">try</span>:
+    risky_operation()
+<span class="kw">except</span> <span class="ex">Exception</span>:
+    logger.exception(<span class="st">"Unexpected error during risky_operation"</span>)
+    <span class="cm"># Logs at ERROR level and includes full traceback</span></code></pre>
+
+    <h3>Manual traceback inspection</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">import</span> traceback, sys
+
+<span class="kw">try</span>:
+    risky_operation()
+<span class="kw">except</span> <span class="ex">Exception</span> <span class="kw">as</span> e:
+    <span class="cm"># String representation of full traceback</span>
+    tb_str <span class="op">=</span> traceback.format_exc()
+
+    <span class="cm"># Tuple: (exception_type, exception_value, traceback_object)</span>
+    exc_type, exc_val, exc_tb <span class="op">=</span> sys.exc_info()
+
+    <span class="cm"># Print to stderr</span>
+    traceback.print_exc()
+
+    <span class="cm"># List of FrameSummary objects</span>
+    frames <span class="op">=</span> traceback.extract_tb(exc_tb)</code></pre>
+
+    <h3>warnings module</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">import</span> warnings
+
+warnings.warn(<span class="st">"use new_func() instead"</span>, DeprecationWarning, stacklevel<span class="op">=</span><span class="nu">2</span>)
+
+<span class="cm"># Treat specific warnings as errors</span>
+warnings.filterwarnings(<span class="st">"error"</span>, category<span class="op">=</span>DeprecationWarning)</code></pre>
+  </section>
+
+  <!-- 11. PATTERNS -->
+  <section id="patterns">
+    <h2>11. Common Patterns</h2>
+
+    <h3>Retry with backoff</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">import</span> time
+
+<span class="kw">def</span> <span class="df">retry</span>(func, retries<span class="op">=</span><span class="nu">3</span>, delay<span class="op">=</span><span class="nu">1.0</span>, backoff<span class="op">=</span><span class="nu">2.0</span>):
+    last_exc <span class="op">=</span> <span class="kw">None</span>
+    <span class="kw">for</span> attempt <span class="kw">in</span> <span class="nb">range</span>(retries):
+        <span class="kw">try</span>:
+            <span class="kw">return</span> func()
+        <span class="kw">except</span> <span class="ex">Exception</span> <span class="kw">as</span> e:
+            last_exc <span class="op">=</span> e
+            time.sleep(delay <span class="op">*</span> (backoff <span class="op">**</span> attempt))
+    <span class="kw">raise</span> last_exc</code></pre>
+
+    <h3>Fallback / default value</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">def</span> <span class="df">safe_parse_int</span>(value, default<span class="op">=</span><span class="nu">0</span>):
+    <span class="kw">try</span>:
+        <span class="kw">return</span> <span class="nb">int</span>(value)
+    <span class="kw">except</span> (<span class="ex">ValueError</span>, <span class="ex">TypeError</span>):
+        <span class="kw">return</span> default</code></pre>
+
+    <h3>Guard clause / validate at boundary</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">def</span> <span class="df">process_order</span>(order_id: <span class="nb">int</span>) <span class="op">-></span> Order:
+    <span class="kw">if not</span> <span class="nb">isinstance</span>(order_id, <span class="nb">int</span>):
+        <span class="kw">raise</span> <span class="ex">TypeError</span>(<span class="st">f"order_id must be int, got </span><span class="op">{</span><span class="nb">type</span>(order_id).__name__<span class="op">}</span><span class="st">"</span>)
+    <span class="kw">if</span> order_id <span class="op">&lt;=</span> <span class="nu">0</span>:
+        <span class="kw">raise</span> <span class="ex">ValueError</span>(<span class="st">"order_id must be positive"</span>)
+    <span class="cm"># ... rest of logic</span></code></pre>
+
+    <h3>Exception translation (layer boundary)</h3>
+    <pre><span class="lang-label">python</span><code><span class="cm"># Translate low-level errors to domain errors at service boundaries</span>
+<span class="kw">def</span> <span class="df">get_user</span>(user_id: <span class="nb">int</span>) <span class="op">-></span> User:
+    <span class="kw">try</span>:
+        <span class="kw">return</span> db.query(<span class="st">f"SELECT * FROM users WHERE id=</span><span class="op">{</span>user_id<span class="op">}</span><span class="st">"</span>)
+    <span class="kw">except</span> <span class="fn">DatabaseConnectionError</span> <span class="kw">as</span> e:
+        <span class="kw">raise</span> <span class="fn">ServiceUnavailableError</span>(<span class="st">"User service unavailable"</span>) <span class="kw">from</span> e
+    <span class="kw">except</span> <span class="fn">RecordNotFoundError</span> <span class="kw">as</span> e:
+        <span class="kw">raise</span> <span class="fn">NotFoundError</span>(<span class="st">"User"</span>, user_id) <span class="kw">from</span> e</code></pre>
+
+    <h3>Async exception handling</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">import</span> asyncio
+
+<span class="kw">async def</span> <span class="df">fetch_data</span>(url: <span class="nb">str</span>) <span class="op">-></span> <span class="nb">dict</span>:
+    <span class="kw">try</span>:
+        <span class="kw">async with</span> session.get(url) <span class="kw">as</span> resp:
+            resp.raise_for_status()
+            <span class="kw">return await</span> resp.json()
+    <span class="kw">except</span> asyncio.TimeoutError:
+        <span class="kw">raise</span> <span class="fn">ServiceTimeout</span>(<span class="st">f"Request to </span><span class="op">{</span>url<span class="op">}</span><span class="st"> timed out"</span>)
+    <span class="kw">except</span> <span class="ex">Exception</span> <span class="kw">as</span> e:
+        <span class="kw">raise</span> <span class="fn">FetchError</span>(url) <span class="kw">from</span> e</code></pre>
+  </section>
+
+  <!-- 12. BEST PRACTICES -->
+  <section id="best">
+    <h2>12. Best Practices &amp; Anti-patterns</h2>
+
+    <div class="grid2">
+      <div>
+        <h3 style="color:var(--green)">✓ Do</h3>
+        <div class="callout tip">Catch specific exception types, not broad ones.</div>
+        <div class="callout tip">Use <code>raise ... from e</code> to preserve the cause.</div>
+        <div class="callout tip">Put cleanup code in <code>finally</code> or use <code>with</code>.</div>
+        <div class="callout tip">Define a base error class per library/package.</div>
+        <div class="callout tip">Log with <code>logger.exception()</code> to capture the traceback.</div>
+        <div class="callout tip">Validate inputs at system/API boundaries.</div>
+        <div class="callout tip">Re-raise if you can't meaningfully handle an exception.</div>
+      </div>
+      <div>
+        <h3 style="color:var(--red)">✗ Avoid</h3>
+        <div class="callout danger">Bare <code>except:</code> — catches everything including <code>KeyboardInterrupt</code>.</div>
+        <div class="callout danger">Silently swallowing exceptions: <code>except Exception: pass</code>.</div>
+        <div class="callout danger">Using exceptions for normal control flow (EAFP has limits).</div>
+        <div class="callout danger">Accessing exception variable <code>e</code> after the <code>except</code> block — it's deleted.</div>
+        <div class="callout danger">Catching <code>Exception</code> in library code and not re-raising.</div>
+        <div class="callout danger">Raising bare <code>Exception</code> — always use a specific type.</div>
+        <div class="callout danger">Over-catching at low levels, hiding bugs from upper layers.</div>
+      </div>
+    </div>
+
+    <h3>Variable scoping gotcha</h3>
+    <pre><span class="lang-label">python</span><code><span class="kw">try</span>:
+    <span class="kw">raise</span> <span class="ex">ValueError</span>(<span class="st">"oops"</span>)
+<span class="kw">except</span> <span class="ex">ValueError</span> <span class="kw">as</span> e:
+    err <span class="op">=</span> <span class="nb">str</span>(e)   <span class="cm"># save before the block ends!</span>
+
+<span class="cm"># 'e' is deleted here — Python does this to break reference cycles</span>
+<span class="nb">print</span>(err)        <span class="cm"># OK — we saved it in 'err'</span>
+<span class="cm"># print(e)        # NameError!</span></code></pre>
+  </section>
+
+  <!-- 13. BUILT-IN REFERENCE -->
+  <section id="builtins">
+    <h2>13. Built-in Exception Reference</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Exception</th><th>When raised</th></tr>
+        <tr><td><code>ValueError</code></td><td>Right type, but inappropriate value (e.g. <code>int("abc")</code>)</td></tr>
+        <tr><td><code>TypeError</code></td><td>Wrong type for an operation (e.g. <code>"a" + 1</code>)</td></tr>
+        <tr><td><code>KeyError</code></td><td>Dict key not found</td></tr>
+        <tr><td><code>IndexError</code></td><td>Sequence index out of range</td></tr>
+        <tr><td><code>AttributeError</code></td><td>Object has no such attribute</td></tr>
+        <tr><td><code>NameError</code></td><td>Local/global name not found</td></tr>
+        <tr><td><code>UnboundLocalError</code></td><td>Local variable referenced before assignment</td></tr>
+        <tr><td><code>FileNotFoundError</code></td><td>File or directory not found (subclass of <code>OSError</code>)</td></tr>
+        <tr><td><code>PermissionError</code></td><td>Insufficient permissions (subclass of <code>OSError</code>)</td></tr>
+        <tr><td><code>TimeoutError</code></td><td>Operation timed out (subclass of <code>OSError</code>)</td></tr>
+        <tr><td><code>ZeroDivisionError</code></td><td>Division or modulo by zero</td></tr>
+        <tr><td><code>OverflowError</code></td><td>Arithmetic result too large</td></tr>
+        <tr><td><code>MemoryError</code></td><td>Insufficient memory to allocate</td></tr>
+        <tr><td><code>RecursionError</code></td><td>Maximum recursion depth exceeded</td></tr>
+        <tr><td><code>NotImplementedError</code></td><td>Abstract method not implemented</td></tr>
+        <tr><td><code>ImportError</code></td><td>Import failed</td></tr>
+        <tr><td><code>ModuleNotFoundError</code></td><td>Module not found (subclass of <code>ImportError</code>)</td></tr>
+        <tr><td><code>StopIteration</code></td><td>Iterator has no more items</td></tr>
+        <tr><td><code>RuntimeError</code></td><td>Generic runtime error (use as last resort)</td></tr>
+        <tr><td><code>AssertionError</code></td><td><code>assert</code> statement failed</td></tr>
+        <tr><td><code>SystemExit</code></td><td><code>sys.exit()</code> called (not <code>Exception</code> subclass)</td></tr>
+        <tr><td><code>KeyboardInterrupt</code></td><td>User pressed Ctrl+C (not <code>Exception</code> subclass)</td></tr>
+        <tr><td><code>UnicodeDecodeError</code></td><td>Bytes cannot be decoded with given encoding</td></tr>
+        <tr><td><code>UnicodeEncodeError</code></td><td>String cannot be encoded with given encoding</td></tr>
+        <tr><td><code>ConnectionError</code></td><td>Network connection problem (base of several subclasses)</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- 14. COMPLETE PROGRAMS -->
+  <section id="programs">
+    <h2>14. Complete Programs</h2>
+    <p>Fully runnable Python programs demonstrating real-world exception handling scenarios.</p>
+
+    <!-- Program 1 -->
+    <h3>Program 1 — Basic Exception Handling Demo</h3>
+    <p>Covers <code>try/except/else/finally</code>, multiple handlers, and bare re-raise.</p>
+    <pre><span class="lang-label">python</span><code><span class="cm"># program1_basics.py</span>
+
+<span class="kw">def</span> <span class="df">divide</span>(a, b):
+    <span class="kw">try</span>:
+        result <span class="op">=</span> a <span class="op">/</span> b
+    <span class="kw">except</span> <span class="ex">ZeroDivisionError</span>:
+        <span class="nb">print</span>(<span class="st">"[except]  Cannot divide by zero"</span>)
+        <span class="kw">return None</span>
+    <span class="kw">except</span> <span class="ex">TypeError</span> <span class="kw">as</span> e:
+        <span class="nb">print</span>(<span class="st">f"[except]  Type error: </span><span class="op">{</span>e<span class="op">}</span><span class="st">"</span>)
+        <span class="kw">return None</span>
+    <span class="kw">else</span>:
+        <span class="nb">print</span>(<span class="st">f"[else]    Division succeeded: </span><span class="op">{</span>result<span class="op">}</span><span class="st">"</span>)
+        <span class="kw">return</span> result
+    <span class="kw">finally</span>:
+        <span class="nb">print</span>(<span class="st">"[finally] divide() finished\n"</span>)
+
+
+<span class="nb">print</span>(<span class="st">"--- Case 1: normal division ---"</span>)
+divide(<span class="nu">10</span>, <span class="nu">2</span>)
+
+<span class="nb">print</span>(<span class="st">"--- Case 2: divide by zero ---"</span>)
+divide(<span class="nu">10</span>, <span class="nu">0</span>)
+
+<span class="nb">print</span>(<span class="st">"--- Case 3: wrong type ---"</span>)
+divide(<span class="nu">10</span>, <span class="st">"x"</span>)
+
+<span class="cm"># Expected output:
+# --- Case 1: normal division ---
+# [else]    Division succeeded: 5.0
+# [finally] divide() finished
+#
+# --- Case 2: divide by zero ---
+# [except]  Cannot divide by zero
+# [finally] divide() finished
+#
+# --- Case 3: wrong type ---
+# [except]  Type error: unsupported operand type(s) for /: 'int' and 'str'
+# [finally] divide() finished</span></code></pre>
+
+    <!-- Program 2 -->
+    <h3>Program 2 — Custom Exception Hierarchy</h3>
+    <p>Defines a multi-level exception hierarchy for a user management service.</p>
+    <pre><span class="lang-label">python</span><code><span class="cm"># program2_custom_exceptions.py</span>
+
+<span class="cm"># --- Exception definitions ---</span>
+<span class="kw">class</span> <span class="fn">AppError</span>(<span class="ex">Exception</span>):
+    <span class="st">"""Root error for this application."""</span>
+
+<span class="kw">class</span> <span class="fn">ValidationError</span>(<span class="fn">AppError</span>):
+    <span class="kw">def</span> <span class="df">__init__</span>(<span class="kw">self</span>, field: <span class="nb">str</span>, msg: <span class="nb">str</span>):
+        <span class="kw">self</span>.field <span class="op">=</span> field
+        <span class="nb">super</span>().<span class="df">__init__</span>(<span class="st">f"Validation failed on '{field}': {msg}"</span>)
+
+<span class="kw">class</span> <span class="fn">NotFoundError</span>(<span class="fn">AppError</span>):
+    <span class="kw">def</span> <span class="df">__init__</span>(<span class="kw">self</span>, resource: <span class="nb">str</span>, id_):
+        <span class="kw">self</span>.resource <span class="op">=</span> resource
+        <span class="kw">self</span>.id_ <span class="op">=</span> id_
+        <span class="nb">super</span>().<span class="df">__init__</span>(<span class="st">f"{resource} with id={id_} not found"</span>)
+
+<span class="kw">class</span> <span class="fn">DatabaseError</span>(<span class="fn">AppError</span>):
+    <span class="kw">def</span> <span class="df">__init__</span>(<span class="kw">self</span>, msg: <span class="nb">str</span>, query: <span class="nb">str</span> <span class="op">=</span> <span class="st">""</span>):
+        <span class="kw">self</span>.query <span class="op">=</span> query
+        <span class="nb">super</span>().<span class="df">__init__</span>(msg)
+
+
+<span class="cm"># --- Fake database ---</span>
+_USERS <span class="op">=</span> {<span class="nu">1</span>: <span class="st">"Alice"</span>, <span class="nu">2</span>: <span class="st">"Bob"</span>}
+
+<span class="kw">def</span> <span class="df">_db_fetch</span>(user_id: <span class="nb">int</span>) <span class="op">-></span> <span class="nb">str</span>:
+    <span class="kw">if</span> user_id <span class="op">==</span> <span class="nu">99</span>:
+        <span class="kw">raise</span> <span class="fn">DatabaseError</span>(<span class="st">"Connection refused"</span>, <span class="st">f"SELECT * FROM users WHERE id={user_id}"</span>)
+    <span class="kw">if</span> user_id <span class="kw">not in</span> _USERS:
+        <span class="kw">raise</span> <span class="fn">NotFoundError</span>(<span class="st">"User"</span>, user_id)
+    <span class="kw">return</span> _USERS[user_id]
+
+
+<span class="cm"># --- Service layer ---</span>
+<span class="kw">def</span> <span class="df">get_user</span>(user_id) <span class="op">-></span> <span class="nb">str</span>:
+    <span class="kw">if not</span> <span class="nb">isinstance</span>(user_id, <span class="nb">int</span>):
+        <span class="kw">raise</span> <span class="fn">ValidationError</span>(<span class="st">"user_id"</span>, <span class="st">"must be an integer"</span>)
+    <span class="kw">if</span> user_id <span class="op">&lt;=</span> <span class="nu">0</span>:
+        <span class="kw">raise</span> <span class="fn">ValidationError</span>(<span class="st">"user_id"</span>, <span class="st">"must be positive"</span>)
+    <span class="kw">return</span> _db_fetch(user_id)
+
+
+<span class="cm"># --- Caller ---</span>
+<span class="kw">def</span> <span class="df">show_user</span>(user_id):
+    <span class="kw">try</span>:
+        name <span class="op">=</span> get_user(user_id)
+        <span class="nb">print</span>(<span class="st">f"Found: {name}"</span>)
+    <span class="kw">except</span> <span class="fn">ValidationError</span> <span class="kw">as</span> e:
+        <span class="nb">print</span>(<span class="st">f"[ValidationError] {e}  (field={e.field})"</span>)
+    <span class="kw">except</span> <span class="fn">NotFoundError</span> <span class="kw">as</span> e:
+        <span class="nb">print</span>(<span class="st">f"[NotFoundError]   {e}"</span>)
+    <span class="kw">except</span> <span class="fn">DatabaseError</span> <span class="kw">as</span> e:
+        <span class="nb">print</span>(<span class="st">f"[DatabaseError]   {e}  (query={e.query})"</span>)
+    <span class="kw">except</span> <span class="fn">AppError</span> <span class="kw">as</span> e:
+        <span class="nb">print</span>(<span class="st">f"[AppError]        {e}"</span>)
+
+
+show_user(<span class="nu">1</span>)       <span class="cm"># Found: Alice</span>
+show_user(<span class="nu">2</span>)       <span class="cm"># Found: Bob</span>
+show_user(<span class="nu">5</span>)       <span class="cm"># [NotFoundError]   User with id=5 not found</span>
+show_user(<span class="nu">-1</span>)      <span class="cm"># [ValidationError] Validation failed on 'user_id': must be positive</span>
+show_user(<span class="st">"abc"</span>)  <span class="cm"># [ValidationError] Validation failed on 'user_id': must be an integer</span>
+show_user(<span class="nu">99</span>)      <span class="cm"># [DatabaseError]   Connection refused</span></code></pre>
+
+    <!-- Program 3 -->
+    <h3>Program 3 — Exception Chaining</h3>
+    <p>Shows implicit context, explicit <code>from e</code> chaining, and <code>from None</code> suppression.</p>
+    <pre><span class="lang-label">python</span><code><span class="cm"># program3_chaining.py</span>
+<span class="kw">import</span> traceback
+
+<span class="kw">class</span> <span class="fn">ServiceError</span>(<span class="ex">Exception</span>): <span class="kw">pass</span>
+<span class="kw">class</span> <span class="fn">PublicError</span>(<span class="ex">Exception</span>):  <span class="kw">pass</span>
+
+<span class="cm"># --- Explicit chaining: raise X from Y ---</span>
+<span class="nb">print</span>(<span class="st">"=== Explicit chain (raise X from Y) ==="</span>)
+<span class="kw">try</span>:
+    <span class="kw">try</span>:
+        <span class="nb">int</span>(<span class="st">"not-a-number"</span>)
+    <span class="kw">except</span> <span class="ex">ValueError</span> <span class="kw">as</span> e:
+        <span class="kw">raise</span> <span class="fn">ServiceError</span>(<span class="st">"Failed to parse config"</span>) <span class="kw">from</span> e
+<span class="kw">except</span> <span class="fn">ServiceError</span>:
+    traceback.print_exc()
+
+<span class="nb">print</span>()
+
+<span class="cm"># --- Suppressed chain: raise X from None ---</span>
+<span class="nb">print</span>(<span class="st">"=== Suppressed chain (raise X from None) ==="</span>)
+<span class="kw">try</span>:
+    <span class="kw">try</span>:
+        <span class="nb">int</span>(<span class="st">"not-a-number"</span>)
+    <span class="kw">except</span> <span class="ex">ValueError</span>:
+        <span class="kw">raise</span> <span class="fn">PublicError</span>(<span class="st">"Invalid configuration value"</span>) <span class="kw">from</span> <span class="kw">None</span>
+<span class="kw">except</span> <span class="fn">PublicError</span>:
+    traceback.print_exc()   <span class="cm"># original ValueError NOT shown</span>
+
+<span class="nb">print</span>()
+
+<span class="cm"># --- Inspecting __cause__ and __context__ ---</span>
+<span class="nb">print</span>(<span class="st">"=== Inspecting chain attributes ==="</span>)
+<span class="kw">try</span>:
+    <span class="kw">try</span>:
+        <span class="nb">open</span>(<span class="st">"nonexistent.txt"</span>)
+    <span class="kw">except</span> <span class="ex">FileNotFoundError</span> <span class="kw">as</span> e:
+        <span class="kw">raise</span> <span class="fn">ServiceError</span>(<span class="st">"Could not load file"</span>) <span class="kw">from</span> e
+<span class="kw">except</span> <span class="fn">ServiceError</span> <span class="kw">as</span> e:
+    <span class="nb">print</span>(<span class="st">f"Exception      : {e}"</span>)
+    <span class="nb">print</span>(<span class="st">f"__cause__      : {e.__cause__}"</span>)
+    <span class="nb">print</span>(<span class="st">f"__context__    : {e.__context__}"</span>)
+    <span class="nb">print</span>(<span class="st">f"suppress ctx   : {e.__suppress_context__}"</span>)</code></pre>
+
+    <!-- Program 4 -->
+    <h3>Program 4 — Context Managers</h3>
+    <p>Class-based and <code>@contextmanager</code> decorator with exception handling inside.</p>
+    <pre><span class="lang-label">python</span><code><span class="cm"># program4_context_managers.py</span>
+<span class="kw">from</span> contextlib <span class="kw">import</span> contextmanager, suppress
+
+<span class="cm"># --- Class-based context manager ---</span>
+<span class="kw">class</span> <span class="fn">ManagedFile</span>:
+    <span class="kw">def</span> <span class="df">__init__</span>(<span class="kw">self</span>, path: <span class="nb">str</span>, mode: <span class="nb">str</span> <span class="op">=</span> <span class="st">"r"</span>):
+        <span class="kw">self</span>.path <span class="op">=</span> path
+        <span class="kw">self</span>.mode <span class="op">=</span> mode
+
+    <span class="kw">def</span> <span class="df">__enter__</span>(<span class="kw">self</span>):
+        <span class="nb">print</span>(<span class="st">f"[ManagedFile] Opening {self.path}"</span>)
+        <span class="kw">self</span>._fh <span class="op">=</span> <span class="nb">open</span>(<span class="kw">self</span>.path, <span class="kw">self</span>.mode)
+        <span class="kw">return</span> <span class="kw">self</span>._fh
+
+    <span class="kw">def</span> <span class="df">__exit__</span>(<span class="kw">self</span>, exc_type, exc_val, exc_tb):
+        <span class="kw">self</span>._fh.close()
+        <span class="kw">if</span> exc_type <span class="kw">is not None</span>:
+            <span class="nb">print</span>(<span class="st">f"[ManagedFile] Exception suppressed: {exc_type.__name__}: {exc_val}"</span>)
+            <span class="kw">return True</span>   <span class="cm"># suppress the exception</span>
+        <span class="nb">print</span>(<span class="st">"[ManagedFile] Closed cleanly"</span>)
+        <span class="kw">return False</span>
+
+
+<span class="nb">print</span>(<span class="st">"--- Using ManagedFile (no error) ---"</span>)
+<span class="kw">import</span> tempfile, os
+tmp <span class="op">=</span> tempfile.NamedTemporaryFile(delete<span class="op">=</span><span class="kw">False</span>, suffix<span class="op">=</span><span class="st">".txt"</span>, mode<span class="op">=</span><span class="st">"w"</span>)
+tmp.write(<span class="st">"hello"</span>); tmp.close()
+
+<span class="kw">with</span> <span class="fn">ManagedFile</span>(tmp.name) <span class="kw">as</span> f:
+    <span class="nb">print</span>(<span class="st">f"  Read: {f.read()}"</span>)
+
+<span class="nb">print</span>(<span class="st">"\n--- Using ManagedFile (exception inside) ---"</span>)
+<span class="kw">with</span> <span class="fn">ManagedFile</span>(tmp.name) <span class="kw">as</span> f:
+    <span class="kw">raise</span> <span class="ex">ValueError</span>(<span class="st">"something went wrong"</span>)
+<span class="nb">print</span>(<span class="st">"  Execution continues after suppressed exception"</span>)
+
+os.unlink(tmp.name)
+
+
+<span class="cm"># --- Generator-based context manager ---</span>
+<span class="op">@</span>contextmanager
+<span class="kw">def</span> <span class="df">transaction</span>(name: <span class="nb">str</span>):
+    <span class="nb">print</span>(<span class="st">f"\n[tx] BEGIN {name}"</span>)
+    <span class="kw">try</span>:
+        <span class="kw">yield</span> name
+        <span class="nb">print</span>(<span class="st">f"[tx] COMMIT {name}"</span>)
+    <span class="kw">except</span> <span class="ex">Exception</span> <span class="kw">as</span> e:
+        <span class="nb">print</span>(<span class="st">f"[tx] ROLLBACK {name} due to {e}"</span>)
+        <span class="kw">raise</span>
+
+<span class="nb">print</span>(<span class="st">"--- transaction (success) ---"</span>)
+<span class="kw">with</span> <span class="df">transaction</span>(<span class="st">"order-insert"</span>) <span class="kw">as</span> tx:
+    <span class="nb">print</span>(<span class="st">f"  Working inside {tx}"</span>)
+
+<span class="nb">print</span>(<span class="st">"\n--- transaction (failure) ---"</span>)
+<span class="kw">try</span>:
+    <span class="kw">with</span> <span class="df">transaction</span>(<span class="st">"payment-update"</span>) <span class="kw">as</span> tx:
+        <span class="nb">print</span>(<span class="st">f"  Working inside {tx}"</span>)
+        <span class="kw">raise</span> <span class="ex">RuntimeError</span>(<span class="st">"payment gateway timeout"</span>)
+<span class="kw">except</span> <span class="ex">RuntimeError</span> <span class="kw">as</span> e:
+    <span class="nb">print</span>(<span class="st">f"  Caught outer: {e}"</span>)
+
+
+<span class="cm"># --- suppress ---</span>
+<span class="nb">print</span>(<span class="st">"\n--- suppress ---"</span>)
+<span class="kw">with</span> suppress(<span class="ex">FileNotFoundError</span>):
+    os.remove(<span class="st">"file_that_does_not_exist.txt"</span>)
+<span class="nb">print</span>(<span class="st">"  No error raised"</span>)</code></pre>
+
+    <!-- Program 5 -->
+    <h3>Program 5 — Retry Decorator</h3>
+    <p>A production-ready retry decorator with exponential backoff and selective exception types.</p>
+    <pre><span class="lang-label">python</span><code><span class="cm"># program5_retry_decorator.py</span>
+<span class="kw">import</span> time
+<span class="kw">import</span> functools
+<span class="kw">import</span> random
+
+<span class="kw">def</span> <span class="df">retry</span>(exceptions, retries<span class="op">=</span><span class="nu">3</span>, delay<span class="op">=</span><span class="nu">0.5</span>, backoff<span class="op">=</span><span class="nu">2.0</span>):
+    <span class="st">"""Retry decorator with exponential backoff.
+
+    Args:
+        exceptions: exception type or tuple of types to retry on
+        retries:    maximum number of attempts
+        delay:      initial wait in seconds
+        backoff:    multiplier applied to delay after each failure
+    """</span>
+    <span class="kw">def</span> <span class="df">decorator</span>(func):
+        <span class="op">@</span>functools.wraps(func)
+        <span class="kw">def</span> <span class="df">wrapper</span>(<span class="op">*</span>args, <span class="op">**</span>kwargs):
+            wait <span class="op">=</span> delay
+            <span class="kw">for</span> attempt <span class="kw">in</span> <span class="nb">range</span>(<span class="nu">1</span>, retries <span class="op">+</span> <span class="nu">1</span>):
+                <span class="kw">try</span>:
+                    <span class="kw">return</span> func(<span class="op">*</span>args, <span class="op">**</span>kwargs)
+                <span class="kw">except</span> exceptions <span class="kw">as</span> e:
+                    <span class="kw">if</span> attempt <span class="op">==</span> retries:
+                        <span class="nb">print</span>(<span class="st">f"  [retry] All {retries} attempts failed. Raising."</span>)
+                        <span class="kw">raise</span>
+                    <span class="nb">print</span>(<span class="st">f"  [retry] Attempt {attempt} failed: {e}. Retrying in {wait:.1f}s"</span>)
+                    time.sleep(wait)
+                    wait <span class="op">*=</span> backoff
+        <span class="kw">return</span> wrapper
+    <span class="kw">return</span> decorator
+
+
+<span class="cm"># Simulated flaky service</span>
+_call_count <span class="op">=</span> <span class="nu">0</span>
+
+<span class="op">@</span><span class="df">retry</span>((<span class="ex">ConnectionError</span>, <span class="ex">TimeoutError</span>), retries<span class="op">=</span><span class="nu">4</span>, delay<span class="op">=</span><span class="nu">0.1</span>)
+<span class="kw">def</span> <span class="df">flaky_api_call</span>():
+    <span class="kw">global</span> _call_count
+    _call_count <span class="op">+=</span> <span class="nu">1</span>
+    <span class="nb">print</span>(<span class="st">f"  [api] attempt #{_call_count}"</span>)
+    <span class="kw">if</span> _call_count <span class="op">&lt;</span> <span class="nu">3</span>:
+        <span class="kw">raise</span> <span class="ex">ConnectionError</span>(<span class="st">"service unreachable"</span>)
+    <span class="kw">return</span> <span class="st">"{'status': 'ok'}"</span>
+
+
+<span class="nb">print</span>(<span class="st">"--- Retrying until success ---"</span>)
+result <span class="op">=</span> flaky_api_call()
+<span class="nb">print</span>(<span class="st">f"  Result: {result}"</span>)
+
+<span class="cm"># Reset and test exhaustion</span>
+_call_count <span class="op">=</span> <span class="nu">0</span>
+
+<span class="op">@</span><span class="df">retry</span>(<span class="ex">ConnectionError</span>, retries<span class="op">=</span><span class="nu">3</span>, delay<span class="op">=</span><span class="nu">0.1</span>)
+<span class="kw">def</span> <span class="df">always_fails</span>():
+    <span class="kw">global</span> _call_count
+    _call_count <span class="op">+=</span> <span class="nu">1</span>
+    <span class="kw">raise</span> <span class="ex">ConnectionError</span>(<span class="st">"always down"</span>)
+
+<span class="nb">print</span>(<span class="st">"\n--- All retries exhausted ---"</span>)
+<span class="kw">try</span>:
+    always_fails()
+<span class="kw">except</span> <span class="ex">ConnectionError</span> <span class="kw">as</span> e:
+    <span class="nb">print</span>(<span class="st">f"  Final error caught: {e}"</span>)</code></pre>
+
+    <!-- Program 6 -->
+    <h3>Program 6 — File Processing with Robust Error Handling</h3>
+    <p>Reads a CSV-like file, validates each row, collects all errors, and reports a summary.</p>
+    <pre><span class="lang-label">python</span><code><span class="cm"># program6_file_processing.py</span>
+<span class="kw">import</span> io
+
+<span class="cm"># Simulated file content (use open() for real files)</span>
+CSV_DATA <span class="op">=</span> <span class="st">"""\
+name,age,email
+Alice,30,alice@example.com
+Bob,abc,bob@example.com
+Charlie,,charlie@example.com
+Diana,25,not-an-email
+Eve,17,eve@example.com
+"""</span>
+
+<span class="kw">class</span> <span class="fn">RowValidationError</span>(<span class="ex">Exception</span>):
+    <span class="kw">def</span> <span class="df">__init__</span>(<span class="kw">self</span>, row: <span class="nb">int</span>, field: <span class="nb">str</span>, msg: <span class="nb">str</span>):
+        <span class="kw">self</span>.row <span class="op">=</span> row
+        <span class="kw">self</span>.field <span class="op">=</span> field
+        <span class="nb">super</span>().<span class="df">__init__</span>(<span class="st">f"Row {row}, field '{field}': {msg}"</span>)
+
+
+<span class="kw">def</span> <span class="df">validate_row</span>(row_num: <span class="nb">int</span>, name: <span class="nb">str</span>, age: <span class="nb">str</span>, email: <span class="nb">str</span>):
+    errors <span class="op">=</span> []
+    <span class="kw">if not</span> name.strip():
+        errors.append(<span class="fn">RowValidationError</span>(row_num, <span class="st">"name"</span>, <span class="st">"cannot be empty"</span>))
+    <span class="kw">try</span>:
+        age_val <span class="op">=</span> <span class="nb">int</span>(age)
+        <span class="kw">if</span> age_val <span class="op">&lt;</span> <span class="nu">18</span>:
+            errors.append(<span class="fn">RowValidationError</span>(row_num, <span class="st">"age"</span>, <span class="st">f"must be >= 18, got {age_val}"</span>))
+    <span class="kw">except</span> <span class="ex">ValueError</span>:
+        errors.append(<span class="fn">RowValidationError</span>(row_num, <span class="st">"age"</span>, <span class="st">f"must be integer, got '{age}'"</span>))
+    <span class="kw">if</span> <span class="st">"@"</span> <span class="kw">not in</span> email <span class="kw">or</span> <span class="st">"."</span> <span class="kw">not in</span> email.split(<span class="st">"@"</span>)[<span class="op">-</span><span class="nu">1</span>]:
+        errors.append(<span class="fn">RowValidationError</span>(row_num, <span class="st">"email"</span>, <span class="st">f"invalid format '{email}'"</span>))
+    <span class="kw">return</span> errors
+
+
+<span class="kw">def</span> <span class="df">process_csv</span>(data: <span class="nb">str</span>):
+    valid_rows <span class="op">=</span> []
+    all_errors <span class="op">=</span> []
+
+    reader <span class="op">=</span> io.StringIO(data)
+    headers <span class="op">=</span> reader.readline().strip().split(<span class="st">","</span>)  <span class="cm"># skip header</span>
+
+    <span class="kw">for</span> row_num, line <span class="kw">in</span> <span class="nb">enumerate</span>(reader, start<span class="op">=</span><span class="nu">2</span>):
+        line <span class="op">=</span> line.strip()
+        <span class="kw">if not</span> line:
+            <span class="kw">continue</span>
+        <span class="kw">try</span>:
+            parts <span class="op">=</span> line.split(<span class="st">","</span>)
+            <span class="kw">if</span> <span class="nb">len</span>(parts) <span class="op">!=</span> <span class="nu">3</span>:
+                <span class="kw">raise</span> <span class="ex">ValueError</span>(<span class="st">f"expected 3 columns, got {len(parts)}"</span>)
+            name, age, email <span class="op">=</span> parts
+        <span class="kw">except</span> <span class="ex">ValueError</span> <span class="kw">as</span> e:
+            all_errors.append(<span class="fn">RowValidationError</span>(row_num, <span class="st">"row"</span>, <span class="nb">str</span>(e)))
+            <span class="kw">continue</span>
+
+        errors <span class="op">=</span> validate_row(row_num, name, age, email)
+        <span class="kw">if</span> errors:
+            all_errors.extend(errors)
+        <span class="kw">else</span>:
+            valid_rows.append({<span class="st">"name"</span>: name, <span class="st">"age"</span>: <span class="nb">int</span>(age), <span class="st">"email"</span>: email})
+
+    <span class="kw">return</span> valid_rows, all_errors
+
+
+valid, errors <span class="op">=</span> process_csv(CSV_DATA)
+
+<span class="nb">print</span>(<span class="st">f"Valid rows ({len(valid)}):"</span>)
+<span class="kw">for</span> r <span class="kw">in</span> valid:
+    <span class="nb">print</span>(<span class="st">f"  {r}"</span>)
+
+<span class="nb">print</span>(<span class="st">f"\nErrors ({len(errors)}):"</span>)
+<span class="kw">for</span> e <span class="kw">in</span> errors:
+    <span class="nb">print</span>(<span class="st">f"  {e}"</span>)</code></pre>
+
+    <!-- Program 7 -->
+    <h3>Program 7 — Logging Integration</h3>
+    <p>Configures a logger, captures exception tracebacks, and writes to both console and a log file.</p>
+    <pre><span class="lang-label">python</span><code><span class="cm"># program7_logging.py</span>
+<span class="kw">import</span> logging
+<span class="kw">import</span> traceback
+<span class="kw">import</span> sys
+
+<span class="cm"># Configure logging: console + file handler</span>
+logging.basicConfig(
+    level<span class="op">=</span>logging.DEBUG,
+    format<span class="op">=</span><span class="st">"%(asctime)s [%(levelname)-8s] %(name)s: %(message)s"</span>,
+    datefmt<span class="op">=</span><span class="st">"%H:%M:%S"</span>,
+    handlers<span class="op">=</span>[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler(<span class="st">"app.log"</span>, mode<span class="op">=</span><span class="st">"w"</span>),
+    ]
+)
+logger <span class="op">=</span> logging.getLogger(<span class="st">"myapp"</span>)
+
+
+<span class="kw">def</span> <span class="df">parse_config</span>(raw: <span class="nb">str</span>) <span class="op">-></span> <span class="nb">dict</span>:
+    <span class="cm"># Simulate JSON parse failure</span>
+    <span class="kw">import</span> json
+    <span class="kw">return</span> json.loads(raw)
+
+
+<span class="kw">def</span> <span class="df">start_service</span>(config_str: <span class="nb">str</span>):
+    logger.info(<span class="st">"Starting service..."</span>)
+    <span class="kw">try</span>:
+        config <span class="op">=</span> parse_config(config_str)
+        logger.debug(<span class="st">f"Config loaded: {config}"</span>)
+        port <span class="op">=</span> config[<span class="st">"port"</span>]
+        logger.info(<span class="st">f"Listening on port {port}"</span>)
+    <span class="kw">except</span> <span class="ex">KeyError</span> <span class="kw">as</span> e:
+        logger.error(<span class="st">f"Missing config key: {e}"</span>)
+        <span class="kw">raise</span>
+    <span class="kw">except</span> <span class="ex">Exception</span>:
+        <span class="cm"># logger.exception logs at ERROR level AND appends full traceback</span>
+        logger.exception(<span class="st">"Unexpected error while starting service"</span>)
+        <span class="kw">raise</span>
+
+
+<span class="nb">print</span>(<span class="st">"--- Valid config ---"</span>)
+<span class="kw">try</span>:
+    start_service(<span class="st">'{"port": 8080}'</span>)
+<span class="kw">except</span> <span class="ex">Exception</span>:
+    <span class="kw">pass</span>
+
+<span class="nb">print</span>(<span class="st">"\n--- Missing key ---"</span>)
+<span class="kw">try</span>:
+    start_service(<span class="st">'{"host": "localhost"}'</span>)
+<span class="kw">except</span> <span class="ex">Exception</span>:
+    <span class="kw">pass</span>
+
+<span class="nb">print</span>(<span class="st">"\n--- Invalid JSON ---"</span>)
+<span class="kw">try</span>:
+    start_service(<span class="st">"not json at all"</span>)
+<span class="kw">except</span> <span class="ex">Exception</span>:
+    <span class="kw">pass</span>
+
+<span class="nb">print</span>(<span class="st">"\nLog also written to app.log"</span>)</code></pre>
+
+    <!-- Program 8 -->
+    <h3>Program 8 — Exception Groups (Python 3.11+)</h3>
+    <p>Raises and handles simultaneous exceptions using <code>ExceptionGroup</code> and <code>except*</code>.</p>
+    <pre><span class="lang-label">python</span><code><span class="cm"># program8_exception_groups.py  (requires Python 3.11+)</span>
+<span class="kw">import</span> sys
+
+<span class="kw">if</span> sys.version_info <span class="op">&lt;</span> (<span class="nu">3</span>, <span class="nu">11</span>):
+    <span class="nb">print</span>(<span class="st">"Skipping: requires Python 3.11+"</span>)
+    sys.exit(<span class="nu">0</span>)
+
+<span class="kw">import</span> asyncio
+
+
+<span class="kw">async def</span> <span class="df">validate_all</span>(items):
+    <span class="st">"""Validate all items and raise all errors at once."""</span>
+    errors <span class="op">=</span> []
+    <span class="kw">for</span> item <span class="kw">in</span> items:
+        <span class="kw">if not</span> <span class="nb">isinstance</span>(item[<span class="st">"age"</span>], <span class="nb">int</span>):
+            errors.append(<span class="ex">TypeError</span>(<span class="st">f"age must be int for {item['name']}"</span>))
+        <span class="kw">elif</span> item[<span class="st">"age"</span>] <span class="op">&lt;</span> <span class="nu">0</span>:
+            errors.append(<span class="ex">ValueError</span>(<span class="st">f"negative age for {item['name']}"</span>))
+    <span class="kw">if</span> errors:
+        <span class="kw">raise</span> ExceptionGroup(<span class="st">"validation errors"</span>, errors)
+    <span class="kw">return</span> items
+
+
+<span class="kw">async def</span> <span class="df">main</span>():
+    dataset <span class="op">=</span> [
+        {<span class="st">"name"</span>: <span class="st">"Alice"</span>, <span class="st">"age"</span>: <span class="nu">30</span>},
+        {<span class="st">"name"</span>: <span class="st">"Bob"</span>,   <span class="st">"age"</span>: <span class="st">"old"</span>},   <span class="cm"># TypeError</span>
+        {<span class="st">"name"</span>: <span class="st">"Carol"</span>, <span class="st">"age"</span>: <span class="op">-</span><span class="nu">5</span>},    <span class="cm"># ValueError</span>
+        {<span class="st">"name"</span>: <span class="st">"Dave"</span>,  <span class="st">"age"</span>: <span class="st">"???"</span>},  <span class="cm"># TypeError</span>
+    ]
+    <span class="kw">try</span>:
+        <span class="kw">await</span> validate_all(dataset)
+    <span class="kw">except*</span> <span class="ex">TypeError</span> <span class="kw">as</span> eg:
+        <span class="nb">print</span>(<span class="st">f"Type errors ({len(eg.exceptions)}):"</span>)
+        <span class="kw">for</span> e <span class="kw">in</span> eg.exceptions:
+            <span class="nb">print</span>(<span class="st">f"  {e}"</span>)
+    <span class="kw">except*</span> <span class="ex">ValueError</span> <span class="kw">as</span> eg:
+        <span class="nb">print</span>(<span class="st">f"Value errors ({len(eg.exceptions)}):"</span>)
+        <span class="kw">for</span> e <span class="kw">in</span> eg.exceptions:
+            <span class="nb">print</span>(<span class="st">f"  {e}"</span>)
+
+    <span class="cm"># TaskGroup: all task errors collected automatically</span>
+    <span class="nb">print</span>(<span class="st">"\n--- asyncio.TaskGroup ---"</span>)
+    <span class="kw">async def</span> <span class="df">task</span>(name, fail<span class="op">=</span><span class="kw">False</span>):
+        <span class="kw">if</span> fail:
+            <span class="kw">raise</span> <span class="ex">RuntimeError</span>(<span class="st">f"task {name} failed"</span>)
+        <span class="kw">return</span> <span class="st">f"task {name} ok"</span>
+
+    <span class="kw">try</span>:
+        <span class="kw">async with</span> asyncio.TaskGroup() <span class="kw">as</span> tg:
+            tg.create_task(task(<span class="st">"A"</span>))
+            tg.create_task(task(<span class="st">"B"</span>, fail<span class="op">=</span><span class="kw">True</span>))
+            tg.create_task(task(<span class="st">"C"</span>, fail<span class="op">=</span><span class="kw">True</span>))
+    <span class="kw">except*</span> <span class="ex">RuntimeError</span> <span class="kw">as</span> eg:
+        <span class="nb">print</span>(<span class="st">f"Caught {len(eg.exceptions)} RuntimeErrors from TaskGroup:"</span>)
+        <span class="kw">for</span> e <span class="kw">in</span> eg.exceptions:
+            <span class="nb">print</span>(<span class="st">f"  {e}"</span>)
+
+asyncio.run(main())</code></pre>
+
+    <!-- Program 9 -->
+    <h3>Program 9 — Full Application: Bank Account</h3>
+    <p>A complete mini-application tying together custom exceptions, validation, context managers, and logging.</p>
+    <pre><span class="lang-label">python</span><code><span class="cm"># program9_bank_account.py</span>
+<span class="kw">import</span> logging
+<span class="kw">from</span> contextlib <span class="kw">import</span> contextmanager
+
+logging.basicConfig(
+    level<span class="op">=</span>logging.INFO,
+    format<span class="op">=</span><span class="st">"%(levelname)-8s %(message)s"</span>
+)
+logger <span class="op">=</span> logging.getLogger(<span class="st">"bank"</span>)
+
+
+<span class="cm"># --- Exceptions ---</span>
+<span class="kw">class</span> <span class="fn">BankError</span>(<span class="ex">Exception</span>):         <span class="kw">pass</span>
+<span class="kw">class</span> <span class="fn">InsufficientFundsError</span>(<span class="fn">BankError</span>):
+    <span class="kw">def</span> <span class="df">__init__</span>(<span class="kw">self</span>, balance, amount):
+        <span class="nb">super</span>().<span class="df">__init__</span>(<span class="st">f"Cannot withdraw {amount:.2f}, balance is {balance:.2f}"</span>)
+        <span class="kw">self</span>.balance <span class="op">=</span> balance
+        <span class="kw">self</span>.amount <span class="op">=</span> amount
+
+<span class="kw">class</span> <span class="fn">NegativeAmountError</span>(<span class="fn">BankError</span>):
+    <span class="kw">def</span> <span class="df">__init__</span>(<span class="kw">self</span>, amount):
+        <span class="nb">super</span>().<span class="df">__init__</span>(<span class="st">f"Amount must be positive, got {amount}"</span>)
+
+<span class="kw">class</span> <span class="fn">FrozenAccountError</span>(<span class="fn">BankError</span>):
+    <span class="kw">def</span> <span class="df">__init__</span>(<span class="kw">self</span>, account_id):
+        <span class="nb">super</span>().<span class="df">__init__</span>(<span class="st">f"Account {account_id} is frozen"</span>)
+
+
+<span class="cm"># --- Account ---</span>
+<span class="kw">class</span> <span class="fn">BankAccount</span>:
+    <span class="kw">def</span> <span class="df">__init__</span>(<span class="kw">self</span>, account_id: <span class="nb">str</span>, balance: <span class="nb">float</span> <span class="op">=</span> <span class="nu">0.0</span>):
+        <span class="kw">self</span>.account_id <span class="op">=</span> account_id
+        <span class="kw">self</span>._balance <span class="op">=</span> balance
+        <span class="kw">self</span>._frozen <span class="op">=</span> <span class="kw">False</span>
+
+    <span class="op">@</span><span class="kw">property</span>
+    <span class="kw">def</span> <span class="df">balance</span>(<span class="kw">self</span>): <span class="kw">return</span> <span class="kw">self</span>._balance
+
+    <span class="kw">def</span> <span class="df">_check_frozen</span>(<span class="kw">self</span>):
+        <span class="kw">if</span> <span class="kw">self</span>._frozen:
+            <span class="kw">raise</span> <span class="fn">FrozenAccountError</span>(<span class="kw">self</span>.account_id)
+
+    <span class="kw">def</span> <span class="df">deposit</span>(<span class="kw">self</span>, amount: <span class="nb">float</span>):
+        <span class="kw">self</span>._check_frozen()
+        <span class="kw">if</span> amount <span class="op">&lt;=</span> <span class="nu">0</span>:
+            <span class="kw">raise</span> <span class="fn">NegativeAmountError</span>(amount)
+        <span class="kw">self</span>._balance <span class="op">+=</span> amount
+        logger.info(<span class="st">f"[{self.account_id}] Deposited {amount:.2f} → balance={self._balance:.2f}"</span>)
+
+    <span class="kw">def</span> <span class="df">withdraw</span>(<span class="kw">self</span>, amount: <span class="nb">float</span>):
+        <span class="kw">self</span>._check_frozen()
+        <span class="kw">if</span> amount <span class="op">&lt;=</span> <span class="nu">0</span>:
+            <span class="kw">raise</span> <span class="fn">NegativeAmountError</span>(amount)
+        <span class="kw">if</span> amount <span class="op">&gt;</span> <span class="kw">self</span>._balance:
+            <span class="kw">raise</span> <span class="fn">InsufficientFundsError</span>(<span class="kw">self</span>._balance, amount)
+        <span class="kw">self</span>._balance <span class="op">-=</span> amount
+        logger.info(<span class="st">f"[{self.account_id}] Withdrew  {amount:.2f} → balance={self._balance:.2f}"</span>)
+
+    <span class="kw">def</span> <span class="df">freeze</span>(<span class="kw">self</span>):
+        <span class="kw">self</span>._frozen <span class="op">=</span> <span class="kw">True</span>
+        logger.warning(<span class="st">f"[{self.account_id}] Account frozen"</span>)
+
+
+<span class="cm"># --- Transfer context manager ---</span>
+<span class="op">@</span>contextmanager
+<span class="kw">def</span> <span class="df">atomic_transfer</span>(src: <span class="fn">BankAccount</span>, dst: <span class="fn">BankAccount</span>, amount: <span class="nb">float</span>):
+    <span class="st">"""Transfer atomically: rolls back source withdrawal on failure."""</span>
+    logger.info(<span class="st">f"Transfer {amount:.2f} from {src.account_id} to {dst.account_id}"</span>)
+    src.withdraw(amount)
+    <span class="kw">try</span>:
+        <span class="kw">yield</span>
+        dst.deposit(amount)
+    <span class="kw">except</span> <span class="fn">BankError</span> <span class="kw">as</span> e:
+        logger.error(<span class="st">f"Transfer failed: {e} — rolling back"</span>)
+        src._balance <span class="op">+=</span> amount  <span class="cm"># rollback</span>
+        <span class="kw">raise</span>
+
+
+<span class="cm"># --- Demo ---</span>
+alice <span class="op">=</span> <span class="fn">BankAccount</span>(<span class="st">"ACC-001"</span>, balance<span class="op">=</span><span class="nu">500.0</span>)
+bob   <span class="op">=</span> <span class="fn">BankAccount</span>(<span class="st">"ACC-002"</span>, balance<span class="op">=</span><span class="nu">100.0</span>)
+eve   <span class="op">=</span> <span class="fn">BankAccount</span>(<span class="st">"ACC-003"</span>, balance<span class="op">=</span><span class="nu">200.0</span>)
+eve.freeze()
+
+operations <span class="op">=</span> [
+    (<span class="st">"Deposit 200 to Alice"</span>,       <span class="kw">lambda</span>: alice.deposit(<span class="nu">200</span>)),
+    (<span class="st">"Withdraw 100 from Alice"</span>,    <span class="kw">lambda</span>: alice.withdraw(<span class="nu">100</span>)),
+    (<span class="st">"Withdraw 1000 from Bob"</span>,     <span class="kw">lambda</span>: bob.withdraw(<span class="nu">1000</span>)),
+    (<span class="st">"Deposit -50 to Bob"</span>,          <span class="kw">lambda</span>: bob.deposit(<span class="op">-</span><span class="nu">50</span>)),
+    (<span class="st">"Deposit to frozen Eve"</span>,       <span class="kw">lambda</span>: eve.deposit(<span class="nu">10</span>)),
+    (<span class="st">"Transfer 150 Alice→Bob"</span>,     <span class="kw">lambda</span>: atomic_transfer(alice, bob, <span class="nu">150</span>).__enter__()),
+]
+
+<span class="nb">print</span>(<span class="st">"="</span><span class="op">*</span><span class="nu">55</span>)
+<span class="kw">for</span> desc, op <span class="kw">in</span> operations:
+    <span class="nb">print</span>(<span class="st">f"\n▶ {desc}"</span>)
+    <span class="kw">try</span>:
+        op()
+    <span class="kw">except</span> <span class="fn">InsufficientFundsError</span> <span class="kw">as</span> e:
+        logger.error(<span class="st">f"  Insufficient funds: {e}"</span>)
+    <span class="kw">except</span> <span class="fn">NegativeAmountError</span> <span class="kw">as</span> e:
+        logger.error(<span class="st">f"  Negative amount: {e}"</span>)
+    <span class="kw">except</span> <span class="fn">FrozenAccountError</span> <span class="kw">as</span> e:
+        logger.error(<span class="st">f"  Frozen account: {e}"</span>)
+    <span class="kw">except</span> <span class="fn">BankError</span> <span class="kw">as</span> e:
+        logger.error(<span class="st">f"  Bank error: {e}"</span>)
+
+<span class="nb">print</span>(<span class="st">f"\n{'='*55}"</span>)
+<span class="nb">print</span>(<span class="st">f"Final balances — Alice: {alice.balance:.2f}  Bob: {bob.balance:.2f}"</span>)</code></pre>
+
+  </section>
+
+  <footer>
+    Python Exception Handling Reference &mdash; Python 3.x &mdash; Generated May 2026
+  </footer>
+
+</div>
+</body>
+</html>
