@@ -3,1405 +3,1776 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Python Logging — End-to-End Guide</title>
+  <title>Python Logging – End-to-End Reference</title>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3250;
+      --accent: #5b8dee;
+      --green: #3ecf8e;
+      --yellow: #f5a623;
+      --red: #e05252;
+      --purple: #b48ead;
+      --text: #d4d8f0;
+      --muted: #6b7094;
+      --code-bg: #13151f;
+      --radius: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
+      background: var(--bg);
+      color: var(--text);
       font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #0f1117;
-      color: #c9d1d9;
+      font-size: 15px;
       line-height: 1.7;
-      padding: 2rem 1rem;
     }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
 
-    .container {
-      max-width: 960px;
-      margin: 0 auto;
+    /* ── layout ── */
+    .page { display: flex; min-height: 100vh; }
+    nav {
+      width: 260px;
+      min-width: 260px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 28px 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
     }
-
-    h1 {
-      font-size: 2.2rem;
-      color: #58a6ff;
-      border-bottom: 2px solid #21262d;
-      padding-bottom: 0.6rem;
-      margin-bottom: 2rem;
-    }
-
-    h2 {
-      font-size: 1.4rem;
-      color: #79c0ff;
-      margin: 2.5rem 0 0.8rem;
-      padding-left: 0.6rem;
-      border-left: 4px solid #388bfd;
-    }
-
-    h3 {
-      font-size: 1.05rem;
-      color: #d2a8ff;
-      margin: 1.4rem 0 0.4rem;
-    }
-
-    p { margin-bottom: 0.8rem; }
-
-    a { color: #58a6ff; }
-
-    /* Tables */
-    .table-wrap { overflow-x: auto; margin: 1rem 0; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.92rem;
-    }
-
-    thead tr { background: #161b22; }
-
-    th {
-      text-align: left;
-      padding: 0.55rem 1rem;
-      color: #79c0ff;
-      border-bottom: 2px solid #30363d;
-    }
-
-    td {
-      padding: 0.5rem 1rem;
-      border-bottom: 1px solid #21262d;
-    }
-
-    tbody tr:hover { background: #1c2128; }
-
-    /* Code blocks */
-    pre {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      padding: 1.2rem 1.4rem;
-      overflow-x: auto;
-      margin: 0.8rem 0 1.4rem;
-      font-size: 0.88rem;
-      line-height: 1.6;
-    }
-
-    code {
-      font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
-      color: #e6edf3;
-    }
-
-    pre code { color: #e6edf3; }
-
-    /* Inline code */
-    p code, li code, td code {
-      background: #1c2128;
-      border: 1px solid #30363d;
-      border-radius: 4px;
-      padding: 0.1rem 0.4rem;
-      font-size: 0.85em;
-      color: #ffa657;
-    }
-
-    /* Syntax highlight tokens */
-    .kw  { color: #ff7b72; }   /* keywords */
-    .fn  { color: #d2a8ff; }   /* functions */
-    .str { color: #a5d6ff; }   /* strings */
-    .cm  { color: #8b949e; font-style: italic; } /* comments */
-    .num { color: #79c0ff; }   /* numbers */
-    .cls { color: #ffa657; }   /* class names */
-
-    /* Callout box */
-    .callout {
-      background: #1c2128;
-      border-left: 4px solid #388bfd;
-      border-radius: 0 8px 8px 0;
-      padding: 0.9rem 1.2rem;
-      margin: 1rem 0;
-      font-size: 0.93rem;
-    }
-
-    .callout.warn  { border-color: #d29922; }
-    .callout.danger { border-color: #f85149; }
-
-    /* Nav TOC */
-    .toc {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      padding: 1.2rem 1.6rem;
-      margin-bottom: 2.5rem;
-      display: inline-block;
-      min-width: 280px;
-    }
-
-    .toc h2 {
-      font-size: 1rem;
-      margin: 0 0 0.7rem;
-      padding: 0;
-      border: none;
-      color: #8b949e;
+    nav h2 {
+      font-size: 11px;
+      letter-spacing: .12em;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 0 24px 10px;
+    }
+    nav ul { list-style: none; }
+    nav ul li a {
+      display: block;
+      padding: 7px 24px;
+      color: var(--text);
+      font-size: 13.5px;
+      border-left: 3px solid transparent;
+      transition: background .15s, border-color .15s;
+    }
+    nav ul li a:hover,
+    nav ul li a.active {
+      background: var(--surface2);
+      border-left-color: var(--accent);
+      color: #fff;
+      text-decoration: none;
+    }
+    main {
+      flex: 1;
+      padding: 48px 56px;
+      max-width: 960px;
+    }
+    h1 { font-size: 2rem; color: #fff; margin-bottom: 6px; }
+    .subtitle { color: var(--muted); margin-bottom: 40px; font-size: 14px; }
+    h2 {
+      font-size: 1.3rem;
+      color: #fff;
+      margin-top: 52px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    h3 { font-size: 1rem; color: var(--accent); margin: 22px 0 8px; }
+    p { margin-bottom: 12px; color: var(--text); }
+
+    /* ── code blocks ── */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      overflow-x: auto;
+      margin: 14px 0 22px;
+      position: relative;
+    }
+    code { font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; font-size: 13.5px; }
+    p code, li code {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 13px;
     }
 
-    .toc ol {
-      padding-left: 1.2rem;
+    /* syntax highlight classes */
+    .kw  { color: #c792ea; }  /* keyword */
+    .fn  { color: #82aaff; }  /* function / method */
+    .cl  { color: #ffcb6b; }  /* class */
+    .st  { color: var(--green); }  /* string */
+    .cm  { color: var(--muted); font-style: italic; }  /* comment */
+    .nu  { color: #f78c6c; }  /* number */
+    .bi  { color: #89ddff; }  /* built-in / constant */
+
+    /* ── level badges ── */
+    .level-table { width: 100%; border-collapse: collapse; margin: 16px 0 22px; }
+    .level-table th, .level-table td { padding: 9px 14px; border: 1px solid var(--border); font-size: 13.5px; }
+    .level-table th { background: var(--surface2); color: var(--muted); text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+    .badge { display: inline-block; border-radius: 4px; padding: 2px 10px; font-size: 12px; font-weight: 600; }
+    .b-debug    { background: #1c3a5e; color: #82aaff; }
+    .b-info     { background: #1a3d2e; color: var(--green); }
+    .b-warning  { background: #3d2f0f; color: var(--yellow); }
+    .b-error    { background: #3d1515; color: var(--red); }
+    .b-critical { background: #4a0e0e; color: #ff8080; }
+
+    /* ── callouts ── */
+    .callout {
+      border-left: 4px solid var(--accent);
+      background: var(--surface2);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 14px 18px;
+      margin: 18px 0;
+      font-size: 14px;
     }
+    .callout.warn { border-left-color: var(--yellow); }
+    .callout.tip  { border-left-color: var(--green); }
 
-    .toc li { margin: 0.3rem 0; font-size: 0.93rem; }
-
-    .toc a { text-decoration: none; color: #58a6ff; }
-    .toc a:hover { text-decoration: underline; }
-
-    hr {
-      border: none;
-      border-top: 1px solid #21262d;
-      margin: 2.5rem 0;
+    /* ── flow diagram ── */
+    .flow {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      margin: 18px 0 26px;
     }
+    .flow-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 18px;
+      font-size: 13px;
+      text-align: center;
+      min-width: 110px;
+    }
+    .flow-arrow { color: var(--muted); font-size: 20px; padding: 0 8px; }
 
-    ul, ol { padding-left: 1.4rem; margin-bottom: 0.8rem; }
-    li { margin: 0.25rem 0; }
-
-    .badge {
+    /* ── toc badges ── */
+    .toc-num {
       display: inline-block;
-      padding: 0.15rem 0.55rem;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      margin-left: 0.4rem;
-      vertical-align: middle;
+      background: var(--surface2);
+      border-radius: 4px;
+      font-size: 11px;
+      padding: 1px 6px;
+      color: var(--muted);
+      margin-right: 6px;
     }
-    .badge-blue  { background: #1f3a5a; color: #79c0ff; }
-    .badge-green { background: #1a3a2a; color: #56d364; }
-    .badge-red   { background: #3a1a1a; color: #f85149; }
+    ul.list { padding-left: 22px; margin-bottom: 14px; }
+    ul.list li { margin-bottom: 5px; }
   </style>
 </head>
 <body>
-<div class="container">
+<div class="page">
 
-  <h1>Python Logging — End-to-End Guide</h1>
+<!-- ── Sidebar ── -->
+<nav>
+  <h2>Contents</h2>
+  <ul>
+    <li><a href="#intro">Introduction</a></li>
+    <li><a href="#architecture">Architecture</a></li>
+    <li><a href="#levels">Log Levels</a></li>
+    <li><a href="#basicconfig">basicConfig</a></li>
+    <li><a href="#loggers">Loggers</a></li>
+    <li><a href="#handlers">Handlers</a></li>
+    <li><a href="#formatters">Formatters</a></li>
+    <li><a href="#filters">Filters</a></li>
+    <li><a href="#filehandler">File Logging</a></li>
+    <li><a href="#rotating">Rotating Handlers</a></li>
+    <li><a href="#dictconfig">dictConfig / YAML</a></li>
+    <li><a href="#fileconfig">fileConfig (.ini)</a></li>
+    <li><a href="#exceptions">Exceptions &amp; Tracebacks</a></li>
+    <li><a href="#structured">Structured / JSON Logging</a></li>
+    <li><a href="#extra">Extra &amp; LoggerAdapter</a></li>
+    <li><a href="#multiprocess">Multiprocess Safety</a></li>
+    <li><a href="#third-party">Third-party Integrations</a></li>
+    <li><a href="#best-practices">Best Practices</a></li>
+    <li><a href="#usecases">Real-World Use Cases</a></li>
+    <li><a href="#ml-ai">ML &amp; AI Use Cases</a></li>
+    <li><a href="#advanced">Advanced Concepts</a></li>
+  </ul>
+</nav>
 
-  <nav class="toc">
-    <h2>Contents</h2>
-    <ol>
-      <li><a href="#levels">Log Levels</a></li>
-      <li><a href="#basic">Basic Setup</a></li>
-      <li><a href="#hierarchy">Logger Hierarchy</a></li>
-      <li><a href="#handlers">Handlers</a></li>
-      <li><a href="#structured">Structured / JSON Logging</a></li>
-      <li><a href="#config">Config via File</a></li>
-      <li><a href="#usecases">Real Use Cases</a></li>
-      <li><a href="#pitfalls">Common Pitfalls</a></li>
-      <li><a href="#libs">Third-Party Libraries</a></li>
-      <li><a href="#prod-debug">Debugging Production Issues</a></li>
-      <li><a href="#framework-setup">Real-World Setup: Django &amp; FastAPI</a></li>
-      <li><a href="#elk">Centralized Logging: ELK Stack</a></li>
-    </ol>
-  </nav>
+<!-- ── Main ── -->
+<main>
+  <h1>Python Logging</h1>
+  <p class="subtitle">End-to-end reference — stdlib <code>logging</code> module</p>
 
-  <!-- ── 1. Log Levels ─────────────────────────────────────────── -->
-  <section id="levels">
-    <h2>1. Log Levels</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Level</th><th>Value</th><th>Use Case</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>DEBUG</code></td>    <td>10</td><td>Detailed diagnostic info during development</td></tr>
-          <tr><td><code>INFO</code></td>     <td>20</td><td>Confirmation that things are working as expected</td></tr>
-          <tr><td><code>WARNING</code></td>  <td>30</td><td>Something unexpected happened, but the app continues</td></tr>
-          <tr><td><code>ERROR</code></td>    <td>40</td><td>A serious problem; a function failed</td></tr>
-          <tr><td><code>CRITICAL</code></td> <td>50</td><td>A severe error; the program may not continue</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="callout">
-      Only messages at or above the configured level are emitted.
-      Setting a logger to <code>WARNING</code> silences <code>DEBUG</code> and <code>INFO</code>.
-    </div>
-  </section>
+  <!-- 1 ─ Intro -->
+  <h2 id="intro">1 · Introduction</h2>
+  <p>Python's built-in <code>logging</code> package (PEP 282) provides a flexible, thread-safe logging framework that covers everything from a quick <code>print</code> replacement to enterprise-grade, structured, multi-destination logging pipelines — all without third-party dependencies.</p>
+  <ul class="list">
+    <li>Part of the Python standard library since Python 2.3</li>
+    <li>Thread-safe; partially multiprocess-safe with <code>QueueHandler</code></li>
+    <li>Configurable at runtime without code changes (via dictConfig / fileConfig)</li>
+    <li>Hierarchical logger namespace that mirrors the package tree</li>
+  </ul>
 
-  <hr />
+  <!-- 2 ─ Architecture -->
+  <h2 id="architecture">2 · Architecture &amp; Data Flow</h2>
+  <p>Every log call travels through these five stages:</p>
+  <div class="flow">
+    <div class="flow-box">📝<br>Application<br><small>logger.info(…)</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">🔍<br>Logger<br><small>level check</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">📦<br>LogRecord<br><small>created</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">🔀<br>Handler(s)<br><small>filter + emit</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">🖨<br>Formatter<br><small>renders string</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box">📤<br>Destination<br><small>file / console / …</small></div>
+  </div>
+  <p>Loggers form a <strong>hierarchy</strong> separated by dots. A child logger propagates records up to its parent unless <code>propagate = False</code>. The root logger (<code>logging.getLogger()</code>) sits at the top.</p>
+<pre><code><span class="cm"># Hierarchy example</span>
+<span class="st">"myapp"</span>        <span class="cm"># parent</span>
+<span class="st">"myapp.db"</span>     <span class="cm"># child — propagates to "myapp" by default</span>
+<span class="st">"myapp.db.sql"</span> <span class="cm"># grandchild</span>
+</code></pre>
 
-  <!-- ── 2. Basic Setup ────────────────────────────────────────── -->
-  <section id="basic">
-    <h2>2. Basic Setup</h2>
+  <!-- 3 ─ Levels -->
+  <h2 id="levels">3 · Log Levels</h2>
+  <table class="level-table">
+    <tr>
+      <th>Level</th><th>Numeric Value</th><th>Use when…</th>
+    </tr>
+    <tr>
+      <td><span class="badge b-debug">DEBUG</span></td>
+      <td>10</td>
+      <td>Detailed diagnostic information (dev / troubleshooting only)</td>
+    </tr>
+    <tr>
+      <td><span class="badge b-info">INFO</span></td>
+      <td>20</td>
+      <td>Confirmation that things are working as expected</td>
+    </tr>
+    <tr>
+      <td><span class="badge b-warning">WARNING</span></td>
+      <td>30</td>
+      <td>Something unexpected, but the app continues (default level)</td>
+    </tr>
+    <tr>
+      <td><span class="badge b-error">ERROR</span></td>
+      <td>40</td>
+      <td>A serious problem; some function could not be performed</td>
+    </tr>
+    <tr>
+      <td><span class="badge b-critical">CRITICAL</span></td>
+      <td>50</td>
+      <td>A severe error; the program itself may be unable to continue</td>
+    </tr>
+  </table>
 <pre><code><span class="kw">import</span> logging
 
+logger = logging.<span class="fn">getLogger</span>(<span class="bi">__name__</span>)
+
+logger.<span class="fn">debug</span>(<span class="st">"x = %s"</span>, x)
+logger.<span class="fn">info</span>(<span class="st">"Server started on port %d"</span>, port)
+logger.<span class="fn">warning</span>(<span class="st">"Config missing; using defaults"</span>)
+logger.<span class="fn">error</span>(<span class="st">"Failed to connect to database"</span>)
+logger.<span class="fn">critical</span>(<span class="st">"Disk full — shutting down"</span>)
+
+<span class="cm"># Or with explicit level:</span>
+logger.<span class="fn">log</span>(logging.INFO, <span class="st">"Custom level call"</span>)
+</code></pre>
+  <div class="callout tip">Use <strong>lazy % formatting</strong> (<code>logger.debug("val=%s", val)</code>) not f-strings — the string is only built if the message actually gets emitted.</div>
+
+  <!-- 4 ─ basicConfig -->
+  <h2 id="basicconfig">4 · Quick Start with <code>basicConfig</code></h2>
+  <p><code>logging.basicConfig()</code> is a one-call setup for the <em>root logger</em>. It has no effect if the root logger already has handlers attached.</p>
+<pre><code><span class="kw">import</span> logging
+
+<span class="cm"># Console only (default)</span>
+logging.<span class="fn">basicConfig</span>(level=logging.DEBUG)
+
+<span class="cm"># File + format</span>
 logging.<span class="fn">basicConfig</span>(
-    level=logging.DEBUG,
-    format=<span class="str">"%(asctime)s [%(levelname)s] %(name)s - %(message)s"</span>,
-    datefmt=<span class="str">"%Y-%m-%d %H:%M:%S"</span>
+    filename=<span class="st">"app.log"</span>,
+    filemode=<span class="st">"a"</span>,                       <span class="cm"># "w" to overwrite each run</span>
+    level=logging.INFO,
+    format=<span class="st">"%(asctime)s [%(levelname)s] %(name)s — %(message)s"</span>,
+    datefmt=<span class="st">"%Y-%m-%d %H:%M:%S"</span>,
+    encoding=<span class="st">"utf-8"</span>,                   <span class="cm"># Python ≥ 3.9</span>
 )
 
-logger = logging.<span class="fn">getLogger</span>(__name__)
+<span class="cm"># Both console AND file (Python ≥ 3.8 — handlers kwarg)</span>
+logging.<span class="fn">basicConfig</span>(
+    level=logging.DEBUG,
+    handlers=[
+        logging.<span class="cl">StreamHandler</span>(),
+        logging.<span class="cl">FileHandler</span>(<span class="st">"app.log"</span>),
+    ]
+)
+</code></pre>
 
-logger.<span class="fn">debug</span>(<span class="str">"Debug message"</span>)
-logger.<span class="fn">info</span>(<span class="str">"Info message"</span>)
-logger.<span class="fn">warning</span>(<span class="str">"Warning message"</span>)
-logger.<span class="fn">error</span>(<span class="str">"Error message"</span>)
-logger.<span class="fn">critical</span>(<span class="str">"Critical message"</span>)</code></pre>
+  <!-- 5 ─ Loggers -->
+  <h2 id="loggers">5 · Logger Objects</h2>
+  <p>Always get a logger by name — typically <code>__name__</code> so the hierarchy mirrors the package structure.</p>
+<pre><code><span class="kw">import</span> logging
 
-    <p><strong>Output:</strong></p>
-<pre><code>2026-05-02 10:00:00 [DEBUG]    __main__ - Debug message
-2026-05-02 10:00:00 [INFO]     __main__ - Info message
-2026-05-02 10:00:00 [WARNING]  __main__ - Warning message
-2026-05-02 10:00:00 [ERROR]    __main__ - Error message
-2026-05-02 10:00:00 [CRITICAL] __main__ - Critical message</code></pre>
+<span class="cm"># Module-level logger (best practice)</span>
+logger = logging.<span class="fn">getLogger</span>(<span class="bi">__name__</span>)
 
-    <div class="callout warn">
-      <strong>Rule:</strong> Call <code>basicConfig()</code> only once, at the application entry point
-      (<code>main.py</code> / <code>app.py</code>). Calling it multiple times has no effect after the
-      first call.
-    </div>
-  </section>
+<span class="cm"># Explicit name</span>
+db_logger = logging.<span class="fn">getLogger</span>(<span class="st">"myapp.db"</span>)
+db_logger.<span class="fn">setLevel</span>(logging.WARNING)   <span class="cm"># only WARNING+ from db</span>
+db_logger.propagate = <span class="bi">False</span>             <span class="cm"># don't bubble up to root</span>
 
-  <hr />
-
-  <!-- ── 3. Logger Hierarchy ───────────────────────────────────── -->
-  <section id="hierarchy">
-    <h2>3. Logger Hierarchy</h2>
-    <p>
-      Loggers form a dotted-name tree. A logger named <code>myapp.db</code> is a child of
-      <code>myapp</code>, which is a child of the root logger. Log records propagate up the
-      tree unless <code>propagate = False</code>.
-    </p>
-<pre><code><span class="cm"># Root logger (avoid using directly)</span>
+<span class="cm"># Root logger (use sparingly)</span>
 root = logging.<span class="fn">getLogger</span>()
 
-<span class="cm"># Best practice: always use __name__</span>
-logger = logging.<span class="fn">getLogger</span>(__name__)   <span class="cm"># e.g. "myapp.services.user"</span>
+<span class="cm"># Check effective level</span>
+<span class="fn">print</span>(logger.<span class="fn">getEffectiveLevel</span>())       <span class="cm"># 20 (INFO)</span>
+<span class="fn">print</span>(logger.<span class="fn">isEnabledFor</span>(logging.DEBUG)) <span class="cm"># False</span>
+</code></pre>
 
-<span class="cm"># Child logger with its own level</span>
-db_logger = logging.<span class="fn">getLogger</span>(<span class="str">"myapp.db"</span>)
-db_logger.setLevel(logging.WARNING)       <span class="cm"># quieter than parent</span>
+  <!-- 6 ─ Handlers -->
+  <h2 id="handlers">6 · Handlers</h2>
+  <p>Handlers send <code>LogRecord</code>s to a destination. Multiple handlers can be attached to one logger.</p>
 
-<span class="cm"># Prevent propagation to root</span>
-audit_logger = logging.<span class="fn">getLogger</span>(<span class="str">"audit"</span>)
-audit_logger.propagate = <span class="kw">False</span></code></pre>
-  </section>
-
-  <hr />
-
-  <!-- ── 4. Handlers ───────────────────────────────────────────── -->
-  <section id="handlers">
-    <h2>4. Handlers — Where Logs Go</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Handler</th><th>Description</th></tr></thead>
-        <tbody>
-          <tr><td><code>StreamHandler</code></td><td>Console (stdout / stderr)</td></tr>
-          <tr><td><code>FileHandler</code></td><td>Write to a single file</td></tr>
-          <tr><td><code>RotatingFileHandler</code></td><td>Rotate when file reaches a size limit</td></tr>
-          <tr><td><code>TimedRotatingFileHandler</code></td><td>Rotate on a schedule (hourly, daily…)</td></tr>
-          <tr><td><code>SysLogHandler</code></td><td>Unix syslog / remote syslog</td></tr>
-          <tr><td><code>SMTPHandler</code></td><td>Send emails on ERROR / CRITICAL</td></tr>
-          <tr><td><code>QueueHandler</code></td><td>Non-blocking async logging via a queue</td></tr>
-        </tbody>
-      </table>
-    </div>
-
+  <h3>Built-in handlers</h3>
 <pre><code><span class="kw">import</span> logging
-<span class="kw">from</span> logging.handlers <span class="kw">import</span> RotatingFileHandler, TimedRotatingFileHandler
+<span class="kw">import</span> logging.handlers
 
-logger = logging.<span class="fn">getLogger</span>(<span class="str">"myapp"</span>)
-logger.<span class="fn">setLevel</span>(logging.DEBUG)
+<span class="cm"># Console</span>
+ch = logging.<span class="cl">StreamHandler</span>()            <span class="cm"># sys.stderr by default</span>
+ch = logging.<span class="cl">StreamHandler</span>(sys.stdout)
 
-fmt = logging.<span class="cls">Formatter</span>(<span class="str">"%(asctime)s [%(levelname)s] %(name)s - %(message)s"</span>)
+<span class="cm"># File</span>
+fh = logging.<span class="cl">FileHandler</span>(<span class="st">"app.log"</span>, encoding=<span class="st">"utf-8"</span>)
 
-<span class="cm"># Console — INFO and above</span>
-console = logging.<span class="cls">StreamHandler</span>()
-console.<span class="fn">setLevel</span>(logging.INFO)
-console.<span class="fn">setFormatter</span>(fmt)
+<span class="cm"># Rotating by size</span>
+rh = logging.handlers.<span class="cl">RotatingFileHandler</span>(
+    <span class="st">"app.log"</span>, maxBytes=<span class="nu">5_000_000</span>, backupCount=<span class="nu">5</span>
+)
 
-<span class="cm"># Rotating file — DEBUG and above, max 5 MB, keep 3 backups</span>
-file_h = <span class="cls">RotatingFileHandler</span>(<span class="str">"app.log"</span>, maxBytes=<span class="num">5_000_000</span>, backupCount=<span class="num">3</span>)
-file_h.<span class="fn">setLevel</span>(logging.DEBUG)
-file_h.<span class="fn">setFormatter</span>(fmt)
+<span class="cm"># Rotating by time</span>
+th = logging.handlers.<span class="cl">TimedRotatingFileHandler</span>(
+    <span class="st">"app.log"</span>, when=<span class="st">"midnight"</span>, backupCount=<span class="nu">30</span>, utc=<span class="bi">True</span>
+)
 
-<span class="cm"># Daily rotation, keep 7 days</span>
-timed_h = <span class="cls">TimedRotatingFileHandler</span>(<span class="str">"daily.log"</span>, when=<span class="str">"midnight"</span>, backupCount=<span class="num">7</span>)
-timed_h.<span class="fn">setFormatter</span>(fmt)
+<span class="cm"># Syslog</span>
+sh = logging.handlers.<span class="cl">SysLogHandler</span>(address=<span class="st">"/dev/log"</span>)
 
-logger.<span class="fn">addHandler</span>(console)
-logger.<span class="fn">addHandler</span>(file_h)
-logger.<span class="fn">addHandler</span>(timed_h)</code></pre>
-  </section>
+<span class="cm"># HTTP POST</span>
+hh = logging.handlers.<span class="cl">HTTPHandler</span>(<span class="st">"logs.example.com"</span>, <span class="st">"/log"</span>, method=<span class="st">"POST"</span>)
 
-  <hr />
+<span class="cm"># Queue (async, multiprocess-safe)</span>
+qh = logging.handlers.<span class="cl">QueueHandler</span>(queue)
 
-  <!-- ── 5. Structured / JSON Logging ─────────────────────────── -->
-  <section id="structured">
-    <h2>5. Structured / JSON Logging <span class="badge badge-green">Production Standard</span></h2>
-    <p>
-      Plain-text logs are hard to query. JSON logs are natively parsed by Elasticsearch,
-      Splunk, CloudWatch, Datadog, and most modern log platforms.
-    </p>
-<pre><code><span class="kw">import</span> logging, json
+<span class="cm"># Memory (testing)</span>
+mh = logging.handlers.<span class="cl">MemoryHandler</span>(capacity=<span class="nu">1000</span>, target=fh)
 
-<span class="kw">class</span> <span class="cls">JSONFormatter</span>(logging.<span class="cls">Formatter</span>):
-    <span class="kw">def</span> <span class="fn">format</span>(<span class="kw">self</span>, record):
-        log = {
-            <span class="str">"timestamp"</span>: <span class="kw">self</span>.<span class="fn">formatTime</span>(record),
-            <span class="str">"level"</span>:     record.levelname,
-            <span class="str">"logger"</span>:    record.name,
-            <span class="str">"message"</span>:   record.<span class="fn">getMessage</span>(),
-            <span class="str">"module"</span>:    record.module,
-            <span class="str">"line"</span>:      record.lineno,
-        }
-        <span class="kw">if</span> record.exc_info:
-            log[<span class="str">"exception"</span>] = <span class="kw">self</span>.<span class="fn">formatException</span>(record.exc_info)
-        <span class="cm"># Merge any extra= fields passed by the caller</span>
-        _std = logging.<span class="cls">LogRecord</span>.__dict__
-        <span class="kw">for</span> k, v <span class="kw">in</span> record.__dict__.items():
-            <span class="kw">if</span> k <span class="kw">not in</span> _std <span class="kw">and not</span> k.<span class="fn">startswith</span>(<span class="str">"_"</span>):
-                log[k] = v
-        <span class="kw">return</span> json.<span class="fn">dumps</span>(log)
+<span class="cm"># Attach to logger</span>
+logger.<span class="fn">addHandler</span>(ch)
+logger.<span class="fn">addHandler</span>(fh)
+logger.<span class="fn">removeHandler</span>(fh)
+</code></pre>
 
-handler = logging.<span class="cls">StreamHandler</span>()
-handler.<span class="fn">setFormatter</span>(<span class="cls">JSONFormatter</span>())
+  <!-- 7 ─ Formatters -->
+  <h2 id="formatters">7 · Formatters</h2>
+  <p>Formatters convert a <code>LogRecord</code> to a string. Attach one per handler.</p>
+<pre><code>fmt = logging.<span class="cl">Formatter</span>(
+    fmt=<span class="st">"%(asctime)s [%(levelname)-8s] %(name)s:%(lineno)d — %(message)s"</span>,
+    datefmt=<span class="st">"%Y-%m-%dT%H:%M:%S"</span>,
+)
+handler.<span class="fn">setFormatter</span>(fmt)
+</code></pre>
 
-logger = logging.<span class="fn">getLogger</span>(<span class="str">"myapp"</span>)
-logger.<span class="fn">addHandler</span>(handler)
-logger.<span class="fn">setLevel</span>(logging.DEBUG)
+  <h3>All built-in format attributes</h3>
+  <table class="level-table">
+    <tr><th>Attribute</th><th>Description</th></tr>
+    <tr><td><code>%(asctime)s</code></td><td>Human-readable timestamp (<code>datefmt</code> controls format)</td></tr>
+    <tr><td><code>%(created)f</code></td><td>Unix epoch time the record was created</td></tr>
+    <tr><td><code>%(filename)s</code></td><td>Source file name</td></tr>
+    <tr><td><code>%(funcName)s</code></td><td>Name of the function containing the log call</td></tr>
+    <tr><td><code>%(levelname)s</code></td><td>Text level: DEBUG, INFO, …</td></tr>
+    <tr><td><code>%(levelno)d</code></td><td>Numeric level</td></tr>
+    <tr><td><code>%(lineno)d</code></td><td>Source line number</td></tr>
+    <tr><td><code>%(message)s</code></td><td>The logged message (after % interpolation)</td></tr>
+    <tr><td><code>%(module)s</code></td><td>Module portion of filename</td></tr>
+    <tr><td><code>%(name)s</code></td><td>Logger name</td></tr>
+    <tr><td><code>%(pathname)s</code></td><td>Full path of source file</td></tr>
+    <tr><td><code>%(process)d</code></td><td>Process ID</td></tr>
+    <tr><td><code>%(processName)s</code></td><td>Process name</td></tr>
+    <tr><td><code>%(thread)d</code></td><td>Thread ID</td></tr>
+    <tr><td><code>%(threadName)s</code></td><td>Thread name</td></tr>
+    <tr><td><code>%(msecs)d</code></td><td>Millisecond portion of creation time</td></tr>
+    <tr><td><code>%(relativeCreated)d</code></td><td>ms since the logging module was loaded</td></tr>
+    <tr><td><code>%(exc_info)s</code></td><td>Exception info tuple (if any)</td></tr>
+    <tr><td><code>%(stack_info)s</code></td><td>Stack info (if requested)</td></tr>
+  </table>
 
-<span class="cm"># Extra context attached inline</span>
-logger.<span class="fn">info</span>(<span class="str">"User logged in"</span>, extra={<span class="str">"user_id"</span>: <span class="num">42</span>, <span class="str">"ip"</span>: <span class="str">"10.0.0.1"</span>})</code></pre>
+  <!-- 8 ─ Filters -->
+  <h2 id="filters">8 · Filters</h2>
+  <p>Filters can be attached to loggers <em>or</em> handlers for fine-grained control beyond level checking.</p>
+<pre><code><span class="cm"># Class-based filter</span>
+<span class="kw">class</span> <span class="cl">HealthCheckFilter</span>(logging.<span class="cl">Filter</span>):
+    <span class="st">"""Suppress noisy health-check endpoint log lines."""</span>
+    <span class="kw">def</span> <span class="fn">filter</span>(self, record: logging.<span class="cl">LogRecord</span>) -> <span class="bi">bool</span>:
+        <span class="kw">return</span> <span class="st">"GET /health"</span> <span class="kw">not in</span> record.getMessage()
 
-    <p><strong>Output:</strong></p>
-<pre><code>{"timestamp": "2026-05-02 10:00:00,000", "level": "INFO", "logger": "myapp",
- "message": "User logged in", "module": "app", "line": 28,
- "user_id": 42, "ip": "10.0.0.1"}</code></pre>
-  </section>
+handler.<span class="fn">addFilter</span>(<span class="cl">HealthCheckFilter</span>())
 
-  <hr />
+<span class="cm"># Function-based filter (Python ≥ 3.2 accepts callables)</span>
+handler.<span class="fn">addFilter</span>(<span class="kw">lambda</span> r: r.levelno != logging.DEBUG)
 
-  <!-- ── 6. Config via File ────────────────────────────────────── -->
-  <section id="config">
-    <h2>6. Configuration via File</h2>
-    <p>
-      Hard-coding logger setup in Python clutters app code and makes it hard to adjust levels
-      per environment. Use <code>dictConfig</code> loaded from YAML or JSON instead.
-    </p>
+<span class="cm"># Filter that injects context into every record</span>
+<span class="kw">class</span> <span class="cl">RequestIdFilter</span>(logging.<span class="cl">Filter</span>):
+    <span class="kw">def</span> <span class="fn">filter</span>(self, record):
+        record.request_id = get_current_request_id()   <span class="cm"># thread-local / contextvars</span>
+        <span class="kw">return</span> <span class="bi">True</span>
+</code></pre>
 
-    <h3>logging.yaml</h3>
-<pre><code>version: 1
-disable_existing_loggers: false
+  <!-- 9 ─ File Logging -->
+  <h2 id="filehandler">9 · File Logging – Complete Example</h2>
+<pre><code><span class="kw">import</span> logging
+<span class="kw">import</span> sys
 
-formatters:
-  standard:
-    format: "%(asctime)s [%(levelname)s] %(name)s - %(message)s"
-  json:
-    "()": myapp.logging_utils.JSONFormatter
+<span class="kw">def</span> <span class="fn">setup_logging</span>(log_file=<span class="st">"app.log"</span>, console_level=logging.INFO, file_level=logging.DEBUG):
+    logger = logging.<span class="fn">getLogger</span>()          <span class="cm"># root logger</span>
+    logger.<span class="fn">setLevel</span>(logging.DEBUG)         <span class="cm"># must be ≤ lowest handler level</span>
 
-handlers:
-  console:
-    class: logging.StreamHandler
-    level: INFO
-    formatter: standard
-    stream: ext://sys.stdout
-  file:
-    class: logging.handlers.RotatingFileHandler
-    level: DEBUG
-    formatter: json
-    filename: logs/app.log
-    maxBytes: 10485760   # 10 MB
-    backupCount: 5
+    fmt = logging.<span class="cl">Formatter</span>(
+        <span class="st">"%(asctime)s [%(levelname)-8s] %(name)s — %(message)s"</span>,
+        datefmt=<span class="st">"%Y-%m-%dT%H:%M:%S"</span>,
+    )
 
-root:
-  level: DEBUG
-  handlers: [console, file]
+    <span class="cm"># Console handler</span>
+    ch = logging.<span class="cl">StreamHandler</span>(sys.stdout)
+    ch.<span class="fn">setLevel</span>(console_level)
+    ch.<span class="fn">setFormatter</span>(fmt)
 
-loggers:
-  myapp.db:          # silence noisy DB logger in production
-    level: WARNING
-    propagate: true</code></pre>
+    <span class="cm"># File handler</span>
+    fh = logging.<span class="cl">FileHandler</span>(log_file, encoding=<span class="st">"utf-8"</span>)
+    fh.<span class="fn">setLevel</span>(file_level)
+    fh.<span class="fn">setFormatter</span>(fmt)
 
-    <h3>Load in Python</h3>
+    logger.<span class="fn">addHandler</span>(ch)
+    logger.<span class="fn">addHandler</span>(fh)
+    <span class="kw">return</span> logger
+
+
+logger = <span class="fn">setup_logging</span>()
+logger.<span class="fn">info</span>(<span class="st">"App started"</span>)
+</code></pre>
+
+  <!-- 10 ─ Rotating -->
+  <h2 id="rotating">10 · Rotating File Handlers</h2>
+<pre><code><span class="kw">from</span> logging.handlers <span class="kw">import</span> RotatingFileHandler, TimedRotatingFileHandler
+
+<span class="cm"># ── Size-based: max 10 MB per file, keep 7 backups ──</span>
+rh = <span class="cl">RotatingFileHandler</span>(
+    <span class="st">"app.log"</span>,
+    maxBytes=<span class="nu">10</span> * <span class="nu">1024</span> * <span class="nu">1024</span>,
+    backupCount=<span class="nu">7</span>,
+    encoding=<span class="st">"utf-8"</span>,
+)
+
+<span class="cm"># ── Time-based: rotate at midnight UTC, keep 30 days ──</span>
+th = <span class="cl">TimedRotatingFileHandler</span>(
+    <span class="st">"app.log"</span>,
+    when=<span class="st">"midnight"</span>,     <span class="cm"># "S","M","H","D","W0"-"W6","midnight"</span>
+    interval=<span class="nu">1</span>,
+    backupCount=<span class="nu">30</span>,
+    utc=<span class="bi">True</span>,
+    encoding=<span class="st">"utf-8"</span>,
+)
+<span class="cm"># Resulting files: app.log, app.log.2026-05-01, app.log.2026-04-30 …</span>
+</code></pre>
+
+  <!-- 11 ─ dictConfig -->
+  <h2 id="dictconfig">11 · dictConfig (recommended for apps)</h2>
+  <p><code>logging.config.dictConfig()</code> is the modern, version-controlled way to configure logging. The dict can be loaded from JSON, YAML, or a Python file.</p>
 <pre><code><span class="kw">import</span> logging.config
-<span class="kw">import</span> yaml
-
-<span class="kw">with</span> <span class="fn">open</span>(<span class="str">"logging.yaml"</span>) <span class="kw">as</span> f:
-    config = yaml.<span class="fn">safe_load</span>(f)
-
-logging.config.<span class="fn">dictConfig</span>(config)
-logger = logging.<span class="fn">getLogger</span>(__name__)</code></pre>
-  </section>
-
-  <hr />
-
-  <!-- ── 7. Real Use Cases ─────────────────────────────────────── -->
-  <section id="usecases">
-    <h2>7. Real Use Cases</h2>
-
-    <h3>Exception Logging with Stack Trace</h3>
-<pre><code><span class="kw">try</span>:
-    result = <span class="num">10</span> / <span class="num">0</span>
-<span class="kw">except</span> ZeroDivisionError:
-    logger.<span class="fn">exception</span>(<span class="str">"Division failed"</span>)   <span class="cm"># includes full traceback automatically</span>
-    <span class="cm"># Equivalent:</span>
-    <span class="cm"># logger.error("Division failed", exc_info=True)</span></code></pre>
-
-    <h3>Request Context (FastAPI / Flask)</h3>
-<pre><code><span class="kw">import</span> uuid
-<span class="kw">from</span> contextvars <span class="kw">import</span> ContextVar
-
-request_id_var: ContextVar[str] = <span class="cls">ContextVar</span>(<span class="str">"request_id"</span>, default=<span class="str">"-"</span>)
-
-<span class="kw">class</span> <span class="cls">RequestContextFilter</span>(logging.<span class="cls">Filter</span>):
-    <span class="kw">def</span> <span class="fn">filter</span>(<span class="kw">self</span>, record):
-        record.request_id = request_id_var.<span class="fn">get</span>()
-        <span class="kw">return</span> <span class="kw">True</span>
-
-logger.<span class="fn">addFilter</span>(<span class="cls">RequestContextFilter</span>())
-<span class="cm"># Use in format: "%(asctime)s [%(request_id)s] %(message)s"</span>
-
-<span class="cm"># In FastAPI middleware:</span>
-<span class="kw">async def</span> <span class="fn">logging_middleware</span>(request, call_next):
-    request_id_var.<span class="fn">set</span>(str(uuid.<span class="fn">uuid4</span>()))
-    response = <span class="kw">await</span> <span class="fn">call_next</span>(request)
-    <span class="kw">return</span> response</code></pre>
-
-    <h3>Database Query Logging</h3>
-<pre><code><span class="kw">import</span> time
-
-db_logger = logging.<span class="fn">getLogger</span>(<span class="str">"myapp.db"</span>)
-
-<span class="kw">def</span> <span class="fn">execute_query</span>(sql, params):
-    db_logger.<span class="fn">debug</span>(<span class="str">"Executing query"</span>, extra={<span class="str">"sql"</span>: sql, <span class="str">"params"</span>: params})
-    start = time.<span class="fn">perf_counter</span>()
-    <span class="kw">try</span>:
-        result = conn.<span class="fn">execute</span>(sql, params)
-        elapsed = time.<span class="fn">perf_counter</span>() - start
-        db_logger.<span class="fn">info</span>(<span class="str">"Query OK"</span>, extra={<span class="str">"elapsed_ms"</span>: <span class="fn">round</span>(elapsed * <span class="num">1000</span>, <span class="num">2</span>)})
-        <span class="kw">return</span> result
-    <span class="kw">except</span> Exception:
-        db_logger.<span class="fn">exception</span>(<span class="str">"Query failed"</span>, extra={<span class="str">"sql"</span>: sql})
-        <span class="kw">raise</span></code></pre>
-
-    <h3>Audit Logging (Security Events)</h3>
-<pre><code>audit_logger = logging.<span class="fn">getLogger</span>(<span class="str">"audit"</span>)
-audit_handler = logging.<span class="cls">FileHandler</span>(<span class="str">"audit.log"</span>)
-audit_logger.<span class="fn">addHandler</span>(audit_handler)
-audit_logger.propagate = <span class="kw">False</span>   <span class="cm"># never leak audit events to root</span>
-
-<span class="kw">def</span> <span class="fn">log_access</span>(user_id, resource, action, success):
-    audit_logger.<span class="fn">info</span>(<span class="str">"ACCESS"</span>, extra={
-        <span class="str">"user_id"</span>:  user_id,
-        <span class="str">"resource"</span>: resource,
-        <span class="str">"action"</span>:   action,
-        <span class="str">"success"</span>:  success,
-    })</code></pre>
-
-    <h3>Background Worker / Task Queue</h3>
-<pre><code><span class="kw">def</span> <span class="fn">process_task</span>(task_id, payload):
-    log = logging.<span class="fn">getLogger</span>(f<span class="str">"worker.task.{task_id}"</span>)
-    log.<span class="fn">info</span>(<span class="str">"Task started"</span>, extra={<span class="str">"payload_size"</span>: <span class="fn">len</span>(str(payload))})
-    <span class="kw">try</span>:
-        result = <span class="fn">do_work</span>(payload)
-        log.<span class="fn">info</span>(<span class="str">"Task completed"</span>, extra={<span class="str">"result"</span>: result})
-    <span class="kw">except</span> Exception:
-        log.<span class="fn">exception</span>(<span class="str">"Task failed"</span>)
-        <span class="kw">raise</span></code></pre>
-  </section>
-
-  <hr />
-
-  <!-- ── 8. Common Pitfalls ────────────────────────────────────── -->
-  <section id="pitfalls">
-    <h2>8. Common Pitfalls</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Pitfall</th><th>Fix</th></tr></thead>
-        <tbody>
-          <tr><td>Using <code>print()</code> instead of logging</td><td>Always use <code>logger.*</code> in production code</td></tr>
-          <tr><td>Using the root logger directly</td><td>Always <code>getLogger(__name__)</code></td></tr>
-          <tr><td>Calling <code>basicConfig()</code> multiple times</td><td>Call once at the app entry point only</td></tr>
-          <tr><td>Logging inside tight loops</td><td>Guard with <code>logger.isEnabledFor(logging.DEBUG)</code></td></tr>
-          <tr><td>Missing tracebacks on exceptions</td><td>Use <code>logger.exception()</code> or <code>exc_info=True</code></td></tr>
-          <tr><td>Logging PII / passwords</td><td>Scrub or mask sensitive fields before logging</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>Performance Guard for Expensive Log Messages</h3>
-<pre><code><span class="cm"># BAD — f-string is always evaluated, even when DEBUG is disabled</span>
-logger.<span class="fn">debug</span>(f<span class="str">"State: {expensive_serialize(obj)}"</span>)
-
-<span class="cm"># GOOD — evaluated only when the level is actually active</span>
-<span class="kw">if</span> logger.<span class="fn">isEnabledFor</span>(logging.DEBUG):
-    logger.<span class="fn">debug</span>(f<span class="str">"State: {expensive_serialize(obj)}"</span>)</code></pre>
-  </section>
-
-  <hr />
-
-  <!-- ── 9. Third-Party Libraries ──────────────────────────────── -->
-  <section id="libs">
-    <h2>9. Third-Party Libraries</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Library</th><th>Purpose</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><code>structlog</code></td>
-            <td>Structured, contextualized logging with a composable processor pipeline</td>
-          </tr>
-          <tr>
-            <td><code>loguru</code></td>
-            <td>Drop-in replacement with a simpler API, colors, and better tracebacks</td>
-          </tr>
-          <tr>
-            <td><code>python-json-logger</code></td>
-            <td>JSON formatter that plugs directly into the stdlib logger</td>
-          </tr>
-          <tr>
-            <td><code>sentry-sdk</code></td>
-            <td>Automatic error capture, alerting, and context capture integrated with <code>logging</code></td>
-          </tr>
-          <tr>
-            <td><code>opentelemetry-sdk</code></td>
-            <td>Distributed tracing + logs correlated with trace/span IDs</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="callout">
-      For greenfield microservices, consider <strong>structlog</strong> or <strong>loguru</strong>.
-      For existing codebases, the stdlib <code>logging</code> module with a JSON formatter is usually
-      the safest, zero-dependency choice.
-    </div>
-  </section>
-
-  <hr />
-
-  <!-- ── 10. Debugging Production Issues Using Logs ─────────────── -->
-  <section id="prod-debug">
-    <h2>10. Debugging Production Issues Using Logs <span class="badge badge-red">Incident Response</span></h2>
-    <p>
-      Production bugs rarely come with a debugger attached. Logs are your only visibility.
-      Below are concrete patterns used in real incident investigations.
-    </p>
-
-    <!-- ── 10a. Correlate by Request ID ── -->
-    <h3>Strategy 1 — Correlate by Request ID</h3>
-    <p>
-      Without a correlation ID you cannot follow a single request through multiple services.
-      Set a unique ID at the entry point and stamp every log line with it.
-    </p>
-<pre><code><span class="cm"># middleware.py — FastAPI</span>
-<span class="kw">import</span> uuid, logging
-<span class="kw">from</span> contextvars <span class="kw">import</span> ContextVar
-<span class="kw">from</span> starlette.middleware.base <span class="kw">import</span> BaseHTTPMiddleware
-
-request_id_var: ContextVar[str] = <span class="cls">ContextVar</span>(<span class="str">"request_id"</span>, default=<span class="str">"-"</span>)
-
-<span class="kw">class</span> <span class="cls">RequestIDMiddleware</span>(<span class="cls">BaseHTTPMiddleware</span>):
-    <span class="kw">async def</span> <span class="fn">dispatch</span>(<span class="kw">self</span>, request, call_next):
-        <span class="cm"># Accept from upstream (API gateway / load balancer) or generate</span>
-        rid = request.headers.<span class="fn">get</span>(<span class="str">"X-Request-ID"</span>, str(uuid.<span class="fn">uuid4</span>()))
-        request_id_var.<span class="fn">set</span>(rid)
-        response = <span class="kw">await</span> <span class="fn">call_next</span>(request)
-        response.headers[<span class="str">"X-Request-ID"</span>] = rid   <span class="cm"># echo back to caller</span>
-        <span class="kw">return</span> response
-
-<span class="kw">class</span> <span class="cls">RequestIDFilter</span>(logging.<span class="cls">Filter</span>):
-    <span class="kw">def</span> <span class="fn">filter</span>(<span class="kw">self</span>, record):
-        record.request_id = request_id_var.<span class="fn">get</span>()
-        <span class="kw">return</span> <span class="kw">True</span>
-
-<span class="cm"># Attach filter to your logger so every line has request_id</span>
-logging.<span class="fn">getLogger</span>(<span class="str">"myapp"</span>).<span class="fn">addFilter</span>(<span class="cls">RequestIDFilter</span>())
-<span class="cm"># Format: "%(asctime)s [%(request_id)s] [%(levelname)s] %(message)s"</span>
-
-<span class="cm"># Kibana / Splunk query to replay one request end-to-end:</span>
-<span class="cm"># request_id:"abc-123-xyz"  →  all log lines in exact order</span></code></pre>
-
-    <!-- ── 10b. Breadcrumb Decorator ── -->
-    <h3>Strategy 2 — Breadcrumb Decorator</h3>
-    <p>
-      Log entry, exit, duration, and any exception for key functions without touching
-      their internals. Pinpoints exactly which layer is slow or failing.
-    </p>
-<pre><code><span class="kw">import</span> time, logging, functools
-
-<span class="kw">def</span> <span class="fn">log_call</span>(logger):
-    <span class="str">"""Decorator: logs entry, exit, duration, and exceptions."""</span>
-    <span class="kw">def</span> <span class="fn">decorator</span>(func):
-        @functools.<span class="fn">wraps</span>(func)
-        <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
-            logger.<span class="fn">debug</span>(f<span class="str">"{func.__name__} ▶ called"</span>)
-            t0 = time.<span class="fn">perf_counter</span>()
-            <span class="kw">try</span>:
-                result = <span class="fn">func</span>(*args, **kwargs)
-                ms = <span class="fn">round</span>((time.<span class="fn">perf_counter</span>() - t0) * <span class="num">1000</span>, <span class="num">2</span>)
-                logger.<span class="fn">debug</span>(f<span class="str">"{func.__name__} ✔ OK"</span>, extra={<span class="str">"elapsed_ms"</span>: ms})
-                <span class="kw">return</span> result
-            <span class="kw">except</span> Exception <span class="kw">as</span> exc:
-                ms = <span class="fn">round</span>((time.<span class="fn">perf_counter</span>() - t0) * <span class="num">1000</span>, <span class="num">2</span>)
-                logger.<span class="fn">exception</span>(f<span class="str">"{func.__name__} ✖ FAILED"</span>,
-                               extra={<span class="str">"elapsed_ms"</span>: ms, <span class="str">"error"</span>: str(exc)})
-                <span class="kw">raise</span>
-        <span class="kw">return</span> wrapper
-    <span class="kw">return</span> decorator
-
-log = logging.<span class="fn">getLogger</span>(<span class="str">"myapp.payment"</span>)
-
-@<span class="fn">log_call</span>(log)
-<span class="kw">def</span> <span class="fn">charge_card</span>(user_id, amount):
-    ...
-
-@<span class="fn">log_call</span>(log)
-<span class="kw">def</span> <span class="fn">send_receipt</span>(user_id, order_id):
-    ...
-
-<span class="cm"># Log output during an incident:</span>
-<span class="cm"># [abc-123] charge_card ▶ called</span>
-<span class="cm"># [abc-123] charge_card ✖ FAILED  elapsed_ms=1203  error="Gateway timeout"</span>
-<span class="cm"># → immediately isolates: charge_card failed, send_receipt never ran</span></code></pre>
-
-    <!-- ── 10c. Log state before failure ── -->
-    <h3>Strategy 3 — Log State Before a Known Failure Point</h3>
-    <p>
-      When a bug is reported ("fails only for user 99"), log full context around the
-      suspect path so the next occurrence captures everything you need.
-    </p>
-<pre><code><span class="kw">def</span> <span class="fn">apply_discount</span>(user_id, cart):
-    logger.<span class="fn">debug</span>(<span class="str">"apply_discount: entering"</span>, extra={
-        <span class="str">"user_id"</span>:    user_id,
-        <span class="str">"cart_items"</span>: <span class="fn">len</span>(cart.items),
-        <span class="str">"cart_total"</span>: cart.total,
-        <span class="str">"has_coupon"</span>: cart.coupon <span class="kw">is not None</span>,
-        <span class="str">"coupon"</span>:     cart.coupon,
-    })
-    <span class="kw">try</span>:
-        discount = <span class="fn">calculate_discount</span>(cart)
-        logger.<span class="fn">info</span>(<span class="str">"Discount applied"</span>,
-                   extra={<span class="str">"user_id"</span>: user_id, <span class="str">"discount"</span>: discount})
-        <span class="kw">return</span> discount
-    <span class="kw">except</span> ValueError <span class="kw">as</span> e:
-        <span class="cm"># Full context — no guessing in post-mortem</span>
-        logger.<span class="fn">error</span>(<span class="str">"Discount calculation failed"</span>, extra={
-            <span class="str">"user_id"</span>:    user_id,
-            <span class="str">"coupon_code"</span>: cart.coupon,
-            <span class="str">"cart_total"</span>: cart.total,
-            <span class="str">"error"</span>:      str(e),
-        })
-        <span class="kw">raise</span></code></pre>
-
-    <!-- ── 10d. Latency detection ── -->
-    <h3>Strategy 4 — Slow-Query / Latency Detection</h3>
-    <p>
-      Emit a <code>WARNING</code> whenever any operation exceeds a threshold.
-      Alerting rules can then trigger on the log pattern — no APM agent required.
-    </p>
-<pre><code>SLOW_MS = <span class="num">500</span>
-perf_log = logging.<span class="fn">getLogger</span>(<span class="str">"myapp.perf"</span>)
-
-<span class="kw">def</span> <span class="fn">timed</span>(name, fn, *args, **kwargs):
-    t0 = time.<span class="fn">perf_counter</span>()
-    result = <span class="fn">fn</span>(*args, **kwargs)
-    ms = (time.<span class="fn">perf_counter</span>() - t0) * <span class="num">1000</span>
-    level = logging.WARNING <span class="kw">if</span> ms &gt; SLOW_MS <span class="kw">else</span> logging.DEBUG
-    perf_log.<span class="fn">log</span>(level, <span class="str">"op finished"</span>, extra={
-        <span class="str">"op"</span>:         name,
-        <span class="str">"elapsed_ms"</span>: <span class="fn">round</span>(ms, <span class="num">2</span>),
-        <span class="str">"slow"</span>:       ms &gt; SLOW_MS,
-    })
-    <span class="kw">return</span> result
-
-<span class="cm"># Usage:</span>
-rows = <span class="fn">timed</span>(<span class="str">"db.get_active_users"</span>, db.<span class="fn">get_active_users</span>, org_id=<span class="num">7</span>)
-
-<span class="cm"># Splunk / CloudWatch Insights alert rule:</span>
-<span class="cm"># slow:true AND elapsed_ms > 500  →  PagerDuty / Slack alert</span></code></pre>
-
-    <!-- ── 10e. Error fingerprinting ── -->
-    <h3>Strategy 5 — Structured Error Fingerprinting</h3>
-    <p>
-      Include a stable <code>error_code</code> in every error log. Group, count, and alert
-      on specific error types without fragile text-regex matching.
-    </p>
-<pre><code><span class="kw">class</span> <span class="cls">AppError</span>(Exception):
-    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, message, code):
-        <span class="fn">super</span>().__init__(message)
-        <span class="kw">self</span>.code = code   <span class="cm"># e.g. "PAYMENT_DECLINED", "USER_NOT_FOUND"</span>
-
-<span class="kw">def</span> <span class="fn">process_payment</span>(order):
-    <span class="kw">try</span>:
-        <span class="fn">_charge</span>(order)
-    <span class="kw">except</span> <span class="cls">AppError</span> <span class="kw">as</span> e:
-        logger.<span class="fn">error</span>(<span class="str">"Payment failed"</span>, extra={
-            <span class="str">"error_code"</span>: e.code,       <span class="cm"># stable, queryable fingerprint</span>
-            <span class="str">"order_id"</span>:   order.id,
-            <span class="str">"amount"</span>:     order.amount,
-            <span class="str">"currency"</span>:   order.currency,
-        })
-        <span class="kw">raise</span>
-
-<span class="cm"># Incident queries:</span>
-<span class="cm"># error_code:PAYMENT_DECLINED | timechart count  → spike chart</span>
-<span class="cm"># error_code:PAYMENT_DECLINED | stats count by user_id  → blast radius</span>
-<span class="cm"># error_code:PAYMENT_DECLINED AND amount > 1000  → high-value failures</span></code></pre>
-
-    <!-- ── 10f. Incident Workflow Table ── -->
-    <h3>End-to-End Incident Workflow</h3>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>#</th><th>Step</th><th>What You Do</th><th>Example Log Query</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td><td><strong>Detect</strong></td>
-            <td>Alert fires on elevated ERROR rate</td>
-            <td><code>level:ERROR | timechart count</code></td>
-          </tr>
-          <tr>
-            <td>2</td><td><strong>Scope</strong></td>
-            <td>Find the error type and affected users</td>
-            <td><code>error_code:PAYMENT_DECLINED | stats count by user_id</code></td>
-          </tr>
-          <tr>
-            <td>3</td><td><strong>Trace</strong></td>
-            <td>Pick one affected request and replay it</td>
-            <td><code>request_id:"abc-123-xyz"</code></td>
-          </tr>
-          <tr>
-            <td>4</td><td><strong>Isolate</strong></td>
-            <td>Find the exact function / layer that failed</td>
-            <td><code>request_id:"abc-123-xyz" AND level:ERROR</code></td>
-          </tr>
-          <tr>
-            <td>5</td><td><strong>Root-cause</strong></td>
-            <td>Read stack trace + surrounding context fields</td>
-            <td><code>request_id:"abc-123-xyz" | sort @timestamp</code></td>
-          </tr>
-          <tr>
-            <td>6</td><td><strong>Verify fix</strong></td>
-            <td>Confirm error rate drops after deploy</td>
-            <td><code>error_code:PAYMENT_DECLINED | timechart count</code></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="callout warn">
-      <strong>Never log a raw exception without context.</strong> Always include identifiers
-      (user ID, order ID, request ID). An exception message tells you <em>what</em> failed —
-      the extra fields tell you <em>who</em>, <em>when</em>, and <em>how often</em>.
-    </div>
-
-    <div class="callout danger">
-      <strong>Security reminder:</strong> Never log passwords, API keys, full credit card
-      numbers, or other PII. Mask or redact before writing to any log sink.
-    </div>
-  </section>
-
-  <hr />
-
-  <!-- ── 11. Real-World Setup: Django & FastAPI ─────────────────── -->
-  <section id="framework-setup">
-    <h2>11. Real-World Logging Setup <span class="badge badge-blue">Django</span> <span class="badge badge-green">FastAPI</span></h2>
-
-    <!-- ════════════════════════════════════════════════════════════
-         DJANGO
-         ════════════════════════════════════════════════════════════ -->
-    <h3>Django — Full Production Setup</h3>
-    <p>
-      Django uses <code>dictConfig</code> under the hood. Put the entire config in
-      <code>settings.py</code> (or a dedicated <code>settings/logging.py</code> imported there).
-      Django's built-in loggers (<code>django</code>, <code>django.request</code>,
-      <code>django.db.backends</code>) plug in automatically.
-    </p>
-
-    <h3 style="color:#56d364;">settings.py — LOGGING dict</h3>
-<pre><code><span class="cm"># settings.py</span>
-<span class="kw">import</span> os
 
 LOGGING = {
-    <span class="str">"version"</span>: <span class="num">1</span>,
-    <span class="str">"disable_existing_loggers"</span>: <span class="kw">False</span>,
-
-    <span class="str">"formatters"</span>: {
-        <span class="str">"verbose"</span>: {
-            <span class="str">"format"</span>: <span class="str">"{asctime} [{levelname}] {name} {process:d} {thread:d} — {message}"</span>,
-            <span class="str">"style"</span>: <span class="str">"{"</span>,
+    <span class="st">"version"</span>: <span class="nu">1</span>,
+    <span class="st">"disable_existing_loggers"</span>: <span class="bi">False</span>,
+    <span class="st">"formatters"</span>: {
+        <span class="st">"standard"</span>: {
+            <span class="st">"format"</span>: <span class="st">"%(asctime)s [%(levelname)s] %(name)s — %(message)s"</span>,
+            <span class="st">"datefmt"</span>: <span class="st">"%Y-%m-%dT%H:%M:%S"</span>,
         },
-        <span class="str">"json"</span>: {
-            <span class="str">"()"</span>: <span class="str">"myapp.logging_utils.JSONFormatter"</span>,  <span class="cm"># custom class from section 5</span>
-        },
-    },
-
-    <span class="str">"filters"</span>: {
-        <span class="str">"require_debug_false"</span>: {<span class="str">"()"</span>: <span class="str">"django.utils.log.RequireDebugFalse"</span>},
-        <span class="str">"require_debug_true"</span>:  {<span class="str">"()"</span>: <span class="str">"django.utils.log.RequireDebugTrue"</span>},
-    },
-
-    <span class="str">"handlers"</span>: {
-        <span class="str">"console"</span>: {
-            <span class="str">"class"</span>:     <span class="str">"logging.StreamHandler"</span>,
-            <span class="str">"formatter"</span>: <span class="str">"verbose"</span>,
-            <span class="str">"filters"</span>:   [<span class="str">"require_debug_true"</span>],   <span class="cm"># dev only</span>
-        },
-        <span class="str">"json_file"</span>: {
-            <span class="str">"class"</span>:      <span class="str">"logging.handlers.RotatingFileHandler"</span>,
-            <span class="str">"filename"</span>:   os.path.<span class="fn">join</span>(BASE_DIR, <span class="str">"logs/app.log"</span>),
-            <span class="str">"maxBytes"</span>:   <span class="num">10_485_760</span>,   <span class="cm"># 10 MB</span>
-            <span class="str">"backupCount"</span>: <span class="num">5</span>,
-            <span class="str">"formatter"</span>: <span class="str">"json"</span>,
-        },
-        <span class="str">"mail_admins"</span>: {
-            <span class="str">"class"</span>:     <span class="str">"django.utils.log.AdminEmailHandler"</span>,
-            <span class="str">"level"</span>:     <span class="str">"ERROR"</span>,
-            <span class="str">"filters"</span>:   [<span class="str">"require_debug_false"</span>],  <span class="cm"># production only</span>
-            <span class="str">"formatter"</span>: <span class="str">"verbose"</span>,
+        <span class="st">"json"</span>: {
+            <span class="st">"()"</span>: <span class="st">"myapp.logging.JsonFormatter"</span>,   <span class="cm"># custom class</span>
         },
     },
-
-    <span class="str">"loggers"</span>: {
-        <span class="str">"django"</span>: {
-            <span class="str">"handlers"</span>:  [<span class="str">"console"</span>, <span class="str">"json_file"</span>],
-            <span class="str">"level"</span>:     <span class="str">"INFO"</span>,
-            <span class="str">"propagate"</span>: <span class="kw">False</span>,
+    <span class="st">"filters"</span>: {
+        <span class="st">"no_health"</span>: {<span class="st">"()"</span>: <span class="st">"myapp.logging.HealthCheckFilter"</span>},
+    },
+    <span class="st">"handlers"</span>: {
+        <span class="st">"console"</span>: {
+            <span class="st">"class"</span>: <span class="st">"logging.StreamHandler"</span>,
+            <span class="st">"level"</span>: <span class="st">"INFO"</span>,
+            <span class="st">"formatter"</span>: <span class="st">"standard"</span>,
+            <span class="st">"stream"</span>: <span class="st">"ext://sys.stdout"</span>,
         },
-        <span class="str">"django.request"</span>: {
-            <span class="str">"handlers"</span>:  [<span class="str">"mail_admins"</span>, <span class="str">"json_file"</span>],
-            <span class="str">"level"</span>:     <span class="str">"ERROR"</span>,
-            <span class="str">"propagate"</span>: <span class="kw">False</span>,
-        },
-        <span class="str">"django.db.backends"</span>: {
-            <span class="str">"handlers"</span>:  [<span class="str">"console"</span>],
-            <span class="str">"level"</span>:     <span class="str">"DEBUG"</span>,    <span class="cm"># shows every SQL query in dev</span>
-            <span class="str">"filters"</span>:   [<span class="str">"require_debug_true"</span>],
-            <span class="str">"propagate"</span>: <span class="kw">False</span>,
-        },
-        <span class="str">"myapp"</span>: {           <span class="cm"># your application code</span>
-            <span class="str">"handlers"</span>:  [<span class="str">"console"</span>, <span class="str">"json_file"</span>],
-            <span class="str">"level"</span>:     <span class="str">"DEBUG"</span>,
-            <span class="str">"propagate"</span>: <span class="kw">False</span>,
+        <span class="st">"file"</span>: {
+            <span class="st">"class"</span>: <span class="st">"logging.handlers.RotatingFileHandler"</span>,
+            <span class="st">"level"</span>: <span class="st">"DEBUG"</span>,
+            <span class="st">"formatter"</span>: <span class="st">"standard"</span>,
+            <span class="st">"filename"</span>: <span class="st">"logs/app.log"</span>,
+            <span class="st">"maxBytes"</span>: <span class="nu">10485760</span>,
+            <span class="st">"backupCount"</span>: <span class="nu">5</span>,
+            <span class="st">"encoding"</span>: <span class="st">"utf-8"</span>,
+            <span class="st">"filters"</span>: [<span class="st">"no_health"</span>],
         },
     },
-}</code></pre>
-
-    <h3 style="color:#56d364;">Django — Usage in Views / Services</h3>
-<pre><code><span class="cm"># views.py</span>
-<span class="kw">import</span> logging
-<span class="kw">from</span> django.http <span class="kw">import</span> JsonResponse
-
-logger = logging.<span class="fn">getLogger</span>(__name__)   <span class="cm"># "myapp.views"</span>
-
-<span class="kw">def</span> <span class="fn">checkout</span>(request):
-    user_id = request.user.id
-    logger.<span class="fn">info</span>(<span class="str">"Checkout started"</span>, extra={<span class="str">"user_id"</span>: user_id})
-    <span class="kw">try</span>:
-        order = <span class="fn">create_order</span>(request.user, request.POST)
-        logger.<span class="fn">info</span>(<span class="str">"Order created"</span>,
-                   extra={<span class="str">"user_id"</span>: user_id, <span class="str">"order_id"</span>: order.id})
-        <span class="kw">return</span> <span class="cls">JsonResponse</span>({<span class="str">"order_id"</span>: order.id})
-    <span class="kw">except</span> Exception:
-        logger.<span class="fn">exception</span>(<span class="str">"Checkout failed"</span>, extra={<span class="str">"user_id"</span>: user_id})
-        <span class="kw">return</span> <span class="cls">JsonResponse</span>({<span class="str">"error"</span>: <span class="str">"internal"</span>}, status=<span class="num">500</span>)</code></pre>
-
-    <h3 style="color:#56d364;">Django — Key Built-In Loggers</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Logger name</th><th>What it logs</th></tr></thead>
-        <tbody>
-          <tr><td><code>django</code></td><td>General framework messages</td></tr>
-          <tr><td><code>django.request</code></td><td>HTTP request handling — 4xx/5xx responses &amp; unhandled exceptions</td></tr>
-          <tr><td><code>django.server</code></td><td>Dev server request lines</td></tr>
-          <tr><td><code>django.db.backends</code></td><td>Every SQL query with duration (use in dev only)</td></tr>
-          <tr><td><code>django.security</code></td><td>Security-related events (CSRF, SuspiciousOperation)</td></tr>
-          <tr><td><code>django.template</code></td><td>Template rendering errors</td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <hr style="border-color:#1c2128; margin:2rem 0;" />
-
-    <!-- ════════════════════════════════════════════════════════════
-         FASTAPI
-         ════════════════════════════════════════════════════════════ -->
-    <h3>FastAPI — Full Production Setup</h3>
-    <p>
-      FastAPI has no built-in logging config. Wire it yourself in the app factory,
-      using <code>uvicorn</code>'s existing loggers rather than fighting them.
-    </p>
-
-    <h3 style="color:#56d364;">logging_config.py</h3>
-<pre><code><span class="cm"># app/logging_config.py</span>
-<span class="kw">import</span> logging, logging.config
-
-LOGGING_CONFIG = {
-    <span class="str">"version"</span>: <span class="num">1</span>,
-    <span class="str">"disable_existing_loggers"</span>: <span class="kw">False</span>,
-    <span class="str">"formatters"</span>: {
-        <span class="str">"json"</span>: {<span class="str">"()"</span>: <span class="str">"app.logging_utils.JSONFormatter"</span>},
-        <span class="str">"plain"</span>: {
-            <span class="str">"format"</span>: <span class="str">"%(asctime)s [%(levelname)s] %(name)s — %(message)s"</span>
-        },
+    <span class="st">"loggers"</span>: {
+        <span class="st">"myapp"</span>: {<span class="st">"level"</span>: <span class="st">"DEBUG"</span>, <span class="st">"handlers"</span>: [<span class="st">"console"</span>, <span class="st">"file"</span>], <span class="st">"propagate"</span>: <span class="bi">False</span>},
+        <span class="st">"myapp.db"</span>: {<span class="st">"level"</span>: <span class="st">"WARNING"</span>},  <span class="cm"># inherits handlers from "myapp"</span>
     },
-    <span class="str">"handlers"</span>: {
-        <span class="str">"console"</span>: {
-            <span class="str">"class"</span>:     <span class="str">"logging.StreamHandler"</span>,
-            <span class="str">"formatter"</span>: <span class="str">"json"</span>,
-            <span class="str">"stream"</span>:    <span class="str">"ext://sys.stdout"</span>,
-        },
-        <span class="str">"file"</span>: {
-            <span class="str">"class"</span>:      <span class="str">"logging.handlers.RotatingFileHandler"</span>,
-            <span class="str">"formatter"</span>:  <span class="str">"json"</span>,
-            <span class="str">"filename"</span>:   <span class="str">"logs/api.log"</span>,
-            <span class="str">"maxBytes"</span>:   <span class="num">10_485_760</span>,
-            <span class="str">"backupCount"</span>: <span class="num">5</span>,
-        },
-    },
-    <span class="str">"loggers"</span>: {
-        <span class="str">"uvicorn"</span>:        {<span class="str">"handlers"</span>: [<span class="str">"console"</span>], <span class="str">"level"</span>: <span class="str">"INFO"</span>,  <span class="str">"propagate"</span>: <span class="kw">False</span>},
-        <span class="str">"uvicorn.error"</span>:  {<span class="str">"handlers"</span>: [<span class="str">"console"</span>], <span class="str">"level"</span>: <span class="str">"INFO"</span>,  <span class="str">"propagate"</span>: <span class="kw">False</span>},
-        <span class="str">"uvicorn.access"</span>: {<span class="str">"handlers"</span>: [<span class="str">"console"</span>], <span class="str">"level"</span>: <span class="str">"WARNING"</span>, <span class="str">"propagate"</span>: <span class="kw">False</span>},
-        <span class="str">"app"</span>: {
-            <span class="str">"handlers"</span>:  [<span class="str">"console"</span>, <span class="str">"file"</span>],
-            <span class="str">"level"</span>:     <span class="str">"DEBUG"</span>,
-            <span class="str">"propagate"</span>: <span class="kw">False</span>,
-        },
-    },
-    <span class="str">"root"</span>: {<span class="str">"handlers"</span>: [<span class="str">"console"</span>], <span class="str">"level"</span>: <span class="str">"WARNING"</span>},
+    <span class="st">"root"</span>: {<span class="st">"level"</span>: <span class="st">"WARNING"</span>, <span class="st">"handlers"</span>: [<span class="st">"console"</span>]},
 }
 
-<span class="kw">def</span> <span class="fn">setup_logging</span>():
-    logging.config.<span class="fn">dictConfig</span>(LOGGING_CONFIG)</code></pre>
+logging.config.<span class="fn">dictConfig</span>(LOGGING)
+</code></pre>
 
-    <h3 style="color:#56d364;">main.py — App Factory with Middleware</h3>
-<pre><code><span class="cm"># app/main.py</span>
-<span class="kw">import</span> uuid, logging, time
-<span class="kw">from</span> contextvars <span class="kw">import</span> ContextVar
-<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, Request
-<span class="kw">from</span> fastapi.responses <span class="kw">import</span> JSONResponse
-<span class="kw">from</span> app.logging_config <span class="kw">import</span> setup_logging
+  <!-- 12 ─ fileConfig -->
+  <h2 id="fileconfig">12 · fileConfig (.ini format)</h2>
+<pre><code><span class="cm"># logging.ini</span>
+[loggers]
+keys=root,myapp
 
-<span class="fn">setup_logging</span>()   <span class="cm"># ← must be first, before any logger is created</span>
+[handlers]
+keys=consoleHandler,fileHandler
 
-request_id_var: ContextVar[str] = <span class="cls">ContextVar</span>(<span class="str">"request_id"</span>, default=<span class="str">"-"</span>)
-logger = logging.<span class="fn">getLogger</span>(<span class="str">"app"</span>)
+[formatters]
+keys=standard
 
-app = <span class="cls">FastAPI</span>()
+[logger_root]
+level=WARNING
+handlers=consoleHandler
 
-@app.<span class="fn">middleware</span>(<span class="str">"http"</span>)
-<span class="kw">async def</span> <span class="fn">logging_middleware</span>(request: <span class="cls">Request</span>, call_next):
-    rid = request.headers.<span class="fn">get</span>(<span class="str">"X-Request-ID"</span>, str(uuid.<span class="fn">uuid4</span>()))
-    request_id_var.<span class="fn">set</span>(rid)
-    t0 = time.<span class="fn">perf_counter</span>()
+[logger_myapp]
+level=DEBUG
+handlers=consoleHandler,fileHandler
+qualname=myapp
+propagate=0
 
-    logger.<span class="fn">info</span>(<span class="str">"Request started"</span>, extra={
-        <span class="str">"request_id"</span>: rid,
-        <span class="str">"method"</span>:     request.method,
-        <span class="str">"path"</span>:       request.url.path,
-        <span class="str">"client_ip"</span>:  request.client.host,
-    })
+[handler_consoleHandler]
+class=StreamHandler
+level=INFO
+formatter=standard
+args=(sys.stdout,)
 
-    response = <span class="kw">await</span> <span class="fn">call_next</span>(request)
-    ms = <span class="fn">round</span>((time.<span class="fn">perf_counter</span>() - t0) * <span class="num">1000</span>, <span class="num">2</span>)
+[handler_fileHandler]
+class=handlers.RotatingFileHandler
+level=DEBUG
+formatter=standard
+args=("app.log", "a", 10485760, 5, "utf-8")
 
-    level = logging.WARNING <span class="kw">if</span> response.status_code &gt;= <span class="num">500</span> <span class="kw">else</span> logging.INFO
-    logger.<span class="fn">log</span>(level, <span class="str">"Request finished"</span>, extra={
-        <span class="str">"request_id"</span>:  rid,
-        <span class="str">"status_code"</span>: response.status_code,
-        <span class="str">"elapsed_ms"</span>:  ms,
-    })
+[formatter_standard]
+format=%(asctime)s [%(levelname)s] %(name)s — %(message)s
+datefmt=%Y-%m-%dT%H:%M:%S
+</code></pre>
+<pre><code><span class="cm"># Load it:</span>
+<span class="kw">import</span> logging.config
+logging.config.<span class="fn">fileConfig</span>(<span class="st">"logging.ini"</span>, disable_existing_loggers=<span class="bi">False</span>)
+</code></pre>
 
-    response.headers[<span class="str">"X-Request-ID"</span>] = rid
-    <span class="kw">return</span> response
+  <!-- 13 ─ Exceptions -->
+  <h2 id="exceptions">13 · Exceptions &amp; Tracebacks</h2>
+<pre><code><span class="cm"># Automatically include traceback with exc_info=True</span>
+<span class="kw">try</span>:
+    risky_operation()
+<span class="kw">except</span> <span class="cl">ValueError</span> <span class="kw">as</span> e:
+    logger.<span class="fn">error</span>(<span class="st">"Validation failed"</span>, exc_info=<span class="bi">True</span>)
+    <span class="cm"># shorthand — identical result:</span>
+    logger.<span class="fn">exception</span>(<span class="st">"Validation failed"</span>)    <span class="cm"># always logs at ERROR + traceback</span>
 
-@app.<span class="fn">exception_handler</span>(Exception)
-<span class="kw">async def</span> <span class="fn">global_exception_handler</span>(request: <span class="cls">Request</span>, exc: Exception):
-    logger.<span class="fn">exception</span>(<span class="str">"Unhandled exception"</span>, extra={
-        <span class="str">"request_id"</span>: request_id_var.<span class="fn">get</span>(),
-        <span class="str">"path"</span>:       request.url.path,
-    })
-    <span class="kw">return</span> <span class="cls">JSONResponse</span>(status_code=<span class="num">500</span>,
-                         content={<span class="str">"detail"</span>: <span class="str">"Internal server error"</span>})</code></pre>
+<span class="cm"># Include stack trace at any level</span>
+logger.<span class="fn">debug</span>(<span class="st">"Debug checkpoint"</span>, stack_info=<span class="bi">True</span>)
 
-    <h3 style="color:#56d364;">FastAPI — Usage in Routers</h3>
-<pre><code><span class="cm"># app/routers/orders.py</span>
+<span class="cm"># Re-raise after logging</span>
+<span class="kw">try</span>:
+    connect()
+<span class="kw">except</span> <span class="cl">ConnectionError</span>:
+    logger.<span class="fn">exception</span>(<span class="st">"Could not connect"</span>)
+    <span class="kw">raise</span>                                     <span class="cm"># re-raises the original exception</span>
+</code></pre>
+  <div class="callout warn">Use <code>logger.exception()</code> only inside <code>except</code> blocks — it reads <code>sys.exc_info()</code>. Outside an except block it logs <code>NoneType: None</code> as the exception.</div>
+
+  <!-- 14 ─ Structured -->
+  <h2 id="structured">14 · Structured / JSON Logging</h2>
+  <p>Structured logs (machine-parseable JSON) are essential for log aggregation tools (ELK, Splunk, CloudWatch, etc.).</p>
+<pre><code><span class="kw">import</span> json
 <span class="kw">import</span> logging
-<span class="kw">from</span> fastapi <span class="kw">import</span> APIRouter, HTTPException
+<span class="kw">import</span> traceback
 
-logger = logging.<span class="fn">getLogger</span>(__name__)   <span class="cm"># "app.routers.orders"</span>
-router = <span class="cls">APIRouter</span>(prefix=<span class="str">"/orders"</span>)
-
-@router.<span class="fn">post</span>(<span class="str">"/"</span>)
-<span class="kw">async def</span> <span class="fn">create_order</span>(payload: <span class="cls">OrderIn</span>, user: <span class="cls">User</span> = <span class="cls">Depends</span>(get_current_user)):
-    logger.<span class="fn">info</span>(<span class="str">"Creating order"</span>,
-               extra={<span class="str">"user_id"</span>: user.id, <span class="str">"items"</span>: <span class="fn">len</span>(payload.items)})
-    <span class="kw">try</span>:
-        order = <span class="kw">await</span> order_service.<span class="fn">create</span>(user, payload)
-        logger.<span class="fn">info</span>(<span class="str">"Order created"</span>,
-                   extra={<span class="str">"user_id"</span>: user.id, <span class="str">"order_id"</span>: order.id})
-        <span class="kw">return</span> order
-    <span class="kw">except</span> <span class="cls">InsufficientStockError</span> <span class="kw">as</span> e:
-        logger.<span class="fn">warning</span>(<span class="str">"Order rejected — insufficient stock"</span>,
-                       extra={<span class="str">"user_id"</span>: user.id, <span class="str">"sku"</span>: e.sku})
-        <span class="kw">raise</span> <span class="cls">HTTPException</span>(status_code=<span class="num">409</span>, detail=str(e))
-    <span class="kw">except</span> Exception:
-        logger.<span class="fn">exception</span>(<span class="str">"Order creation failed"</span>,
-                        extra={<span class="str">"user_id"</span>: user.id})
-        <span class="kw">raise</span></code></pre>
-
-    <h3 style="color:#56d364;">Sample JSON Log Output (one HTTP request)</h3>
-<pre><code>{"timestamp":"2026-05-02 10:01:00","level":"INFO","logger":"app","message":"Request started",
- "request_id":"f3a1-...","method":"POST","path":"/orders","client_ip":"10.0.0.5"}
-
-{"timestamp":"2026-05-02 10:01:00","level":"INFO","logger":"app.routers.orders","message":"Creating order",
- "request_id":"f3a1-...","user_id":42,"items":3}
-
-{"timestamp":"2026-05-02 10:01:00","level":"INFO","logger":"app.routers.orders","message":"Order created",
- "request_id":"f3a1-...","user_id":42,"order_id":1091}
-
-{"timestamp":"2026-05-02 10:01:00","level":"INFO","logger":"app","message":"Request finished",
- "request_id":"f3a1-...","status_code":201,"elapsed_ms":47.3}</code></pre>
-
-    <h3>Framework Comparison</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Concern</th><th>Django</th><th>FastAPI</th></tr></thead>
-        <tbody>
-          <tr><td>Config location</td><td><code>settings.py LOGGING</code> dict</td><td>Custom <code>logging_config.py</code>, called before app init</td></tr>
-          <tr><td>Request logging</td><td><code>django.request</code> built-in logger</td><td>Custom <code>@app.middleware("http")</code></td></tr>
-          <tr><td>SQL query logging</td><td><code>django.db.backends</code> built-in</td><td>SQLAlchemy <code>logging.getLogger("sqlalchemy.engine")</code></td></tr>
-          <tr><td>Unhandled exceptions</td><td>Caught by <code>django.request</code> + <code>AdminEmailHandler</code></td><td>Custom <code>@app.exception_handler(Exception)</code></td></tr>
-          <tr><td>Dev vs prod levels</td><td><code>RequireDebugTrue/False</code> filters</td><td>Read <code>LOG_LEVEL</code> env var in config</td></tr>
-          <tr><td>Web server logger</td><td>N/A (gunicorn handles it)</td><td><code>uvicorn</code>, <code>uvicorn.access</code>, <code>uvicorn.error</code></td></tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="callout">
-      <strong>Tip:</strong> In both frameworks, always call your logging setup function
-      <em>before</em> importing application modules. Importing a module that calls
-      <code>getLogger()</code> before <code>dictConfig()</code> runs can create unconfigured
-      logger instances that bypass your handlers.
-    </div>
-  </section>
-
-  <hr />
-
-  <!-- ── 12. Centralized Logging: ELK Stack ────────────────────── -->
-  <section id="elk">
-    <h2>12. Centralized Logging: ELK Stack <span class="badge badge-blue">Elasticsearch</span> <span class="badge badge-green">Logstash</span> <span class="badge badge-red">Kibana</span></h2>
-    <p>
-      The ELK stack (Elasticsearch + Logstash + Kibana) — or its modern variant
-      <strong>Elastic Stack</strong> with Filebeat — is the most widely used
-      centralized log platform in production Python deployments. The Python app
-      writes structured JSON logs; a shipper forwards them to Elasticsearch;
-      Kibana provides search, dashboards, and alerting.
-    </p>
-
-    <!-- Architecture -->
-    <h3>Architecture Overview</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Component</th><th>Role</th><th>What you configure</th></tr></thead>
-        <tbody>
-          <tr>
-            <td><strong>Python app</strong></td>
-            <td>Produces JSON log lines</td>
-            <td>JSON formatter, RotatingFileHandler or stdout</td>
-          </tr>
-          <tr>
-            <td><strong>Filebeat</strong></td>
-            <td>Lightweight log shipper (runs as sidecar / daemon)</td>
-            <td>Which files/containers to tail; output → Logstash or ES directly</td>
-          </tr>
-          <tr>
-            <td><strong>Logstash</strong></td>
-            <td>Parse, enrich, filter, route</td>
-            <td>Input (beats), filter (json codec, grok), output (elasticsearch)</td>
-          </tr>
-          <tr>
-            <td><strong>Elasticsearch</strong></td>
-            <td>Stores &amp; indexes logs; full-text + field queries</td>
-            <td>Index lifecycle policy (ILM), mappings for typed fields</td>
-          </tr>
-          <tr>
-            <td><strong>Kibana</strong></td>
-            <td>Visualize, search, alert</td>
-            <td>Index patterns, dashboards, Watcher/alert rules</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Flow diagram -->
-    <div class="callout">
-      <strong>Data flow:</strong><br/>
-      <code>Python app</code> → writes JSON to <code>stdout / file</code>
-      → <strong>Filebeat</strong> ships to <strong>Logstash</strong>
-      → parses &amp; enriches → <strong>Elasticsearch</strong> index
-      → <strong>Kibana</strong> dashboards &amp; alerts
-    </div>
-
-    <!-- Step 1: Python JSON output -->
-    <h3>Step 1 — Python: Emit Clean JSON to stdout</h3>
-    <p>
-      Containers (Docker/K8s) read stdout. Write one JSON object per line;
-      Filebeat collects it without any file path config.
-    </p>
-<pre><code><span class="cm"># app/logging_utils.py</span>
-<span class="kw">import</span> logging, json, traceback
-
-<span class="kw">class</span> <span class="cls">ELKFormatter</span>(logging.<span class="cls">Formatter</span>):
-    <span class="str">"""One JSON object per line — ECS (Elastic Common Schema) compatible."""</span>
-    <span class="kw">def</span> <span class="fn">format</span>(<span class="kw">self</span>, record):
-        doc = {
-            <span class="str">"@timestamp"</span>:    <span class="kw">self</span>.<span class="fn">formatTime</span>(record, <span class="str">"%Y-%m-%dT%H:%M:%S.%fZ"</span>[:<span class="num">-1</span>]),
-            <span class="str">"log.level"</span>:     record.levelname.lower(),
-            <span class="str">"log.logger"</span>:    record.name,
-            <span class="str">"message"</span>:       record.<span class="fn">getMessage</span>(),
-            <span class="str">"service.name"</span>:  <span class="str">"identity-service"</span>,
-            <span class="str">"process.pid"</span>:   record.process,
-            <span class="str">"log.origin"</span>: {
-                <span class="str">"file.name"</span>: record.filename,
-                <span class="str">"function"</span>:  record.funcName,
-                <span class="str">"line"</span>:      record.lineno,
-            },
+<span class="kw">class</span> <span class="cl">JsonFormatter</span>(logging.<span class="cl">Formatter</span>):
+    <span class="kw">def</span> <span class="fn">format</span>(self, record: logging.<span class="cl">LogRecord</span>) -> <span class="bi">str</span>:
+        log_obj = {
+            <span class="st">"timestamp"</span>: self.<span class="fn">formatTime</span>(record, self.datefmt),
+            <span class="st">"level"</span>:     record.levelname,
+            <span class="st">"logger"</span>:   record.name,
+            <span class="st">"message"</span>:  record.<span class="fn">getMessage</span>(),
+            <span class="st">"module"</span>:   record.module,
+            <span class="st">"function"</span>: record.funcName,
+            <span class="st">"line"</span>:     record.lineno,
         }
         <span class="kw">if</span> record.exc_info:
-            doc[<span class="str">"error.stack_trace"</span>] = <span class="kw">self</span>.<span class="fn">formatException</span>(record.exc_info)
-            doc[<span class="str">"error.type"</span>] = record.exc_info[<span class="num">0</span>].__name__ <span class="kw">if</span> record.exc_info[<span class="num">0</span>] <span class="kw">else</span> <span class="kw">None</span>
-        <span class="cm"># Merge caller-supplied extra= fields at top level</span>
-        _skip = logging.<span class="cls">LogRecord</span>.__dict__
-        <span class="kw">for</span> k, v <span class="kw">in</span> record.__dict__.items():
-            <span class="kw">if</span> k <span class="kw">not in</span> _skip <span class="kw">and not</span> k.<span class="fn">startswith</span>(<span class="str">"_"</span>):
-                doc[k] = v
-        <span class="kw">return</span> json.<span class="fn">dumps</span>(doc, default=str)</code></pre>
+            log_obj[<span class="st">"exception"</span>] = <span class="fn">traceback.format_exception</span>(*record.exc_info)
+        <span class="cm"># Attach any extra keys passed via logger.info(…, extra={…})</span>
+        <span class="kw">for</span> key, val <span class="kw">in</span> record.__dict__.<span class="fn">items</span>():
+            <span class="kw">if</span> key <span class="kw">not in</span> logging.<span class="cl">LogRecord</span>(<span class="st">""</span>,<span class="nu">0</span>,<span class="st">""</span>,<span class="nu">0</span>,<span class="st">""</span>,(),<span class="bi">None</span>).__dict__:
+                log_obj[key] = val
+        <span class="kw">return</span> json.<span class="fn">dumps</span>(log_obj)
 
-    <div class="callout">
-      The field names above follow <strong>Elastic Common Schema (ECS)</strong> conventions
-      (<code>@timestamp</code>, <code>log.level</code>, <code>service.name</code>,
-      <code>error.stack_trace</code>). Using ECS means Kibana's built-in dashboards
-      and ML jobs recognise your fields without custom mappings.
-    </div>
+<span class="cm"># Attach to handler:</span>
+handler.<span class="fn">setFormatter</span>(<span class="cl">JsonFormatter</span>())
+</code></pre>
+  <div class="callout tip"><strong>python-json-logger</strong> (<code>pip install python-json-logger</code>) is the most popular drop-in JSON formatter if you don't want to write your own.</div>
 
-    <!-- Step 2: Filebeat -->
-    <h3>Step 2 — Filebeat: Ship Logs to Logstash</h3>
-<pre><code><span class="cm"># filebeat.yml</span>
-filebeat.inputs:
-  - type: container
-    paths:
-      - /var/lib/docker/containers/*/*.log   <span class="cm"># Docker JSON log files</span>
-    processors:
-      - decode_json_fields:
-          fields: ["message"]
-          target: ""
-          overwrite_keys: true
+  <!-- 15 ─ Extra / LoggerAdapter -->
+  <h2 id="extra">15 · Extra Fields &amp; LoggerAdapter</h2>
+<pre><code><span class="cm"># ── extra= dict ─────────────────────────────────────────────────</span>
+logger.<span class="fn">info</span>(<span class="st">"Request received"</span>, extra={<span class="st">"request_id"</span>: <span class="st">"abc-123"</span>, <span class="st">"user"</span>: <span class="st">"alice"</span>})
+<span class="cm"># Fields are accessible in Formatter as %(request_id)s, %(user)s</span>
 
-  - type: log
-    paths:
-      - /app/logs/*.log   <span class="cm"># If writing to file instead of stdout</span>
-    json.keys_under_root: true
-    json.overwrite_keys: true
-    json.add_error_key: true
+<span class="cm"># ── LoggerAdapter (wraps a logger, auto-injects context) ─────────</span>
+<span class="kw">class</span> <span class="cl">ContextAdapter</span>(logging.<span class="cl">LoggerAdapter</span>):
+    <span class="kw">def</span> <span class="fn">process</span>(self, msg, kwargs):
+        kwargs.setdefault(<span class="st">"extra"</span>, {}).<span class="fn">update</span>(self.extra)
+        <span class="kw">return</span> msg, kwargs
 
-output.logstash:
-  hosts: ["logstash:5044"]
+base_logger = logging.<span class="fn">getLogger</span>(<span class="bi">__name__</span>)
+logger = <span class="cl">ContextAdapter</span>(base_logger, {<span class="st">"service"</span>: <span class="st">"payment-svc"</span>, <span class="st">"env"</span>: <span class="st">"prod"</span>})
+logger.<span class="fn">info</span>(<span class="st">"Payment processed"</span>)   <span class="cm"># always includes service + env</span>
 
-processors:
-  - add_host_metadata: ~
-  - add_docker_metadata: ~</code></pre>
+<span class="cm"># ── contextvars (Python ≥ 3.7) — thread/async safe ──────────────</span>
+<span class="kw">from</span> contextvars <span class="kw">import</span> ContextVar
+_request_id: ContextVar[str] = <span class="cl">ContextVar</span>(<span class="st">"request_id"</span>, default=<span class="st">"-"</span>)
 
-    <!-- Step 3: Logstash -->
-    <h3>Step 3 — Logstash: Parse, Enrich, Route</h3>
-<pre><code><span class="cm"># logstash/pipeline/python-logs.conf</span>
-input {
-  beats { port =&gt; 5044 }
+<span class="kw">class</span> <span class="cl">ContextVarFilter</span>(logging.<span class="cl">Filter</span>):
+    <span class="kw">def</span> <span class="fn">filter</span>(self, record):
+        record.request_id = _request_id.<span class="fn">get</span>()
+        <span class="kw">return</span> <span class="bi">True</span>
+</code></pre>
+
+  <!-- 16 ─ Multiprocess -->
+  <h2 id="multiprocess">16 · Multiprocess-Safe Logging</h2>
+  <p><code>FileHandler</code> is <em>not</em> safe when multiple processes write to the same file. Use <code>QueueHandler</code> + <code>QueueListener</code> instead.</p>
+<pre><code><span class="kw">import</span> logging
+<span class="kw">import</span> logging.handlers
+<span class="kw">from</span> multiprocessing <span class="kw">import</span> Queue
+
+<span class="cm"># ── In the main process ──────────────────────────────────────────</span>
+log_queue = <span class="cl">Queue</span>(maxsize=-<span class="nu">1</span>)
+
+<span class="cm"># The listener runs in its own thread and writes to the real handler</span>
+file_handler = logging.<span class="cl">FileHandler</span>(<span class="st">"app.log"</span>)
+file_handler.<span class="fn">setFormatter</span>(logging.<span class="cl">Formatter</span>(<span class="st">"%(asctime)s %(message)s"</span>))
+
+listener = logging.handlers.<span class="cl">QueueListener</span>(log_queue, file_handler, respect_handler_level=<span class="bi">True</span>)
+listener.<span class="fn">start</span>()
+
+<span class="cm"># ── In each worker process / thread ─────────────────────────────</span>
+qh = logging.handlers.<span class="cl">QueueHandler</span>(log_queue)
+worker_logger = logging.<span class="fn">getLogger</span>()
+worker_logger.<span class="fn">addHandler</span>(qh)
+worker_logger.<span class="fn">setLevel</span>(logging.DEBUG)
+
+<span class="cm"># ── Shutdown ─────────────────────────────────────────────────────</span>
+listener.<span class="fn">stop</span>()
+</code></pre>
+
+  <!-- 17 ─ Third-party -->
+  <h2 id="third-party">17 · Third-party Integrations</h2>
+
+  <h3>structlog</h3>
+<pre><code><span class="kw">import</span> structlog
+log = structlog.<span class="fn">get_logger</span>()
+log.<span class="fn">info</span>(<span class="st">"user_login"</span>, user_id=<span class="nu">42</span>, ip=<span class="st">"10.0.0.1"</span>)
+<span class="cm"># Output: {"event":"user_login","user_id":42,"ip":"10.0.0.1","level":"info",...}</span>
+</code></pre>
+
+  <h3>Loguru (drop-in replacement)</h3>
+<pre><code><span class="kw">from</span> loguru <span class="kw">import</span> logger
+logger.<span class="fn">add</span>(<span class="st">"app_{time}.log"</span>, rotation=<span class="st">"10 MB"</span>, retention=<span class="st">"30 days"</span>, compression=<span class="st">"zip"</span>)
+logger.<span class="fn">add</span>(<span class="st">"errors.log"</span>, level=<span class="st">"ERROR"</span>, backtrace=<span class="bi">True</span>, diagnose=<span class="bi">True</span>)
+logger.<span class="fn">info</span>(<span class="st">"Server started on {host}:{port}"</span>, host=host, port=port)
+</code></pre>
+
+  <h3>Django</h3>
+<pre><code><span class="cm"># settings.py</span>
+LOGGING = {<span class="st">"version"</span>: <span class="nu">1</span>, ...}  <span class="cm"># same dictConfig schema as stdlib</span>
+</code></pre>
+
+  <h3>FastAPI / uvicorn</h3>
+<pre><code>uvicorn_config = {
+    <span class="st">"version"</span>: <span class="nu">1</span>,
+    <span class="st">"loggers"</span>: {
+        <span class="st">"uvicorn"</span>: {<span class="st">"handlers"</span>: [<span class="st">"default"</span>], <span class="st">"level"</span>: <span class="st">"INFO"</span>, <span class="st">"propagate"</span>: <span class="bi">False</span>},
+        <span class="st">"uvicorn.error"</span>: {<span class="st">"level"</span>: <span class="st">"INFO"</span>},
+        <span class="st">"uvicorn.access"</span>: {<span class="st">"handlers"</span>: [<span class="st">"access"</span>], <span class="st">"level"</span>: <span class="st">"INFO"</span>, <span class="st">"propagate"</span>: <span class="bi">False</span>},
+    },
+    ...
 }
+</code></pre>
 
-filter {
-  <span class="cm"># Message is already JSON from ELKFormatter — just parse it</span>
-  if [message] =~ /^\{/ {
-    json {
-      source =&gt; "message"
-      skip_on_invalid_json =&gt; true
-    }
-  }
+  <!-- 18 ─ Best Practices -->
+  <h2 id="best-practices">18 · Best Practices</h2>
+  <ul class="list">
+    <li>Always use <code>logger = logging.getLogger(__name__)</code> in every module — never the root logger in library code.</li>
+    <li>Set the root logger level once in application entry-point (<code>main.py</code> / <code>app.py</code>); libraries should <strong>not</strong> call <code>basicConfig</code>.</li>
+    <li>Use <strong>lazy % formatting</strong> (<code>logger.debug("v=%s", val)</code>) — avoids building the string when the level is filtered out.</li>
+    <li>Use <code>logger.exception()</code> (not <code>logger.error()</code>) inside except blocks to capture tracebacks automatically.</li>
+    <li>Prefer <code>dictConfig</code> over <code>basicConfig</code> for anything beyond a single script.</li>
+    <li>Set <code>disable_existing_loggers: false</code> in dictConfig to avoid silencing third-party library loggers.</li>
+    <li>In libraries: only add a <code>NullHandler</code> to your package logger — let the application configure the real handlers.</li>
+    <li>Use <code>QueueHandler</code> + <code>QueueListener</code> for async / multiprocess applications.</li>
+    <li>Emit structured (JSON) logs in production to enable log aggregation and querying.</li>
+    <li>Never log secrets, PII, or tokens. Scrub or mask sensitive fields in a custom <code>Filter</code>.</li>
+    <li>Include a <strong>correlation / request ID</strong> in every log record (via <code>Filter</code> + <code>contextvars</code>) for distributed tracing.</li>
+  </ul>
 
-  <span class="cm"># Normalise timestamp field to @timestamp</span>
-  if [@timestamp] {
-    date {
-      match =&gt; ["@timestamp", "ISO8601"]
-      target =&gt; "@timestamp"
-    }
-  }
+  <div class="callout">
+    <strong>Library authors:</strong> the correct way to "be logging-friendly" is:
+    <pre style="margin:10px 0 0;background:var(--code-bg);padding:12px;border-radius:6px;"><code><span class="kw">import</span> logging
+logging.<span class="fn">getLogger</span>(<span class="bi">__name__</span>).<span class="fn">addHandler</span>(logging.<span class="cl">NullHandler</span>())
+</code></pre>
+    This prevents "No handlers could be found" warnings and lets the application control output.
+  </div>
 
-  <span class="cm"># Tag slow requests automatically</span>
-  if [elapsed_ms] and [elapsed_ms] &gt; 500 {
-    mutate { add_tag =&gt; ["slow_request"] }
-  }
+  <!-- 19 ─ Real-World Use Cases -->
+  <h2 id="usecases">19 · Real-World Use Cases</h2>
+  <p>The following examples show complete, production-ready logging patterns for the most common application scenarios.</p>
 
-  <span class="cm"># Drop health-check noise</span>
-  if [path] == "/health" or [path] == "/metrics" {
-    drop { }
-  }
-}
+  <!-- UC1 -->
+  <h3>19.1 · REST API — per-request correlation ID</h3>
+  <p>Inject a unique request ID into every log line so you can trace a single HTTP request across dozens of log entries in Kibana / Splunk.</p>
+<pre><code><span class="cm"># middleware.py  (Flask / FastAPI pattern — same idea)</span>
+<span class="kw">import</span> uuid, logging
+<span class="kw">from</span> contextvars <span class="kw">import</span> ContextVar
 
-output {
-  elasticsearch {
-    hosts       =&gt; ["https://elasticsearch:9200"]
-    index       =&gt; "python-logs-%{+YYYY.MM.dd}"
-    user        =&gt; "${ES_USER}"
-    password    =&gt; "${ES_PASSWORD}"
-    ssl_enabled =&gt; true
-  }
-}</code></pre>
+_req_id: ContextVar[str] = <span class="cl">ContextVar</span>(<span class="st">"request_id"</span>, default=<span class="st">"-"</span>)
+logger = logging.<span class="fn">getLogger</span>(<span class="bi">__name__</span>)
 
-    <!-- Step 4: Elasticsearch ILM -->
-    <h3>Step 4 — Elasticsearch: Index Lifecycle Policy</h3>
-    <p>Prevent unbounded storage growth by rolling and deleting old indices automatically.</p>
-<pre><code><span class="cm"># PUT _ilm/policy/python-logs-policy</span>
-{
-  "policy": {
-    "phases": {
-      "hot": {
-        "actions": {
-          "rollover": {
-            "max_size":  "10gb",
-            "max_age":   "1d"
-          }
-        }
-      },
-      "warm": {
-        "min_age": "3d",
-        "actions": { "shrink": { "number_of_shards": 1 } }
-      },
-      "delete": {
-        "min_age": "30d",
-        "actions": { "delete": {} }
-      }
-    }
-  }
-}</code></pre>
+<span class="kw">class</span> <span class="cl">RequestIdFilter</span>(logging.<span class="cl">Filter</span>):
+    <span class="kw">def</span> <span class="fn">filter</span>(self, record):
+        record.request_id = _req_id.<span class="fn">get</span>()
+        <span class="kw">return</span> <span class="bi">True</span>
 
-    <!-- Step 5: Kibana queries -->
-    <h3>Step 5 — Kibana: Useful Production Queries</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Goal</th><th>KQL Query</th></tr></thead>
-        <tbody>
-          <tr><td>All errors in last 15 min</td><td><code>log.level: "error"</code></td></tr>
-          <tr><td>One request end-to-end</td><td><code>request_id: "abc-123-xyz"</code></td></tr>
-          <tr><td>Errors for a specific user</td><td><code>log.level: "error" AND user_id: 42</code></td></tr>
-          <tr><td>Slow requests (&gt;500 ms)</td><td><code>tags: "slow_request" AND elapsed_ms &gt; 500</code></td></tr>
-          <tr><td>Payment failures by type</td><td><code>error_code: "PAYMENT_DECLINED"</code></td></tr>
-          <tr><td>5xx errors (not health)</td><td><code>status_code &gt;= 500 AND NOT path: "/health"</code></td></tr>
-          <tr><td>Exceptions with stack trace</td><td><code>error.stack_trace: *</code></td></tr>
-        </tbody>
-      </table>
-    </div>
+<span class="cm"># Attach filter once at startup</span>
+for handler <span class="kw">in</span> logging.<span class="fn">getLogger</span>().<span class="fn">handlers</span>:
+    handler.<span class="fn">addFilter</span>(<span class="cl">RequestIdFilter</span>())
 
-    <!-- Step 6: docker-compose -->
-    <h3>Step 6 — Docker Compose: Local ELK Dev Stack</h3>
-    <p>Spin up a full local ELK stack to test your log pipeline before deploying.</p>
-<pre><code><span class="cm"># docker-compose-elk.yml</span>
-services:
+<span class="cm"># Format string includes %(request_id)s</span>
+fmt = logging.<span class="cl">Formatter</span>(
+    <span class="st">"%(asctime)s [%(levelname)s] %(name)s req=%(request_id)s — %(message)s"</span>
+)
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false   <span class="cm"># dev only — enable in prod</span>
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-    ports: ["9200:9200"]
-    volumes: ["esdata:/usr/share/elasticsearch/data"]
+<span class="cm"># ── Middleware (called on every request) ──────────────────────────</span>
+<span class="kw">def</span> <span class="fn">set_request_id</span>(request_id: str = <span class="bi">None</span>):
+    rid = request_id <span class="kw">or</span> str(uuid.<span class="fn">uuid4</span>())
+    _req_id.<span class="fn">set</span>(rid)
+    <span class="kw">return</span> rid
 
-  logstash:
-    image: docker.elastic.co/logstash/logstash:8.13.0
-    volumes:
-      - ./logstash/pipeline:/usr/share/logstash/pipeline
-    ports: ["5044:5044"]
-    depends_on: [elasticsearch]
+<span class="cm"># Usage in a FastAPI route:</span>
+<span class="kw">from</span> fastapi <span class="kw">import</span> Request
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.13.0
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    ports: ["5601:5601"]
-    depends_on: [elasticsearch]
+<span class="kw">async def</span> <span class="fn">request_logging_middleware</span>(request: <span class="cl">Request</span>, call_next):
+    rid = <span class="fn">set_request_id</span>(request.headers.<span class="fn">get</span>(<span class="st">"X-Request-ID"</span>))
+    logger.<span class="fn">info</span>(<span class="st">"START %s %s"</span>, request.method, request.url.path)
+    response = <span class="kw">await</span> <span class="fn">call_next</span>(request)
+    logger.<span class="fn">info</span>(<span class="st">"END   %s %s status=%d"</span>, request.method, request.url.path, response.status_code)
+    response.headers[<span class="st">"X-Request-ID"</span>] = rid
+    <span class="kw">return</span> response
+</code></pre>
+  <div class="callout tip">Every log line from every function called during that request now automatically carries <code>req=3fa2…</code> — no need to pass a logger or ID through the call stack.</div>
 
-  filebeat:
-    image: docker.elastic.co/beats/filebeat:8.13.0
-    user: root
-    volumes:
-      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    depends_on: [logstash]
+  <!-- UC2 -->
+  <h3>19.2 · Database query auditing</h3>
+  <p>Log every slow query above a threshold and all write operations (INSERT/UPDATE/DELETE) to a dedicated audit log, separate from the application log.</p>
+<pre><code><span class="kw">import</span> logging, time, functools
 
-volumes:
-  esdata:</code></pre>
+audit_logger = logging.<span class="fn">getLogger</span>(<span class="st">"audit.db"</span>)
+perf_logger  = logging.<span class="fn">getLogger</span>(<span class="st">"perf.db"</span>)
 
-    <!-- Alerting -->
-    <h3>Kibana Alerting — Auto-Notify on Error Spikes</h3>
-<pre><code><span class="cm"># Kibana Watcher (JSON) — fires when ERROR count > 50 in 5 min</span>
-{
-  "trigger": { "schedule": { "interval": "5m" } },
-  "input": {
-    "search": {
-      "request": {
-        "indices": ["python-logs-*"],
-        "body": {
-          "query": {
-            "bool": {
-              "filter": [
-                { "term":  { "log.level": "error" } },
-                { "range": { "@timestamp": { "gte": "now-5m" } } }
-              ]
-            }
-          }
-        }
-      }
-    }
-  },
-  "condition": { "compare": { "ctx.payload.hits.total": { "gt": 50 } } },
-  "actions": {
-    "notify_slack": {
-      "webhook": {
-        "method": "POST",
-        "url":    "{{ctx.metadata.slack_webhook}}",
-        "body":   "{\"text\":\"ERROR spike: {{ctx.payload.hits.total}} errors in 5 min\"}"
-      }
-    }
-  }
-}</code></pre>
+SLOW_QUERY_THRESHOLD_MS = <span class="nu">200</span>
+WRITE_VERBS = (<span class="st">"INSERT"</span>, <span class="st">"UPDATE"</span>, <span class="st">"DELETE"</span>, <span class="st">"MERGE"</span>)
 
-    <!-- Summary -->
-    <h3>End-to-End Checklist</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Item</th><th>Done when…</th></tr></thead>
-        <tbody>
-          <tr><td>Python emits ECS-compatible JSON</td><td>Every log line is valid JSON with <code>@timestamp</code>, <code>log.level</code>, <code>message</code></td></tr>
-          <tr><td>request_id in every line</td><td>Middleware sets <code>ContextVar</code>; filter stamps all records</td></tr>
-          <tr><td>No PII in logs</td><td>Passwords, tokens, card numbers masked before logging</td></tr>
-          <tr><td>Filebeat ships all containers</td><td><code>filebeat.yml</code> mounts docker socket; no log lines dropped</td></tr>
-          <tr><td>ILM policy applied</td><td>Indices roll daily and delete after 30 days</td></tr>
-          <tr><td>Kibana index pattern created</td><td><code>python-logs-*</code> pattern with <code>@timestamp</code> as time field</td></tr>
-          <tr><td>Alert rule active</td><td>Watcher or Kibana Rule fires on ERROR spike → Slack / PagerDuty</td></tr>
-        </tbody>
-      </table>
-    </div>
+<span class="kw">def</span> <span class="fn">execute_query</span>(conn, sql: str, params=()):
+    start = time.<span class="fn">perf_counter</span>()
+    <span class="kw">try</span>:
+        cursor = conn.<span class="fn">execute</span>(sql, params)
+        elapsed_ms = (time.<span class="fn">perf_counter</span>() - start) * <span class="nu">1000</span>
 
-    <div class="callout warn">
-      <strong>Production security:</strong> Always enable <code>xpack.security</code> in
-      Elasticsearch. Use TLS between all components, rotate credentials, and restrict
-      Kibana access behind SSO. Never expose port <code>9200</code> publicly.
-    </div>
-  </section>
+        <span class="cm"># Slow query warning</span>
+        <span class="kw">if</span> elapsed_ms &gt; SLOW_QUERY_THRESHOLD_MS:
+            perf_logger.<span class="fn">warning</span>(
+                <span class="st">"SLOW QUERY %.1f ms | %s | params=%s"</span>,
+                elapsed_ms, sql[:120], params
+            )
+        <span class="kw">else</span>:
+            perf_logger.<span class="fn">debug</span>(<span class="st">"Query %.1f ms | %s"</span>, elapsed_ms, sql[:80])
 
-  <hr />
-  <p style="font-size:0.8rem; color:#484f58; text-align:center;">
-    Python Logging Guide &mdash; Generated 2026-05-02
-  </p>
+        <span class="cm"># Write-operation audit trail</span>
+        verb = sql.<span class="fn">strip</span>().<span class="fn">split</span>()[<span class="nu">0</span>].<span class="fn">upper</span>()
+        <span class="kw">if</span> verb <span class="kw">in</span> WRITE_VERBS:
+            audit_logger.<span class="fn">info</span>(
+                <span class="st">"%s rows_affected=%d sql=%s params=%s"</span>,
+                verb, cursor.rowcount, sql[:200], params
+            )
+        <span class="kw">return</span> cursor
+    <span class="kw">except</span> <span class="cl">Exception</span>:
+        perf_logger.<span class="fn">exception</span>(<span class="st">"Query FAILED: %s"</span>, sql[:200])
+        <span class="kw">raise</span>
 
+<span class="cm"># Separate rotating file just for audit logs:</span>
+audit_handler = logging.handlers.<span class="cl">TimedRotatingFileHandler</span>(
+    <span class="st">"logs/audit.log"</span>, when=<span class="st">"midnight"</span>, backupCount=<span class="nu">90</span>, utc=<span class="bi">True</span>
+)
+audit_logger.<span class="fn">addHandler</span>(audit_handler)
+audit_logger.propagate = <span class="bi">False</span>   <span class="cm"># keep audit entries out of the main log</span>
+</code></pre>
+
+  <!-- UC3 -->
+  <h3>19.3 · Background job / ETL pipeline</h3>
+  <p>Track each job run with start/end timing, record counts, and errors without stopping the pipeline.</p>
+<pre><code><span class="kw">import</span> logging
+<span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass, field
+<span class="kw">from</span> typing <span class="kw">import</span> List
+
+logger = logging.<span class="fn">getLogger</span>(<span class="st">"etl.pipeline"</span>)
+
+<span class="kw">@dataclass</span>
+<span class="kw">class</span> <span class="cl">JobStats</span>:
+    processed: <span class="bi">int</span> = <span class="nu">0</span>
+    skipped:   <span class="bi">int</span> = <span class="nu">0</span>
+    errors:    <span class="bi">int</span> = <span class="nu">0</span>
+    failures:  <span class="cl">List</span>[str] = field(default_factory=list)
+
+<span class="kw">def</span> <span class="fn">run_pipeline</span>(job_name: str, records):
+    stats = <span class="cl">JobStats</span>()
+    logger.<span class="fn">info</span>(<span class="st">"[%s] Pipeline STARTED — %d records to process"</span>, job_name, <span class="fn">len</span>(records))
+
+    <span class="kw">for</span> i, record <span class="kw">in</span> <span class="fn">enumerate</span>(records):
+        <span class="kw">try</span>:
+            <span class="kw">if</span> <span class="kw">not</span> <span class="fn">is_valid</span>(record):
+                logger.<span class="fn">debug</span>(<span class="st">"[%s] Record #%d skipped — validation failed: %s"</span>, job_name, i, record)
+                stats.skipped += <span class="nu">1</span>
+                <span class="kw">continue</span>
+            <span class="fn">transform_and_load</span>(record)
+            stats.processed += <span class="nu">1</span>
+        <span class="kw">except</span> <span class="cl">Exception</span> <span class="kw">as</span> e:
+            logger.<span class="fn">error</span>(<span class="st">"[%s] Record #%d FAILED: %s"</span>, job_name, i, e)
+            stats.errors += <span class="nu">1</span>
+            stats.failures.<span class="fn">append</span>(<span class="fn">str</span>(record))
+
+    level = logging.WARNING <span class="kw">if</span> stats.errors <span class="kw">else</span> logging.INFO
+    logger.<span class="fn">log</span>(level,
+        <span class="st">"[%s] Pipeline FINISHED — processed=%d skipped=%d errors=%d"</span>,
+        job_name, stats.processed, stats.skipped, stats.errors
+    )
+    <span class="kw">if</span> stats.failures:
+        logger.<span class="fn">warning</span>(<span class="st">"[%s] Failed records: %s"</span>, job_name, stats.failures[:<span class="nu">10</span>])
+    <span class="kw">return</span> stats
+</code></pre>
+
+  <!-- UC4 -->
+  <h3>19.4 · Authentication &amp; security event logging</h3>
+  <p>Keep security events in a <em>dedicated</em> log stream (separate from application logs) for SIEM ingestion and compliance.</p>
+<pre><code><span class="kw">import</span> logging
+
+sec_logger = logging.<span class="fn">getLogger</span>(<span class="st">"security"</span>)
+<span class="cm"># Route to a separate file / SIEM handler — never propagate</span>
+sec_logger.propagate = <span class="bi">False</span>
+
+<span class="cm"># ── Login attempt ──────────────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">log_login_attempt</span>(username: str, ip: str, success: bool, reason: str = <span class="st">""</span>):
+    event = <span class="st">"LOGIN_SUCCESS"</span> <span class="kw">if</span> success <span class="kw">else</span> <span class="st">"LOGIN_FAILURE"</span>
+    level = logging.INFO <span class="kw">if</span> success <span class="kw">else</span> logging.WARNING
+    sec_logger.<span class="fn">log</span>(level, <span class="st">"%s user=%s ip=%s reason=%s"</span>, event, username, ip, reason)
+
+<span class="cm"># ── Brute-force detection ──────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">log_account_locked</span>(username: str, ip: str, attempt_count: int):
+    sec_logger.<span class="fn">warning</span>(
+        <span class="st">"ACCOUNT_LOCKED user=%s ip=%s attempts=%d"</span>, username, ip, attempt_count
+    )
+
+<span class="cm"># ── Privilege escalation ───────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">log_privilege_change</span>(actor: str, target: str, old_role: str, new_role: str):
+    sec_logger.<span class="fn">info</span>(
+        <span class="st">"PRIVILEGE_CHANGE actor=%s target=%s %s→%s"</span>, actor, target, old_role, new_role
+    )
+
+<span class="cm"># ── Suspicious activity ────────────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">log_suspicious_request</span>(ip: str, path: str, reason: str):
+    sec_logger.<span class="fn">error</span>(
+        <span class="st">"SUSPICIOUS_REQUEST ip=%s path=%s reason=%s"</span>, ip, path, reason
+    )
+
+<span class="cm"># Example output lines (JSON formatter attached to sec_logger):</span>
+<span class="cm"># {"event":"LOGIN_FAILURE","user":"alice","ip":"203.0.113.5","reason":"bad_password"}</span>
+<span class="cm"># {"event":"ACCOUNT_LOCKED","user":"alice","ip":"203.0.113.5","attempts":5}</span>
+</code></pre>
+  <div class="callout warn">Never log plain-text passwords, tokens, or full credit card numbers. Log only the username, IP, event type, and a sanitised reason code.</div>
+
+  <!-- UC5 -->
+  <h3>19.5 · Microservice with distributed tracing (OpenTelemetry)</h3>
+  <p>Bridge Python logging with OpenTelemetry so every log record carries the active <code>trace_id</code> and <code>span_id</code> — enabling jump-from-log-to-trace in tools like Jaeger or Grafana Tempo.</p>
+<pre><code><span class="cm"># pip install opentelemetry-sdk opentelemetry-instrumentation-logging</span>
+<span class="kw">from</span> opentelemetry <span class="kw">import</span> trace
+<span class="kw">from</span> opentelemetry.instrumentation.logging <span class="kw">import</span> LoggingInstrumentor
+<span class="kw">import</span> logging
+
+<span class="cm"># Automatically injects trace_id + span_id into every LogRecord</span>
+<span class="cl">LoggingInstrumentor</span>().<span class="fn">instrument</span>(set_logging_format=<span class="bi">True</span>)
+
+logger = logging.<span class="fn">getLogger</span>(<span class="st">"payment-service"</span>)
+
+<span class="kw">def</span> <span class="fn">process_payment</span>(order_id: str, amount: float):
+    tracer = trace.<span class="fn">get_tracer</span>(<span class="bi">__name__</span>)
+    <span class="kw">with</span> tracer.<span class="fn">start_as_current_span</span>(<span class="st">"process_payment"</span>) <span class="kw">as</span> span:
+        span.<span class="fn">set_attribute</span>(<span class="st">"order.id"</span>, order_id)
+        logger.<span class="fn">info</span>(<span class="st">"Processing payment order=%s amount=%.2f"</span>, order_id, amount)
+        <span class="kw">try</span>:
+            result = <span class="fn">charge_card</span>(order_id, amount)
+            logger.<span class="fn">info</span>(<span class="st">"Payment OK order=%s txn=%s"</span>, order_id, result.txn_id)
+            <span class="kw">return</span> result
+        <span class="kw">except</span> <span class="cl">PaymentDeclinedError</span> <span class="kw">as</span> e:
+            logger.<span class="fn">warning</span>(<span class="st">"Payment DECLINED order=%s reason=%s"</span>, order_id, e.code)
+            span.<span class="fn">record_exception</span>(e)
+            <span class="kw">raise</span>
+
+<span class="cm"># Log output (with OTel injected fields):</span>
+<span class="cm"># INFO payment-service trace_id=4bf92f3577b34da6 span_id=00f067aa0ba902b7</span>
+<span class="cm">#      Processing payment order=ORD-9912 amount=49.99</span>
+</code></pre>
+
+  <!-- UC6 -->
+  <h3>19.6 · Celery / async task worker</h3>
+  <p>Log task lifecycle (received → started → succeeded / failed / retried) with task ID so you can track individual jobs through the queue.</p>
+<pre><code><span class="kw">from</span> celery <span class="kw">import</span> Celery, signals
+<span class="kw">import</span> logging
+
+app = <span class="cl">Celery</span>(<span class="st">"tasks"</span>)
+logger = logging.<span class="fn">getLogger</span>(<span class="st">"celery.tasks"</span>)
+
+<span class="cm"># ── Per-task logging with task ID ─────────────────────────────────</span>
+<span class="kw">@app.task</span>(bind=<span class="bi">True</span>, max_retries=<span class="nu">3</span>)
+<span class="kw">def</span> <span class="fn">send_notification</span>(self, user_id: int, message: str):
+    task_id = self.request.id
+    logger.<span class="fn">info</span>(<span class="st">"[%s] Sending notification to user=%d"</span>, task_id, user_id)
+    <span class="kw">try</span>:
+        <span class="fn">deliver</span>(user_id, message)
+        logger.<span class="fn">info</span>(<span class="st">"[%s] Notification delivered user=%d"</span>, task_id, user_id)
+    <span class="kw">except</span> <span class="cl">TransientError</span> <span class="kw">as</span> exc:
+        logger.<span class="fn">warning</span>(<span class="st">"[%s] Transient error — retrying (%d/%d): %s"</span>,
+                        task_id, self.request.retries + <span class="nu">1</span>, self.max_retries, exc)
+        <span class="kw">raise</span> self.<span class="fn">retry</span>(exc=exc, countdown=<span class="nu">2</span> ** self.request.retries)
+    <span class="kw">except</span> <span class="cl">Exception</span>:
+        logger.<span class="fn">exception</span>(<span class="st">"[%s] Notification FAILED user=%d"</span>, task_id, user_id)
+        <span class="kw">raise</span>
+
+<span class="cm"># ── Worker-level signals for operational monitoring ───────────────</span>
+<span class="kw">@signals.worker_ready.connect</span>
+<span class="kw">def</span> <span class="fn">on_worker_ready</span>(**kwargs):
+    logger.<span class="fn">info</span>(<span class="st">"Celery worker READY"</span>)
+
+<span class="kw">@signals.worker_shutdown.connect</span>
+<span class="kw">def</span> <span class="fn">on_worker_shutdown</span>(**kwargs):
+    logger.<span class="fn">info</span>(<span class="st">"Celery worker SHUTDOWN"</span>)
+</code></pre>
+
+  <!-- UC7 -->
+  <h3>19.7 · CLI application with --verbose / --quiet flags</h3>
+  <p>Map user-facing <code>-v</code> / <code>-q</code> flags to logging levels so power users get debug output while normal runs stay quiet.</p>
+<pre><code><span class="kw">import</span> argparse, logging, sys
+
+<span class="kw">def</span> <span class="fn">setup_cli_logging</span>(verbosity: int):
+    <span class="cm"># 0 = WARNING, 1 = INFO (-v), 2 = DEBUG (-vv)</span>
+    level = {
+        <span class="nu">0</span>: logging.WARNING,
+        <span class="nu">1</span>: logging.INFO,
+        <span class="nu">2</span>: logging.DEBUG,
+    }.<span class="fn">get</span>(verbosity, logging.DEBUG)
+
+    logging.<span class="fn">basicConfig</span>(
+        level=level,
+        format=<span class="st">"%(levelname)s: %(message)s"</span> <span class="kw">if</span> verbosity &lt; <span class="nu">2</span> <span class="kw">else</span>
+               <span class="st">"%(asctime)s [%(levelname)s] %(name)s:%(lineno)d — %(message)s"</span>,
+        stream=sys.stderr,
+    )
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    parser = argparse.<span class="cl">ArgumentParser</span>()
+    parser.<span class="fn">add_argument</span>(<span class="st">"-v"</span>, <span class="st">"--verbose"</span>, action=<span class="st">"count"</span>, default=<span class="nu">0</span>)
+    parser.<span class="fn">add_argument</span>(<span class="st">"-q"</span>, <span class="st">"--quiet"</span>,   action=<span class="st">"store_true"</span>)
+    args = parser.<span class="fn">parse_args</span>()
+
+    verbosity = <span class="nu">0</span> <span class="kw">if</span> args.quiet <span class="kw">else</span> args.verbose
+    <span class="fn">setup_cli_logging</span>(verbosity)
+
+    logger = logging.<span class="fn">getLogger</span>(<span class="bi">__name__</span>)
+    logger.<span class="fn">info</span>(<span class="st">"Starting tool …"</span>)
+    logger.<span class="fn">debug</span>(<span class="st">"Config loaded: %s"</span>, args)
+
+<span class="kw">if</span> <span class="bi">__name__</span> == <span class="st">"__main__"</span>:
+    <span class="fn">main</span>()
+</code></pre>
+
+  <!-- UC8 -->
+  <h3>19.8 · ML model training &amp; experiment tracking</h3>
+  <p>Log epoch metrics, hyperparameters, and resource usage so you can diagnose training runs without a full MLflow setup.</p>
+<pre><code><span class="kw">import</span> logging, time
+
+train_logger = logging.<span class="fn">getLogger</span>(<span class="st">"ml.training"</span>)
+
+<span class="kw">def</span> <span class="fn">train</span>(model, dataloader, optimizer, epochs: int, run_id: str):
+    train_logger.<span class="fn">info</span>(
+        <span class="st">"Training START run=%s epochs=%d lr=%s device=%s"</span>,
+        run_id, epochs, optimizer.param_groups[<span class="nu">0</span>][<span class="st">"lr"</span>], next(model.<span class="fn">parameters</span>()).device
+    )
+    <span class="kw">for</span> epoch <span class="kw">in</span> <span class="fn">range</span>(<span class="nu">1</span>, epochs + <span class="nu">1</span>):
+        t0 = time.<span class="fn">perf_counter</span>()
+        loss = <span class="fn">run_epoch</span>(model, dataloader, optimizer)
+        elapsed = time.<span class="fn">perf_counter</span>() - t0
+        train_logger.<span class="fn">info</span>(
+            <span class="st">"run=%s epoch=%d/%d loss=%.4f time=%.1fs"</span>,
+            run_id, epoch, epochs, loss, elapsed
+        )
+        <span class="kw">if</span> loss <span class="kw">!=</span> loss:   <span class="cm"># NaN check</span>
+            train_logger.<span class="fn">critical</span>(<span class="st">"run=%s LOSS IS NaN at epoch %d — aborting"</span>, run_id, epoch)
+            <span class="kw">break</span>
+    train_logger.<span class="fn">info</span>(<span class="st">"Training END run=%s"</span>, run_id)
+</code></pre>
+
+  <!-- UC9 -->
+  <h3>19.9 · Health-check endpoint noise suppression</h3>
+  <p>Load balancers hit <code>/health</code> hundreds of times per minute. Filter those lines out of the main log while keeping real request logs intact.</p>
+<pre><code><span class="kw">import</span> logging
+
+<span class="kw">class</span> <span class="cl">SuppressHealthCheck</span>(logging.<span class="cl">Filter</span>):
+    <span class="st">"""Drop GET /health and GET /readyz access log lines."""</span>
+    _NOISE = (<span class="st">"/health"</span>, <span class="st">"/readyz"</span>, <span class="st">"/livez"</span>)
+
+    <span class="kw">def</span> <span class="fn">filter</span>(self, record: logging.<span class="cl">LogRecord</span>) -> <span class="bi">bool</span>:
+        msg = record.<span class="fn">getMessage</span>()
+        <span class="kw">return</span> <span class="kw">not</span> <span class="fn">any</span>(path <span class="kw">in</span> msg <span class="kw">for</span> path <span class="kw">in</span> self._NOISE)
+
+<span class="cm"># Apply to the uvicorn access logger</span>
+logging.<span class="fn">getLogger</span>(<span class="st">"uvicorn.access"</span>).<span class="fn">addFilter</span>(<span class="cl">SuppressHealthCheck</span>())
+
+<span class="cm"># Same idea for gunicorn:</span>
+logging.<span class="fn">getLogger</span>(<span class="st">"gunicorn.access"</span>).<span class="fn">addFilter</span>(<span class="cl">SuppressHealthCheck</span>())
+</code></pre>
+
+  <!-- UC10 -->
+  <h3>19.10 · Alerting on ERROR logs (Slack / PagerDuty webhook)</h3>
+  <p>Attach a custom handler that fires a webhook whenever a <code>CRITICAL</code> or <code>ERROR</code> event is logged — no external daemon required.</p>
+<pre><code><span class="kw">import</span> logging, urllib.request, json
+
+<span class="kw">class</span> <span class="cl">SlackAlertHandler</span>(logging.<span class="cl">Handler</span>):
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, webhook_url: str, level=logging.ERROR):
+        <span class="fn">super</span>().__init__(level)
+        self.webhook_url = webhook_url
+
+    <span class="kw">def</span> <span class="fn">emit</span>(self, record: logging.<span class="cl">LogRecord</span>):
+        <span class="kw">try</span>:
+            text = <span class="st">">:rotating_light: *{}* `{}` — {}"</span>.<span class="fn">format</span>(
+                record.levelname, record.name, self.<span class="fn">format</span>(record)
+            )
+            payload = json.<span class="fn">dumps</span>({<span class="st">"text"</span>: text}).<span class="fn">encode</span>()
+            req = urllib.request.<span class="cl">Request</span>(
+                self.webhook_url,
+                data=payload,
+                headers={<span class="st">"Content-Type"</span>: <span class="st">"application/json"</span>},
+                method=<span class="st">"POST"</span>,
+            )
+            <span class="kw">with</span> urllib.request.<span class="fn">urlopen</span>(req, timeout=<span class="nu">5</span>):
+                <span class="kw">pass</span>
+        <span class="kw">except</span> <span class="cl">Exception</span>:
+            self.<span class="fn">handleError</span>(record)   <span class="cm"># never propagate handler exceptions</span>
+
+<span class="cm"># Wire it up — only fires for ERROR and above</span>
+slack_handler = <span class="cl">SlackAlertHandler</span>(<span class="st">"https://hooks.slack.com/services/T…/B…/…"</span>)
+logging.<span class="fn">getLogger</span>().<span class="fn">addHandler</span>(slack_handler)
+</code></pre>
+  <div class="callout warn">Always override <code>handleError()</code> (or call <code>self.handleError(record)</code>) inside <code>emit()</code> — an exception in a handler that propagates will silently break logging for all subsequent calls.</div>
+
+  <br/><br/>
+  <p style="color:var(--muted);font-size:12px;">Python stdlib docs: <a href="https://docs.python.org/3/library/logging.html">docs.python.org/3/library/logging.html</a></p>
+
+  <!-- 20 ─ ML & AI Use Cases -->
+  <h2 id="ml-ai">20 · ML &amp; AI Logging Use Cases</h2>
+  <p>Machine learning and AI workloads have unique logging needs: long-running training loops, non-deterministic failures, large data pipelines, model inference latency, and experiment reproducibility. The patterns below address all of these.</p>
+
+  <h3>20.1 · Experiment run tracking with hyperparameters</h3>
+  <p>Log every hyperparameter at the start of a run so the log file alone is enough to reproduce it, even without MLflow / W&amp;B.</p>
+<pre><code><span class="kw">import</span> logging, json, dataclasses
+<span class="kw">from</span> dataclasses <span class="kw">import</span> dataclass
+
+train_logger = logging.<span class="fn">getLogger</span>(<span class="st">"ml.experiment"</span>)
+
+<span class="kw">@dataclass</span>
+<span class="kw">class</span> <span class="cl">HParams</span>:
+    model:        str   = <span class="st">"resnet50"</span>
+    lr:           float = <span class="nu">1e-3</span>
+    batch_size:   int   = <span class="nu">64</span>
+    epochs:       int   = <span class="nu">30</span>
+    optimizer:    str   = <span class="st">"adamw"</span>
+    weight_decay: float = <span class="nu">1e-4</span>
+    dropout:      float = <span class="nu">0.3</span>
+    seed:         int   = <span class="nu">42</span>
+
+<span class="kw">def</span> <span class="fn">start_run</span>(run_id: str, hparams: <span class="cl">HParams</span>):
+    train_logger.<span class="fn">info</span>(
+        <span class="st">"RUN_START run_id=%s hparams=%s"</span>,
+        run_id, json.<span class="fn">dumps</span>(dataclasses.<span class="fn">asdict</span>(hparams))
+    )
+
+<span class="kw">def</span> <span class="fn">log_epoch</span>(run_id, epoch, total, train_loss, val_loss, val_acc, lr):
+    train_logger.<span class="fn">info</span>(
+        <span class="st">"EPOCH run=%s epoch=%d/%d train_loss=%.4f val_loss=%.4f val_acc=%.4f lr=%.2e"</span>,
+        run_id, epoch, total, train_loss, val_loss, val_acc, lr
+    )
+
+<span class="kw">def</span> <span class="fn">end_run</span>(run_id, best_val_acc, best_epoch, model_path):
+    train_logger.<span class="fn">info</span>(
+        <span class="st">"RUN_END run=%s best_val_acc=%.4f best_epoch=%d model_saved=%s"</span>,
+        run_id, best_val_acc, best_epoch, model_path
+    )
+
+<span class="cm"># Usage:</span>
+hp = <span class="cl">HParams</span>(lr=<span class="nu">5e-4</span>, batch_size=<span class="nu">128</span>)
+<span class="fn">start_run</span>(<span class="st">"exp-007"</span>, hp)
+<span class="cm"># LOG: RUN_START run_id=exp-007 hparams={"model":"resnet50","lr":0.0005,...}</span>
+</code></pre>
+
+  <h3>20.2 · Dataset loading &amp; preprocessing pipeline</h3>
+  <p>Track record counts, drop reasons, and timing at each stage so data quality issues are caught before training starts.</p>
+<pre><code><span class="kw">import</span> logging, time
+
+data_logger = logging.<span class="fn">getLogger</span>(<span class="st">"ml.data"</span>)
+
+<span class="kw">class</span> <span class="cl">DataPipelineLogger</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, dataset_name: str):
+        self.name = dataset_name
+        self.stage_counts = {}
+
+    <span class="kw">def</span> <span class="fn">stage</span>(self, stage_name: str, input_count: int, output_count: int, elapsed_s: float):
+        dropped  = input_count - output_count
+        drop_pct = (dropped / input_count * <span class="nu">100</span>) <span class="kw">if</span> input_count <span class="kw">else</span> <span class="nu">0</span>
+        level = logging.WARNING <span class="kw">if</span> drop_pct &gt; <span class="nu">10</span> <span class="kw">else</span> logging.INFO
+        data_logger.<span class="fn">log</span>(level,
+            <span class="st">"[%s] stage=%s in=%d out=%d dropped=%d (%.1f%%) time=%.2fs"</span>,
+            self.name, stage_name, input_count, output_count, dropped, drop_pct, elapsed_s
+        )
+        <span class="kw">if</span> drop_pct &gt; <span class="nu">10</span>:
+            data_logger.<span class="fn">warning</span>(
+                <span class="st">"[%s] HIGH DROP RATE at '%s' — check filtering logic"</span>, self.name, stage_name
+            )
+        self.stage_counts[stage_name] = output_count
+
+    <span class="kw">def</span> <span class="fn">summary</span>(self):
+        data_logger.<span class="fn">info</span>(<span class="st">"[%s] Pipeline summary: %s"</span>, self.name, self.stage_counts)
+
+<span class="cm"># Usage</span>
+plog = <span class="cl">DataPipelineLogger</span>(<span class="st">"ImageNet-mini"</span>)
+plog.<span class="fn">stage</span>(<span class="st">"load"</span>,    input_count=<span class="nu">50000</span>, output_count=<span class="nu">50000</span>, elapsed_s=<span class="nu">3.2</span>)
+plog.<span class="fn">stage</span>(<span class="st">"dedup"</span>,   input_count=<span class="nu">50000</span>, output_count=<span class="nu">49801</span>, elapsed_s=<span class="nu">1.1</span>)
+plog.<span class="fn">stage</span>(<span class="st">"augment"</span>, input_count=<span class="nu">49801</span>, output_count=<span class="nu">49801</span>, elapsed_s=<span class="nu">12.4</span>)
+plog.<span class="fn">summary</span>()
+</code></pre>
+
+  <h3>20.3 · Gradient &amp; weight anomaly detection during training</h3>
+  <p>Log NaN / Inf gradients and exploding weight norms before they silently corrupt a multi-hour training run.</p>
+<pre><code><span class="kw">import</span> logging
+<span class="kw">import</span> torch
+
+grad_logger = logging.<span class="fn">getLogger</span>(<span class="st">"ml.gradients"</span>)
+
+<span class="kw">def</span> <span class="fn">check_gradients</span>(model, epoch: int, step: int):
+    total_norm = <span class="nu">0.0</span>
+    has_nan    = <span class="bi">False</span>
+    <span class="kw">for</span> name, param <span class="kw">in</span> model.<span class="fn">named_parameters</span>():
+        <span class="kw">if</span> param.grad <span class="kw">is</span> <span class="bi">None</span>:
+            <span class="kw">continue</span>
+        grad = param.grad.data
+        <span class="kw">if</span> torch.<span class="fn">isnan</span>(grad).<span class="fn">any</span>() <span class="kw">or</span> torch.<span class="fn">isinf</span>(grad).<span class="fn">any</span>():
+            grad_logger.<span class="fn">error</span>(
+                <span class="st">"NaN/Inf gradient epoch=%d step=%d param=%s"</span>, epoch, step, name
+            )
+            has_nan = <span class="bi">True</span>
+        total_norm += grad.<span class="fn">norm</span>().<span class="fn">item</span>() ** <span class="nu">2</span>
+    total_norm = total_norm ** <span class="nu">0.5</span>
+    <span class="kw">if</span> total_norm &gt; <span class="nu">100</span>:
+        grad_logger.<span class="fn">warning</span>(<span class="st">"Exploding gradient epoch=%d step=%d norm=%.2f"</span>, epoch, step, total_norm)
+    <span class="kw">elif</span> step % <span class="nu">100</span> == <span class="nu">0</span>:
+        grad_logger.<span class="fn">debug</span>(<span class="st">"Gradient norm epoch=%d step=%d norm=%.4f"</span>, epoch, step, total_norm)
+    <span class="kw">return</span> has_nan
+
+<span class="cm"># Call after loss.backward() and before optimizer.step()</span>
+<span class="kw">if</span> <span class="fn">check_gradients</span>(model, epoch, step):
+    grad_logger.<span class="fn">critical</span>(<span class="st">"Aborting: NaN gradients at epoch=%d step=%d"</span>, epoch, step)
+    <span class="kw">break</span>
+</code></pre>
+
+  <h3>20.4 · Model inference service — latency &amp; confidence logging</h3>
+  <p>In production inference APIs, log prediction latency, model version, and low-confidence outputs that may need human review.</p>
+<pre><code><span class="kw">import</span> logging, time, uuid
+
+infer_logger = logging.<span class="fn">getLogger</span>(<span class="st">"ml.inference"</span>)
+LOW_CONFIDENCE_THRESHOLD = <span class="nu">0.70</span>
+
+<span class="kw">def</span> <span class="fn">predict</span>(model, input_data, model_version: str):
+    request_id = str(uuid.<span class="fn">uuid4</span>())[:8]
+    t0 = time.<span class="fn">perf_counter</span>()
+    <span class="kw">try</span>:
+        result     = model.<span class="fn">predict</span>(input_data)
+        latency_ms = (time.<span class="fn">perf_counter</span>() - t0) * <span class="nu">1000</span>
+        confidence = <span class="fn">float</span>(result.score)
+        label      = result.label
+
+        infer_logger.<span class="fn">info</span>(
+            <span class="st">"PREDICT req=%s model=%s label=%s confidence=%.3f latency_ms=%.1f"</span>,
+            request_id, model_version, label, confidence, latency_ms
+        )
+        <span class="kw">if</span> confidence &lt; LOW_CONFIDENCE_THRESHOLD:
+            infer_logger.<span class="fn">warning</span>(
+                <span class="st">"LOW_CONFIDENCE req=%s confidence=%.3f — flagging for review"</span>,
+                request_id, confidence
+            )
+        <span class="kw">if</span> latency_ms &gt; <span class="nu">500</span>:
+            infer_logger.<span class="fn">warning</span>(
+                <span class="st">"SLOW_INFERENCE req=%s latency_ms=%.1f model=%s"</span>,
+                request_id, latency_ms, model_version
+            )
+        <span class="kw">return</span> result
+    <span class="kw">except</span> <span class="cl">Exception</span>:
+        infer_logger.<span class="fn">exception</span>(<span class="st">"INFERENCE_ERROR req=%s model=%s"</span>, request_id, model_version)
+        <span class="kw">raise</span>
+</code></pre>
+
+  <h3>20.5 · LLM / generative AI — token usage &amp; cost logging</h3>
+  <p>Log prompt tokens, completion tokens, cost estimates, and latency for every LLM call to track spend and detect regressions.</p>
+<pre><code><span class="kw">import</span> logging, time
+<span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+
+llm_logger = logging.<span class="fn">getLogger</span>(<span class="st">"ai.llm"</span>)
+
+<span class="cm"># Approximate cost per 1K tokens (update to current pricing)</span>
+COST_PER_1K = {<span class="st">"gpt-4o"</span>: (<span class="nu">0.005</span>, <span class="nu">0.015</span>), <span class="st">"gpt-4o-mini"</span>: (<span class="nu">0.00015</span>, <span class="nu">0.0006</span>)}
+
+<span class="kw">def</span> <span class="fn">chat_completion</span>(client: <span class="cl">OpenAI</span>, model: str, messages: list, **kwargs) -> str:
+    t0       = time.<span class="fn">perf_counter</span>()
+    response = client.chat.completions.<span class="fn">create</span>(model=model, messages=messages, **kwargs)
+    latency_ms = (time.<span class="fn">perf_counter</span>() - t0) * <span class="nu">1000</span>
+
+    usage  = response.usage
+    p_tok  = usage.prompt_tokens
+    c_tok  = usage.completion_tokens
+    in_c, out_c = COST_PER_1K.<span class="fn">get</span>(model, (<span class="nu">0</span>, <span class="nu">0</span>))
+    est_cost = (p_tok / <span class="nu">1000</span> * in_c) + (c_tok / <span class="nu">1000</span> * out_c)
+
+    llm_logger.<span class="fn">info</span>(
+        <span class="st">"LLM_CALL model=%s prompt_tok=%d completion_tok=%d total_tok=%d cost_usd=%.5f latency_ms=%.0f"</span>,
+        model, p_tok, c_tok, usage.total_tokens, est_cost, latency_ms
+    )
+    <span class="kw">if</span> c_tok >= kwargs.<span class="fn">get</span>(<span class="st">"max_tokens"</span>, <span class="nu">4096</span>) - <span class="nu">10</span>:
+        llm_logger.<span class="fn">warning</span>(<span class="st">"TOKEN_LIMIT_HIT model=%s — response may be truncated"</span>, model)
+
+    <span class="kw">return</span> response.choices[<span class="nu">0</span>].message.content
+</code></pre>
+  <div class="callout warn">Never log the full prompt or completion text if it may contain PII or sensitive user data. Log only token counts, costs, and latency in production.</div>
+
+  <h3>20.6 · RAG pipeline — retrieval &amp; generation tracing</h3>
+  <p>For Retrieval-Augmented Generation systems, log query embedding time, number of chunks retrieved, rerank scores, and final generation latency to diagnose retrieval quality issues.</p>
+<pre><code><span class="kw">import</span> logging, time
+
+rag_logger = logging.<span class="fn">getLogger</span>(<span class="st">"ai.rag"</span>)
+
+<span class="kw">def</span> <span class="fn">rag_query</span>(question: str, retriever, generator, session_id: str) -> str:
+    rag_logger.<span class="fn">info</span>(<span class="st">"RAG_START session=%s question_len=%d"</span>, session_id, <span class="fn">len</span>(question))
+
+    <span class="cm"># ── Retrieval ──────────────────────────────────────────────────</span>
+    t0     = time.<span class="fn">perf_counter</span>()
+    chunks = retriever.<span class="fn">retrieve</span>(question)
+    ret_ms = (time.<span class="fn">perf_counter</span>() - t0) * <span class="nu">1000</span>
+    scores = [c.score <span class="kw">for</span> c <span class="kw">in</span> chunks]
+
+    rag_logger.<span class="fn">info</span>(
+        <span class="st">"RAG_RETRIEVE session=%s chunks=%d top_score=%.3f min_score=%.3f latency_ms=%.0f"</span>,
+        session_id, <span class="fn">len</span>(chunks),
+        <span class="fn">max</span>(scores, default=<span class="nu">0</span>), <span class="fn">min</span>(scores, default=<span class="nu">0</span>), ret_ms
+    )
+    <span class="kw">if not</span> chunks:
+        rag_logger.<span class="fn">warning</span>(<span class="st">"RAG_NO_CHUNKS session=%s — generation may hallucinate"</span>, session_id)
+    <span class="kw">elif</span> <span class="fn">max</span>(scores) &lt; <span class="nu">0.5</span>:
+        rag_logger.<span class="fn">warning</span>(
+            <span class="st">"RAG_LOW_RELEVANCE session=%s top_score=%.3f — consider query rewriting"</span>,
+            session_id, <span class="fn">max</span>(scores)
+        )
+
+    <span class="cm"># ── Generation ─────────────────────────────────────────────────</span>
+    t1     = time.<span class="fn">perf_counter</span>()
+    answer = generator.<span class="fn">generate</span>(question, chunks)
+    gen_ms = (time.<span class="fn">perf_counter</span>() - t1) * <span class="nu">1000</span>
+
+    rag_logger.<span class="fn">info</span>(
+        <span class="st">"RAG_GENERATE session=%s answer_len=%d gen_ms=%.0f"</span>,
+        session_id, <span class="fn">len</span>(answer), gen_ms
+    )
+    <span class="kw">return</span> answer
+</code></pre>
+
+  <h3>20.7 · Model drift &amp; data quality monitoring</h3>
+  <p>Compare live inference distributions against training baselines and log drift alerts before model quality degrades silently.</p>
+<pre><code><span class="kw">import</span> logging
+<span class="kw">from</span> scipy.stats <span class="kw">import</span> ks_2samp
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+drift_logger      = logging.<span class="fn">getLogger</span>(<span class="st">"ml.drift"</span>)
+DRIFT_P_THRESHOLD = <span class="nu">0.05</span>   <span class="cm"># KS p-value below this → drift</span>
+MISSING_RATE_WARN = <span class="nu">0.02</span>   <span class="cm"># 2% missing values triggers warning</span>
+
+<span class="kw">def</span> <span class="fn">check_feature_drift</span>(feature_name: str, train_data: np.ndarray, live_data: np.ndarray):
+    stat, p_value = <span class="fn">ks_2samp</span>(train_data, live_data)
+    drift_logger.<span class="fn">info</span>(
+        <span class="st">"DRIFT_CHECK feature=%s ks_stat=%.4f p_value=%.4f"</span>, feature_name, stat, p_value
+    )
+    <span class="kw">if</span> p_value &lt; DRIFT_P_THRESHOLD:
+        drift_logger.<span class="fn">warning</span>(
+            <span class="st">"DRIFT_DETECTED feature=%s ks_stat=%.4f p=%.4f — retrain may be needed"</span>,
+            feature_name, stat, p_value
+        )
+
+<span class="kw">def</span> <span class="fn">check_missing_values</span>(batch: np.ndarray, feature_names: list):
+    <span class="kw">for</span> i, name <span class="kw">in</span> <span class="fn">enumerate</span>(feature_names):
+        missing_rate = np.<span class="fn">isnan</span>(batch[:, i]).<span class="fn">mean</span>()
+        <span class="kw">if</span> missing_rate &gt; MISSING_RATE_WARN:
+            drift_logger.<span class="fn">warning</span>(
+                <span class="st">"HIGH_MISSING feature=%s rate=%.2f%%"</span>, name, missing_rate * <span class="nu">100</span>
+            )
+
+<span class="kw">def</span> <span class="fn">check_prediction_drift</span>(model_version: str, baseline_preds, live_preds):
+    shift = <span class="fn">abs</span>(np.<span class="fn">mean</span>(live_preds) - np.<span class="fn">mean</span>(baseline_preds))
+    drift_logger.<span class="fn">info</span>(
+        <span class="st">"PRED_DRIFT model=%s baseline_mean=%.4f live_mean=%.4f shift=%.4f"</span>,
+        model_version, np.<span class="fn">mean</span>(baseline_preds), np.<span class="fn">mean</span>(live_preds), shift
+    )
+    <span class="kw">if</span> shift &gt; <span class="nu">0.1</span>:
+        drift_logger.<span class="fn">error</span>(
+            <span class="st">"PRED_DRIFT_HIGH model=%s shift=%.4f — investigate immediately"</span>,
+            model_version, shift
+        )
+</code></pre>
+
+  <h3>20.8 · AI agent tool-call tracing</h3>
+  <p>When an LLM agent invokes tools (function calling / ReAct), log every tool call, its arguments, result, and elapsed time so you can replay and debug agent reasoning.</p>
+<pre><code><span class="kw">import</span> logging, time, json
+<span class="kw">from</span> functools <span class="kw">import</span> wraps
+
+agent_logger = logging.<span class="fn">getLogger</span>(<span class="st">"ai.agent"</span>)
+
+<span class="kw">def</span> <span class="fn">tool</span>(func):
+    <span class="st">"""Decorator that logs every agent tool invocation."""</span>
+    <span class="kw">@wraps</span>(func)
+    <span class="kw">def</span> <span class="fn">wrapper</span>(*args, **kwargs):
+        call_id = str(<span class="fn">id</span>(wrapper))[-<span class="nu">6</span>:]
+        agent_logger.<span class="fn">info</span>(
+            <span class="st">"TOOL_CALL id=%s tool=%s args=%s"</span>,
+            call_id, func.<span class="bi">__name__</span>,
+            json.<span class="fn">dumps</span>({<span class="st">"args"</span>: args[<span class="nu">1</span>:], <span class="st">"kwargs"</span>: kwargs}, default=str)
+        )
+        t0 = time.<span class="fn">perf_counter</span>()
+        <span class="kw">try</span>:
+            result = <span class="fn">func</span>(*args, **kwargs)
+            ms = (time.<span class="fn">perf_counter</span>() - t0) * <span class="nu">1000</span>
+            agent_logger.<span class="fn">info</span>(
+                <span class="st">"TOOL_RESULT id=%s tool=%s latency_ms=%.0f result=%s"</span>,
+                call_id, func.<span class="bi">__name__</span>, ms,
+                json.<span class="fn">dumps</span>(result, default=str)[:<span class="nu">200</span>]   <span class="cm"># truncate large results</span>
+            )
+            <span class="kw">return</span> result
+        <span class="kw">except</span> <span class="cl">Exception</span> <span class="kw">as</span> e:
+            ms = (time.<span class="fn">perf_counter</span>() - t0) * <span class="nu">1000</span>
+            agent_logger.<span class="fn">error</span>(
+                <span class="st">"TOOL_ERROR id=%s tool=%s latency_ms=%.0f error=%s"</span>,
+                call_id, func.<span class="bi">__name__</span>, ms, e
+            )
+            <span class="kw">raise</span>
+    <span class="kw">return</span> wrapper
+
+<span class="cm"># Decorate your agent tools:</span>
+<span class="kw">@tool</span>
+<span class="kw">def</span> <span class="fn">search_knowledge_base</span>(self, query: str, top_k: int = <span class="nu">5</span>):
+    <span class="kw">return</span> self.retriever.<span class="fn">search</span>(query, top_k)
+
+<span class="kw">@tool</span>
+<span class="kw">def</span> <span class="fn">execute_sql</span>(self, query: str):
+    <span class="kw">return</span> self.db.<span class="fn">run</span>(query)
+
+<span class="cm"># TOOL_CALL  id=abc123 tool=search_knowledge_base args={"args":["refund policy"],...}</span>
+<span class="cm"># TOOL_RESULT id=abc123 tool=search_knowledge_base latency_ms=42 result=[{"chunk":"..."}]</span>
+</code></pre>
+  <div class="callout tip">Combine with a <strong>structured JSON formatter</strong> and ship agent logs to an LLM observability platform (LangSmith, Helicone, Arize) for chain-of-thought analytics.</div>
+
+  <h3>20.9 · Distributed training — per-rank logging</h3>
+  <p>In distributed training each rank must tag its logs clearly so you can separate rank-specific issues from global ones, and suppress per-epoch noise from all ranks except rank 0.</p>
+<pre><code><span class="kw">import</span> logging
+<span class="kw">import</span> torch.distributed <span class="kw">as</span> dist
+
+<span class="kw">def</span> <span class="fn">get_rank_logger</span>(name: str) -> logging.<span class="cl">LoggerAdapter</span>:
+    <span class="st">"""LoggerAdapter that prefixes every message with the distributed rank."""</span>
+    base  = logging.<span class="fn">getLogger</span>(name)
+    rank  = dist.<span class="fn">get_rank</span>()       <span class="kw">if</span> dist.<span class="fn">is_initialized</span>() <span class="kw">else</span> <span class="nu">0</span>
+    world = dist.<span class="fn">get_world_size</span>() <span class="kw">if</span> dist.<span class="fn">is_initialized</span>() <span class="kw">else</span> <span class="nu">1</span>
+    <span class="kw">return</span> logging.<span class="cl">LoggerAdapter</span>(base, {<span class="st">"rank"</span>: rank, <span class="st">"world_size"</span>: world})
+
+<span class="cm"># Format: "%(asctime)s [RANK %(rank)d/%(world_size)d] %(message)s"</span>
+
+<span class="kw">def</span> <span class="fn">log_if_main</span>(logger, level, msg, *args):
+    <span class="cm">"Only rank 0 logs — avoids N identical lines from N GPUs."</span>
+    <span class="kw">if</span> <span class="kw">not</span> dist.<span class="fn">is_initialized</span>() <span class="kw">or</span> dist.<span class="fn">get_rank</span>() == <span class="nu">0</span>:
+        logger.<span class="fn">log</span>(level, msg, *args)
+
+<span class="cm"># Usage in training loop:</span>
+rank_logger = <span class="fn">get_rank_logger</span>(<span class="st">"ml.distributed"</span>)
+rank_logger.<span class="fn">info</span>(<span class="st">"Worker ready on device cuda:%d"</span>, local_rank)
+<span class="fn">log_if_main</span>(rank_logger, logging.INFO, <span class="st">"Epoch %d/%d — loss=%.4f"</span>, epoch, epochs, loss)
+</code></pre>
+
+  <h3>20.10 · Model evaluation &amp; CI regression gate</h3>
+  <p>Log full evaluation results in a machine-parseable format and automatically fail CI when accuracy drops below a baseline.</p>
+<pre><code><span class="kw">import</span> logging
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> classification_report, roc_auc_score
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+
+eval_logger = logging.<span class="fn">getLogger</span>(<span class="st">"ml.evaluation"</span>)
+BASELINE_ACCURACY = <span class="nu">0.92</span>
+
+<span class="kw">def</span> <span class="fn">log_evaluation</span>(run_id: str, model_version: str, y_true, y_pred, y_prob=<span class="bi">None</span>):
+    report = <span class="fn">classification_report</span>(y_true, y_pred, output_dict=<span class="bi">True</span>)
+
+    eval_logger.<span class="fn">info</span>(
+        <span class="st">"EVAL_SUMMARY run=%s model=%s accuracy=%.4f macro_f1=%.4f weighted_f1=%.4f"</span>,
+        run_id, model_version,
+        report[<span class="st">"accuracy"</span>],
+        report[<span class="st">"macro avg"</span>][<span class="st">"f1-score"</span>],
+        report[<span class="st">"weighted avg"</span>][<span class="st">"f1-score"</span>],
+    )
+
+    <span class="cm"># Per-class detail at DEBUG level</span>
+    <span class="kw">for</span> label, m <span class="kw">in</span> report.<span class="fn">items</span>():
+        <span class="kw">if</span> <span class="fn">isinstance</span>(m, dict):
+            eval_logger.<span class="fn">debug</span>(
+                <span class="st">"EVAL_CLASS run=%s model=%s class=%s precision=%.4f recall=%.4f f1=%.4f support=%d"</span>,
+                run_id, model_version, label,
+                m[<span class="st">"precision"</span>], m[<span class="st">"recall"</span>], m[<span class="st">"f1-score"</span>], <span class="fn">int</span>(m[<span class="st">"support"</span>])
+            )
+
+    <span class="kw">if</span> y_prob <span class="kw">is not</span> <span class="bi">None</span>:
+        auc = <span class="fn">roc_auc_score</span>(y_true, y_prob, multi_class=<span class="st">"ovr"</span>)
+        eval_logger.<span class="fn">info</span>(<span class="st">"EVAL_AUC run=%s model=%s auc_ovr=%.4f"</span>, run_id, model_version, auc)
+
+    <span class="cm"># ── CI regression gate ─────────────────────────────────────────</span>
+    <span class="kw">if</span> report[<span class="st">"accuracy"</span>] &lt; BASELINE_ACCURACY:
+        eval_logger.<span class="fn">error</span>(
+            <span class="st">"REGRESSION run=%s model=%s accuracy=%.4f below baseline=%.4f"</span>,
+            run_id, model_version, report[<span class="st">"accuracy"</span>], BASELINE_ACCURACY
+        )
+        <span class="cm"># In a CI script: sys.exit(1) here to fail the build</span>
+</code></pre>
+  <div class="callout tip">Point the <code>ml.evaluation</code> logger at a <code>RotatingFileHandler</code> with a JSON formatter and parse those logs in your CI pipeline to fail a build when accuracy regresses.</div>
+
+  <!-- 21 - Advanced Concepts -->
+  <h2 id="advanced">21 · Other Important Logging Concepts</h2>
+  <p>These topics are frequently overlooked but matter significantly in production systems.</p>
+
+  <h3>21.1 · Custom Log Levels</h3>
+  <p>Add levels between the built-ins when you need finer granularity (e.g. <code>VERBOSE</code> between DEBUG and INFO, <code>AUDIT</code> above WARNING).</p>
+<pre><code><span class="kw">import</span> logging
+
+VERBOSE = <span class="nu">15</span>   <span class="cm"># between DEBUG (10) and INFO (20)</span>
+AUDIT   = <span class="nu">35</span>   <span class="cm"># between WARNING (30) and ERROR (40)</span>
+
+logging.<span class="fn">addLevelName</span>(VERBOSE, <span class="st">"VERBOSE"</span>)
+logging.<span class="fn">addLevelName</span>(AUDIT,   <span class="st">"AUDIT"</span>)
+
+<span class="kw">def</span> <span class="fn">verbose</span>(self, message, *args, **kwargs):
+    <span class="kw">if</span> self.<span class="fn">isEnabledFor</span>(VERBOSE):
+        self.<span class="fn">_log</span>(VERBOSE, message, args, **kwargs)
+
+<span class="kw">def</span> <span class="fn">audit</span>(self, message, *args, **kwargs):
+    <span class="kw">if</span> self.<span class="fn">isEnabledFor</span>(AUDIT):
+        self.<span class="fn">_log</span>(AUDIT, message, args, **kwargs)
+
+logging.<span class="cl">Logger</span>.verbose = verbose
+logging.<span class="cl">Logger</span>.audit   = audit
+
+logger = logging.<span class="fn">getLogger</span>(<span class="bi">__name__</span>)
+logger.<span class="fn">setLevel</span>(VERBOSE)
+logger.<span class="fn">verbose</span>(<span class="st">"Detailed trace: x=%s"</span>, x)
+logger.<span class="fn">audit</span>(<span class="st">"User %s deleted record %s"</span>, user_id, record_id)
+</code></pre>
+  <div class="callout">Custom levels are <strong>global</strong> — once registered with <code>addLevelName</code> they apply to the whole process. Avoid creating too many; prefer structured fields in log records instead.</div>
+
+  <h3>21.2 · Logging in asyncio</h3>
+  <p>The stdlib <code>logging</code> module is thread-safe but its handlers do blocking I/O. In async applications, offload writes to a background thread with <code>QueueHandler</code> so you never block the event loop.</p>
+<pre><code><span class="kw">import</span> asyncio, logging, logging.handlers
+<span class="kw">from</span> queue <span class="kw">import</span> SimpleQueue
+
+<span class="kw">def</span> <span class="fn">setup_async_logging</span>():
+    log_queue = <span class="cl">SimpleQueue</span>()
+
+    file_handler = logging.handlers.<span class="cl">RotatingFileHandler</span>(
+        <span class="st">"app.log"</span>, maxBytes=<span class="nu">10_485_760</span>, backupCount=<span class="nu">5</span>
+    )
+    file_handler.<span class="fn">setFormatter</span>(logging.<span class="cl">Formatter</span>(
+        <span class="st">"%(asctime)s [%(levelname)s] %(name)s -- %(message)s"</span>
+    ))
+
+    <span class="cm"># Listener runs in a daemon thread — never blocks the event loop</span>
+    listener = logging.handlers.<span class="cl">QueueListener</span>(
+        log_queue, file_handler, respect_handler_level=<span class="bi">True</span>
+    )
+    listener.<span class="fn">start</span>()
+
+    root = logging.<span class="fn">getLogger</span>()
+    root.<span class="fn">addHandler</span>(logging.handlers.<span class="cl">QueueHandler</span>(log_queue))
+    root.<span class="fn">setLevel</span>(logging.DEBUG)
+    <span class="kw">return</span> listener
+
+<span class="cm"># Inside an async handler — logger.info() returns instantly</span>
+logger = logging.<span class="fn">getLogger</span>(<span class="bi">__name__</span>)
+
+<span class="kw">async def</span> <span class="fn">handle_request</span>(request_id: str):
+    logger.<span class="fn">info</span>(<span class="st">"req=%s started"</span>, request_id)
+    <span class="kw">await</span> asyncio.<span class="fn">sleep</span>(<span class="nu">0</span>)
+    logger.<span class="fn">info</span>(<span class="st">"req=%s finished"</span>, request_id)
+</code></pre>
+
+  <h3>21.3 · Testing Logging</h3>
+  <p>Two standard approaches: stdlib <code>assertLogs</code> for simple checks, pytest <code>caplog</code> fixture for richer assertions.</p>
+<pre><code><span class="cm"># -- stdlib assertLogs (works with unittest and pytest) -----------</span>
+<span class="kw">import</span> unittest, logging
+
+<span class="kw">class</span> <span class="cl">TestMyModule</span>(unittest.<span class="cl">TestCase</span>):
+    <span class="kw">def</span> <span class="fn">test_warning_emitted</span>(self):
+        <span class="kw">with</span> self.<span class="fn">assertLogs</span>(<span class="st">"myapp"</span>, level=<span class="st">"WARNING"</span>) <span class="kw">as</span> cm:
+            <span class="fn">do_something_risky</span>()
+        self.<span class="fn">assertIn</span>(<span class="st">"WARNING:myapp:Disk space low"</span>, cm.output)
+
+<span class="cm"># -- pytest caplog fixture ----------------------------------------</span>
+<span class="kw">def</span> <span class="fn">test_retry_logs_warning</span>(caplog):
+    <span class="kw">with</span> caplog.<span class="fn">at_level</span>(logging.WARNING, logger=<span class="st">"myapp.retry"</span>):
+        <span class="fn">call_with_retry</span>(failing_func, retries=<span class="nu">3</span>)
+
+    assert <span class="fn">any</span>(
+        r.levelname == <span class="st">"WARNING"</span> <span class="kw">and</span> <span class="st">"Retrying"</span> <span class="kw">in</span> r.message
+        <span class="kw">for</span> r <span class="kw">in</span> caplog.records
+    )
+    assert <span class="kw">not</span> <span class="fn">any</span>(r.levelno >= logging.ERROR <span class="kw">for</span> r <span class="kw">in</span> caplog.records)
+
+<span class="cm"># -- Mock a handler (no pytest needed) ----------------------------</span>
+<span class="kw">from</span> unittest.mock <span class="kw">import</span> MagicMock
+
+<span class="kw">def</span> <span class="fn">test_critical_triggers_alert</span>():
+    mock_handler = <span class="cl">MagicMock</span>(spec=logging.<span class="cl">Handler</span>)
+    mock_handler.level = logging.CRITICAL
+    logging.<span class="fn">getLogger</span>(<span class="st">"myapp"</span>).<span class="fn">addHandler</span>(mock_handler)
+    <span class="fn">trigger_critical_event</span>()
+    mock_handler.emit.<span class="fn">assert_called_once</span>()
+</code></pre>
+
+  <h3>21.4 · Capturing <code>warnings</code> Module in the Log Stream</h3>
+  <p>Python's <code>warnings</code> module and <code>logging</code> are separate by default. One call bridges them so <code>DeprecationWarning</code>, <code>ResourceWarning</code>, etc. appear in your log files.</p>
+<pre><code><span class="kw">import</span> logging, warnings
+
+<span class="cm"># Route all warnings through the "py.warnings" logger</span>
+logging.<span class="fn">captureWarnings</span>(<span class="bi">True</span>)
+
+<span class="cm"># Treat DeprecationWarnings as errors in CI</span>
+warnings.<span class="fn">filterwarnings</span>(<span class="st">"error"</span>, category=<span class="cl">DeprecationWarning</span>)
+
+<span class="cm"># Now this becomes a WARNING log record instead of printing to stderr:</span>
+warnings.<span class="fn">warn</span>(<span class="st">"Using legacy API"</span>, <span class="cl">DeprecationWarning</span>, stacklevel=<span class="nu">2</span>)
+
+<span class="cm"># Useful in Django / FastAPI to catch framework deprecation notices</span>
+<span class="cm"># in the same rotating log file as your application logs.</span>
+</code></pre>
+
+  <h3>21.5 · Sensitive Data Masking</h3>
+  <p>A <code>Filter</code> applied to the <em>logger</em> (not just a handler) scrubs secrets before they reach any destination.</p>
+<pre><code><span class="kw">import</span> logging, re
+
+<span class="kw">class</span> <span class="cl">SensitiveDataFilter</span>(logging.<span class="cl">Filter</span>):
+    <span class="st">"""Redact passwords, tokens, and credit-card-like numbers."""</span>
+    PATTERNS = [
+        <span class="cm"># key=value pairs</span>
+        (re.<span class="fn">compile</span>(<span class="st">r'(?i)(password|passwd|secret|token|api[_-]?key)=\S+'</span>),
+         <span class="kw">lambda</span> m: m.<span class="fn">group</span>(<span class="nu">1</span>) + <span class="st">"=***REDACTED***"</span>),
+        <span class="cm"># 16-digit card numbers</span>
+        (re.<span class="fn">compile</span>(<span class="st">r'\b(\d{4}[\s-]?){3}\d{4}\b'</span>),
+         <span class="kw">lambda</span> m: <span class="st">"****-****-****-"</span> + m.<span class="fn">group</span>()[-<span class="nu">4</span>:]),
+        <span class="cm"># Bearer tokens</span>
+        (re.<span class="fn">compile</span>(<span class="st">r'Bearer\s+[A-Za-z0-9\-._~+/]+'</span>),
+         <span class="kw">lambda</span> _: <span class="st">"Bearer ***REDACTED***"</span>),
+    ]
+
+    <span class="kw">def</span> <span class="fn">filter</span>(self, record: logging.<span class="cl">LogRecord</span>) -> <span class="bi">bool</span>:
+        msg = record.<span class="fn">getMessage</span>()
+        <span class="kw">for</span> pattern, replacement <span class="kw">in</span> self.PATTERNS:
+            msg = pattern.<span class="fn">sub</span>(replacement, msg)
+        record.msg  = msg
+        record.args = ()   <span class="cm"># args already baked into msg</span>
+        <span class="kw">return</span> <span class="bi">True</span>
+
+<span class="cm"># Apply to the root logger — no handler ever sees raw secrets</span>
+logging.<span class="fn">getLogger</span>().<span class="fn">addFilter</span>(<span class="cl">SensitiveDataFilter</span>())
+</code></pre>
+  <div class="callout warn">Apply the masking filter to the <strong>logger</strong>, not just a handler. A handler added later (e.g. a debug console) would otherwise bypass handler-level filters.</div>
+
+  <h3>21.6 · Log Sampling &amp; Rate Limiting</h3>
+  <p>High-throughput services can emit millions of records per minute. Sampling keeps logs useful without drowning your storage.</p>
+<pre><code><span class="kw">import</span> logging, time
+<span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+
+<span class="kw">class</span> <span class="cl">RateLimitFilter</span>(logging.<span class="cl">Filter</span>):
+    <span class="st">"""Allow at most `rate` identical messages per `per` seconds.
+    Appends suppression count when the window resets."""</span>
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, rate: int = <span class="nu">5</span>, per: float = <span class="nu">60.0</span>):
+        <span class="fn">super</span>().__init__()
+        self.rate        = rate
+        self.per         = per
+        self._counts     = defaultdict(int)
+        self._windows    = defaultdict(float)
+        self._suppressed = defaultdict(int)
+
+    <span class="kw">def</span> <span class="fn">filter</span>(self, record: logging.<span class="cl">LogRecord</span>) -> <span class="bi">bool</span>:
+        key = (record.name, record.levelno, record.<span class="fn">getMessage</span>())
+        now = time.<span class="fn">monotonic</span>()
+        <span class="kw">if</span> now - self._windows[key] >= self.per:
+            suppressed = self._suppressed[key]
+            <span class="kw">if</span> suppressed:
+                record.msg  = record.msg + <span class="st">" [+%d suppressed]"</span> % suppressed
+                record.args = ()
+            self._counts[key]     = <span class="nu">1</span>
+            self._windows[key]    = now
+            self._suppressed[key] = <span class="nu">0</span>
+            <span class="kw">return</span> <span class="bi">True</span>
+        <span class="kw">if</span> self._counts[key] &lt; self.rate:
+            self._counts[key] += <span class="nu">1</span>
+            <span class="kw">return</span> <span class="bi">True</span>
+        self._suppressed[key] += <span class="nu">1</span>
+        <span class="kw">return</span> <span class="bi">False</span>
+
+<span class="cm"># Max 3 identical messages per 10 seconds:</span>
+handler.<span class="fn">addFilter</span>(<span class="cl">RateLimitFilter</span>(rate=<span class="nu">3</span>, per=<span class="nu">10.0</span>))
+</code></pre>
+
+  <h3>21.7 · Temporary Level Change (Context Manager)</h3>
+  <p>Temporarily lower a logger's level for a noisy library call, then restore it automatically — useful in tests and targeted debugging.</p>
+<pre><code><span class="kw">import</span> logging
+<span class="kw">from</span> contextlib <span class="kw">import</span> contextmanager
+
+<span class="kw">@contextmanager</span>
+<span class="kw">def</span> <span class="fn">log_level</span>(logger_name: str, level: int):
+    <span class="st">"""Temporarily set a logger to `level`, restore on exit."""</span>
+    logger    = logging.<span class="fn">getLogger</span>(logger_name)
+    old_level = logger.level
+    logger.<span class="fn">setLevel</span>(level)
+    <span class="kw">try</span>:
+        <span class="kw">yield</span> logger
+    <span class="kw">finally</span>:
+        logger.<span class="fn">setLevel</span>(old_level)
+
+<span class="cm"># Silence a chatty library during a known-noisy operation</span>
+<span class="kw">with</span> <span class="fn">log_level</span>(<span class="st">"urllib3"</span>, logging.WARNING):
+    <span class="fn">make_many_http_requests</span>()
+
+<span class="cm"># Enable verbose DEBUG output only for a specific block</span>
+<span class="kw">with</span> <span class="fn">log_level</span>(<span class="st">"myapp.payment"</span>, logging.DEBUG):
+    <span class="fn">process_payment</span>(order)
+</code></pre>
+
+  <h3>21.8 · <code>logging.disable()</code> and <code>logging.shutdown()</code></h3>
+<pre><code><span class="kw">import</span> logging, atexit, os
+
+<span class="cm"># logging.disable(level) globally suppresses all records at or below</span>
+<span class="cm"># the given level — faster than setting every logger individually.</span>
+<span class="kw">if</span> os.<span class="fn">getenv</span>(<span class="st">"ENV"</span>) == <span class="st">"production"</span>:
+    logging.<span class="fn">disable</span>(logging.DEBUG)    <span class="cm"># suppress DEBUG everywhere</span>
+
+logging.<span class="fn">disable</span>(logging.NOTSET)      <span class="cm"># re-enable everything</span>
+
+<span class="cm"># logging.shutdown() flushes and closes all handlers.</span>
+<span class="cm"># Called automatically at interpreter exit, but register it</span>
+<span class="cm"># explicitly when using network / socket handlers that need</span>
+<span class="cm"># guaranteed flushing before the process dies:</span>
+atexit.<span class="fn">register</span>(logging.shutdown)
+</code></pre>
+
+  <h3>21.9 · The <code>lastResort</code> Handler &amp; Library Etiquette</h3>
+  <p>When no handlers are configured on the root logger, Python 3.2+ uses a built-in <code>_defaultLastResort</code> handler that writes <code>WARNING+</code> to <code>sys.stderr</code>. Understanding this prevents confusing "ghost" log lines.</p>
+<pre><code><span class="cm"># If root logger has no handlers and propagation reaches it,</span>
+<span class="cm"># logging._defaultLastResort (StreamHandler at WARNING) catches it.</span>
+<span class="cm"># This is why WARNING appears on stderr even with no basicConfig call.</span>
+
+<span class="cm"># Correct library pattern -- add NullHandler in your package __init__.py</span>
+<span class="cm"># so the lastResort never fires for your library's loggers:</span>
+<span class="kw">import</span> logging
+logging.<span class="fn">getLogger</span>(<span class="st">"mylib"</span>).<span class="fn">addHandler</span>(logging.<span class="cl">NullHandler</span>())
+
+<span class="cm"># Silence chatty third-party libraries in your application:</span>
+<span class="kw">for</span> noisy <span class="kw">in</span> (<span class="st">"boto3"</span>, <span class="st">"botocore"</span>, <span class="st">"urllib3"</span>, <span class="st">"httpx"</span>):
+    logging.<span class="fn">getLogger</span>(noisy).<span class="fn">setLevel</span>(logging.WARNING)
+</code></pre>
+
+  <h3>21.10 · Zero-Cost Logging Guards (Performance)</h3>
+  <p>Logging calls in hot paths have measurable overhead even when filtered out, because argument evaluation happens before the level check.</p>
+<pre><code><span class="kw">import</span> logging, json
+logger = logging.<span class="fn">getLogger</span>(<span class="bi">__name__</span>)
+
+<span class="cm"># BAD: f-string always evaluated, even when DEBUG is off (~420 ns)</span>
+logger.<span class="fn">debug</span>(<span class="st">f"state=<span class="bi">{expensive_repr(obj)}</span>"</span>)
+
+<span class="cm"># GOOD: % format — string only built if level passes (~180 ns)</span>
+logger.<span class="fn">debug</span>(<span class="st">"state=%s"</span>, obj)
+
+<span class="cm"># BETTER for truly expensive calls: explicit guard (~45 ns when off)</span>
+<span class="kw">if</span> logger.<span class="fn">isEnabledFor</span>(logging.DEBUG):
+    logger.<span class="fn">debug</span>(<span class="st">"state=%s"</span>, <span class="fn">expensive_repr</span>(obj))
+
+<span class="cm"># PATTERN: Lazy wrapper -- __str__ only called when record is emitted</span>
+<span class="kw">class</span> <span class="cl">Lazy</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self, fn): self.fn = fn
+    <span class="kw">def</span> <span class="fn">__str__</span>(self):      <span class="kw">return</span> <span class="fn">str</span>(self.<span class="fn">fn</span>())
+
+logger.<span class="fn">debug</span>(<span class="st">"dump=%s"</span>, <span class="cl">Lazy</span>(<span class="kw">lambda</span>: json.<span class="fn">dumps</span>(big_dict)))
+</code></pre>
+  <div class="callout tip">In tight loops (&gt;10k calls/sec) the <code>isEnabledFor()</code> guard is the recommended pattern. The difference between <code>%</code> and f-strings is negligible in normal code but measurable in hot paths.</div>
+
+  <br/><br/>
+  <p style="color:var(--muted);font-size:12px;">Python stdlib docs: <a href="https://docs.python.org/3/library/logging.html">docs.python.org/3/library/logging.html</a></p>
+
+</main>
 </div>
+
+<script>
+  // Highlight active nav link on scroll
+  const sections = document.querySelectorAll("h2[id]");
+  const links = document.querySelectorAll("nav a");
+  window.addEventListener("scroll", () => {
+    let current = "";
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
+    links.forEach(l => {
+      l.classList.toggle("active", l.getAttribute("href") === "#" + current);
+    });
+  });
+</script>
 </body>
 </html>
